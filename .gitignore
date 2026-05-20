@@ -1,0 +1,32 @@
+# MPLAB X generated output
+*.X/build/
+*.X/dist/
+*.X/.generated_files/
+*.X/nbproject/private/
+
+# Common compiler and linker artifacts
+*.o
+*.obj
+*.d
+*.elf
+*.hex
+*.map
+*.lst
+*.sdb
+*.sym
+memoryfile.xml
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# OS and editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
