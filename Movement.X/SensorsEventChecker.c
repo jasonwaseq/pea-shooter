@@ -1,5 +1,5 @@
 /*
- * File:   TemplateEventChecker.c
+ * File:   SensorsEventChecker.c
  * Author: Gabriel Hugh Elkaim
  *
  * Template file to set up typical EventCheckers for the  Events and Services
@@ -27,15 +27,21 @@
  ******************************************************************************/
 
 #include "ES_Configure.h"
-#include "TemplateEventChecker.h"
+#include "SensorsEventChecker.h"
 #include "ES_Events.h"
 #include "serial.h"
 #include "AD.h"
+#include "peashooter.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define BATTERY_DISCONNECT_THRESHOLD 175
+#define TAPE_SAMPE_SIZE 5
+
+/* peashooter.h uses SWITCH_TRIPPED / SWITCH_NOT_TRIPPED as raw switch states.
+ * ES_Configure.h also uses those names as event types, so keep the raw values
+ * under local names and then restore access to the event enum identifiers. */
 
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
@@ -108,6 +114,147 @@ uint8_t TemplateCheckBattery(void) {
     return (returnVal);
 }
 
+uint8_t TemplateCheckSwitch(void) {
+    static ES_EventTyp_t lastEvent = BUMPER_NOT_TRIPPED;
+    static unsigned char debouncedState = SWITCH_NOT_TRIPPED;
+    static unsigned char lastSample = SWITCH_NOT_TRIPPED;
+    static unsigned char sameSampleCount = 0;
+    ES_EventTyp_t curEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    unsigned char switchState = PS_ReadSwitch();
+
+    enum {
+        SWITCH_DEBOUNCE_COUNT = 5
+    };
+
+    if (switchState == lastSample) {
+        if (sameSampleCount < SWITCH_DEBOUNCE_COUNT) {
+            sameSampleCount++;
+        }
+    } else {
+        lastSample = switchState;
+        sameSampleCount = 1;
+        return returnVal;
+    }
+
+    if ((sameSampleCount >= SWITCH_DEBOUNCE_COUNT)
+            && (switchState != debouncedState)) {
+        debouncedState = switchState;
+
+        if (debouncedState == SWITCH_TRIPPED) {
+            curEvent = BUMPER_TRIPPED;
+        } else {
+            curEvent = BUMPER_NOT_TRIPPED;
+        }
+
+        if (curEvent != lastEvent) { // check for change from last time
+            thisEvent.EventType = curEvent;
+            thisEvent.EventParam = debouncedState;
+            returnVal = TRUE;
+            lastEvent = curEvent; // update history
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+            PostGenericService(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    }
+    return (returnVal);
+}
+
+uint8_t TemplateCheckTape(void) {
+    static unsigned char lastTapeState = 0;
+    static unsigned char leftSamples[TAPE_SAMPE_SIZE] = {0};
+    static unsigned char midSamples[TAPE_SAMPE_SIZE] = {0};
+    static unsigned char rightSamples[TAPE_SAMPE_SIZE] = {0};
+    static unsigned char sampleIndex = 0;
+    static unsigned char sampleCount = 0;
+    static unsigned char leftSum = 0;
+    static unsigned char midSum = 0;
+    static unsigned char rightSum = 0;
+    ES_EventTyp_t curEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    unsigned char rawTapeState = PS_ReadTapeDigitalAll();
+    unsigned char tapeState = 0;
+    unsigned char changedTape;
+    unsigned char leftSample = (rawTapeState & LEFT_TAPE_MASK) ? 1 : 0;
+    unsigned char midSample = (rawTapeState & MID_TAPE_MASK) ? 1 : 0;
+    unsigned char rightSample = (rawTapeState & RIGHT_TAPE_MASK) ? 1 : 0;
+
+    leftSum -= leftSamples[sampleIndex];
+    midSum -= midSamples[sampleIndex];
+    rightSum -= rightSamples[sampleIndex];
+
+    leftSamples[sampleIndex] = leftSample;
+    midSamples[sampleIndex] = midSample;
+    rightSamples[sampleIndex] = rightSample;
+
+    leftSum += leftSample;
+    midSum += midSample;
+    rightSum += rightSample;
+
+    sampleIndex++;
+    if (sampleIndex >= TAPE_SAMPE_SIZE) {
+        sampleIndex = 0;
+    }
+    if (sampleCount < TAPE_SAMPE_SIZE) {
+        sampleCount++;
+    }
+
+    if (sampleCount < TAPE_SAMPE_SIZE) {
+        return returnVal;
+    }
+
+    if ((leftSum * 2) >= sampleCount) {
+        tapeState |= LEFT_TAPE_MASK;
+    }
+    if ((midSum * 2) >= sampleCount) {
+        tapeState |= MID_TAPE_MASK;
+    }
+    if ((rightSum * 2) >= sampleCount) {
+        tapeState |= RIGHT_TAPE_MASK;
+    }
+
+    changedTape = tapeState ^ lastTapeState;
+
+    if (changedTape & LEFT_TAPE_MASK) {
+        if (tapeState & LEFT_TAPE_MASK) {
+            curEvent = LEFT_TAPE_NOT_DETECTED;
+        } else {
+            curEvent = LEFT_TAPE_DETECTED;
+        }
+    } else if (changedTape & MID_TAPE_MASK) {
+        if (tapeState & MID_TAPE_MASK) {
+            curEvent = MIDDLE_TAPE_NOT_DETECTED;
+        } else {
+            curEvent = MIDDLE_TAPE_DETECTED;
+        }
+    } else if (changedTape & RIGHT_TAPE_MASK) {
+        if (tapeState & RIGHT_TAPE_MASK) {
+            curEvent = RIGHT_TAPE_NOT_DETECTED;
+        } else {
+            curEvent = RIGHT_TAPE_DETECTED;
+        }
+    } else {
+        return returnVal;
+    }
+
+    if (tapeState != lastTapeState) { // check for change from last time
+        thisEvent.EventType = curEvent;
+        thisEvent.EventParam = tapeState;
+        returnVal = TRUE;
+        lastTapeState = tapeState; // update history
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+        PostGenericService(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
+    return (returnVal);
+}
+
 /* 
  * The Test Harness for the event checkers is conditionally compiled using
  * the EVENTCHECKER_TEST macro (defined either in the file or at the project level).
@@ -137,21 +284,21 @@ void PrintEvent(void);
 
 void main(void) {
     BOARD_Init();
-    /* user initialization code goes here */
+    SERIAL_Init();
+    PS_Init();
 
-    // Do not alter anything below this line
     int i;
 
-    printf("\r\nEvent checking test harness for %s", __FILE__);
+    printf("\r\nPeashooter event checking test harness for %s", __FILE__);
+    printf("\r\nTesting switch and tape events...\r\n");
 
     while (1) {
         if (IsTransmitEmpty()) {
-            for (i = 0; i< sizeof (EventList) >> 2; i++) {
+            for (i = 0; i < sizeof(EventList) / sizeof(EventList[0]); i++) {
                 if (EventList[i]() == TRUE) {
                     PrintEvent();
                     break;
                 }
-
             }
         }
     }

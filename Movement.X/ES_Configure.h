@@ -46,6 +46,14 @@ typedef enum {
     /* User-defined events start here */
     BATTERY_CONNECTED,
     BATTERY_DISCONNECTED,
+    BUMPER_TRIPPED,
+    BUMPER_NOT_TRIPPED,
+    RIGHT_TAPE_DETECTED,
+    RIGHT_TAPE_NOT_DETECTED,
+    MIDDLE_TAPE_DETECTED,
+    MIDDLE_TAPE_NOT_DETECTED,
+    LEFT_TAPE_DETECTED,
+    LEFT_TAPE_NOT_DETECTED,
 	/* User-defined events end here */
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
@@ -63,6 +71,14 @@ static const char *EventNames[] = {
 	"ES_TIMERSTOPPED",
 	"BATTERY_CONNECTED",
 	"BATTERY_DISCONNECTED",
+	"BUMPER_TRIPPED",
+	"BUMPER_NOT_TRIPPED",
+	"RIGHT_TAPE_DETECTED",
+	"RIGHT_TAPE_NOT_DETECTED",
+	"MIDDLE_TAPE_DETECTED",
+	"MIDDLE_TAPE_NOT_DETECTED",
+	"LEFT_TAPE_DETECTED",
+	"LEFT_TAPE_NOT_DETECTED",
 	"NUMBEROFEVENTS",
 };
 
@@ -71,11 +87,11 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This are the name of the Event checking function header file.
-#define EVENT_CHECK_HEADER "TemplateEventChecker.h"
+#define EVENT_CHECK_HEADER "SensorsEventChecker.h"
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  TemplateCheckBattery
+#define EVENT_CHECK_LIST  TemplateCheckSwitch, TemplateCheckTape
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the

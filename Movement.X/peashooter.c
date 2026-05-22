@@ -4,41 +4,89 @@
 #include <pwm.h>
 #include <serial.h>
 #include <AD.h>
+#include <IO_Ports.h>
 
 #define LEFT_PWM PWM_PORTY10
-#define RIGHT_PWM PWM_PORTY12
+#define RIGHT_PWM PWM_PORTY04
+#define INDEXER_PWM PWM_PORTY12
 
-#define LEFT_IN1 LATBbits.LATB3
-#define LEFT_IN2 LATBbits.LATB2
-#define RIGHT_IN1 LATEbits.LATE5
-#define RIGHT_IN2 LATEbits.LATE6
+// Left motor cluster: Y09, Y10, Y11
+#define LEFT_IN1 LATEbits.LATE6      // PORTY09
+#define LEFT_IN2 LATEbits.LATE5      // PORTY11
 
-#define LEFT_IN1_TRIS _TRISB3
-#define LEFT_IN2_TRIS _TRISB2
-#define RIGHT_IN1_TRIS _TRISE5
-#define RIGHT_IN2_TRIS _TRISE6
+// Right motor cluster: Y03, Y04, Y05
+#define RIGHT_IN1 LATDbits.LATD11    // PORTY03
+#define RIGHT_IN2 LATDbits.LATD5     // PORTY05
+
+#define LEFT_IN1_TRIS _TRISE6
+#define LEFT_IN2_TRIS _TRISE5
+#define RIGHT_IN1_TRIS _TRISD11
+#define RIGHT_IN2_TRIS _TRISD5
 
 #define SWITCH_SENSOR AD_PORTW3
-#define TAPE_SENSOR   AD_PORTW4
+
+#define LEFT_TAPE   AD_PORTW4
+#define MID_TAPE  AD_PORTW5
+#define RIGHT_TAPE   AD_PORTW6
+
+#define LEFT_TAPE_DIGITAL PORTW04_BIT
+#define MID_TAPE_DIGITAL PORTW05_BIT
+#define RIGHT_TAPE_DIGITAL PORTW06_BIT
+
+#define LEFT_TAPE_DIGITAL_TRIS PORTW04_TRIS
+#define MID_TAPE_DIGITAL_TRIS PORTW05_TRIS
+#define RIGHT_TAPE_DIGITAL_TRIS PORTW06_TRIS
+
+#define LEFT_TAPE_DIGITAL_PCFG (1 << _AD1PCFG_PCFG10_POSITION)
+#define MID_TAPE_DIGITAL_PCFG (1 << _AD1PCFG_PCFG13_POSITION)
+#define RIGHT_TAPE_DIGITAL_PCFG (1 << _AD1PCFG_PCFG12_POSITION)
+
+void PS_LeftMotorInit(void)
+{
+    PWM_AddPins(LEFT_PWM);
+
+    LEFT_IN1_TRIS = 0;
+    LEFT_IN2_TRIS = 0;
+
+    LEFT_IN1 = 1;
+    LEFT_IN2 = 0;
+
+    PWM_SetDutyCycle(LEFT_PWM, 0);
+}
+
+void PS_RightMotorInit(void)
+{
+    PWM_AddPins(RIGHT_PWM);
+
+    RIGHT_IN1_TRIS = 0;
+    RIGHT_IN2_TRIS = 0;
+
+    RIGHT_IN1 = 1;
+    RIGHT_IN2 = 0;
+
+    PWM_SetDutyCycle(RIGHT_PWM, 0);
+}
+
+void PS_IndexerMotorInit(void)
+{
+    PWM_AddPins(INDEXER_PWM);
+    PWM_SetDutyCycle(INDEXER_PWM, 0);
+}
 
 void PS_Init(void)
 {
     PWM_Init();
     PWM_SetFrequency(1000);
-    PWM_AddPins(LEFT_PWM | RIGHT_PWM);
+    PS_LeftMotorInit();
+    PS_RightMotorInit();
+    PS_IndexerMotorInit();
 
-    LEFT_IN1_TRIS = 0;
-    LEFT_IN2_TRIS = 0;
-    RIGHT_IN1_TRIS = 0;
-    RIGHT_IN2_TRIS = 0;
-
-    LEFT_IN1 = 1;
-    LEFT_IN2 = 0;
-    RIGHT_IN1 = 1;
-    RIGHT_IN2 = 0;
+    LEFT_TAPE_DIGITAL_TRIS = 1;
+    MID_TAPE_DIGITAL_TRIS = 1;
+    RIGHT_TAPE_DIGITAL_TRIS = 1;
 
     AD_Init();
-    AD_AddPins(SWITCH_SENSOR | TAPE_SENSOR);
+    AD_AddPins(SWITCH_SENSOR | LEFT_TAPE | MID_TAPE | RIGHT_TAPE);
 }
 
 char PS_LeftMtrSpeed(char power)
@@ -90,31 +138,133 @@ unsigned char PS_ReadSwitch(void)
     }
 }
 
-unsigned int PS_ReadTapeSensor(void)
+
+
+
+
+
+unsigned char PS_ReadLeftTape(void)
 {
-    return AD_ReadADPin(TAPE_SENSOR);
+    static unsigned char tapeState = TAPE_NOT_DETECTED;
+
+    unsigned int value = AD_ReadADPin(LEFT_TAPE);
+
+    if (value > TAPE_HIGH) {
+        tapeState = TAPE_DETECTED;
+    }
+    else if (value < TAPE_LOW) {
+        tapeState = TAPE_NOT_DETECTED;
+    }
+
+    return tapeState;
+}
+
+unsigned char PS_ReadMidTape(void)
+{
+    static unsigned char tapeState = TAPE_NOT_DETECTED;
+
+    unsigned int value = AD_ReadADPin(MID_TAPE);
+
+    if (value > TAPE_HIGH) {
+        tapeState = TAPE_DETECTED;
+    }
+    else if (value < TAPE_LOW) {
+        tapeState = TAPE_NOT_DETECTED;
+    }
+
+    return tapeState;
+}
+
+unsigned char PS_ReadRightTape(void)
+{
+    static unsigned char tapeState = TAPE_NOT_DETECTED;
+
+    unsigned int value = AD_ReadADPin(RIGHT_TAPE);
+
+    if (value > TAPE_HIGH) {
+        tapeState = TAPE_DETECTED;
+    }
+    else if (value < TAPE_LOW) {
+        tapeState = TAPE_NOT_DETECTED;
+    }
+
+    return tapeState;
+}
+
+unsigned char PS_ReadTape(void)
+{
+    //0, 1, 2
+    return (PS_ReadLeftTape()
+            + (PS_ReadMidTape() << 1)
+            + (PS_ReadRightTape() << 2));
 }
 
 unsigned char PS_ReadTapeDigital(void)
 {
-    unsigned int tapeVal = AD_ReadADPin(TAPE_SENSOR);
+    unsigned int oldConfig = AD1PCFG & LEFT_TAPE_DIGITAL_PCFG;
+    unsigned char tapeDigital;
 
-    if (tapeVal > TAPE_THRESHOLD) {
-        return TAPE_DETECTED;
-    } else {
-        return TAPE_NOT_DETECTED;
+    AD1PCFGSET = LEFT_TAPE_DIGITAL_PCFG;
+    LEFT_TAPE_DIGITAL_TRIS = 1;
+    tapeDigital = (LEFT_TAPE_DIGITAL ? 1 : 0);
+
+    if (!oldConfig) {
+        AD1PCFGCLR = LEFT_TAPE_DIGITAL_PCFG;
     }
+
+    return tapeDigital;
 }
 
-char PS_Forward(char power, char dist)
+unsigned char PS_ReadTapeDigitalAll(void)
 {
-    unsigned int delay;
+    unsigned int oldConfig = AD1PCFG & (LEFT_TAPE_DIGITAL_PCFG
+            | MID_TAPE_DIGITAL_PCFG | RIGHT_TAPE_DIGITAL_PCFG);
+    unsigned char tapeDigital;
 
+    AD1PCFGSET = LEFT_TAPE_DIGITAL_PCFG
+            | MID_TAPE_DIGITAL_PCFG | RIGHT_TAPE_DIGITAL_PCFG;
+
+    LEFT_TAPE_DIGITAL_TRIS = 1;
+    MID_TAPE_DIGITAL_TRIS = 1;
+    RIGHT_TAPE_DIGITAL_TRIS = 1;
+
+    tapeDigital = ((LEFT_TAPE_DIGITAL ? 1 : 0)
+            + ((MID_TAPE_DIGITAL ? 1 : 0) << 1)
+            + ((RIGHT_TAPE_DIGITAL ? 1 : 0) << 2));
+
+    AD1PCFGCLR = (~oldConfig) & (LEFT_TAPE_DIGITAL_PCFG
+            | MID_TAPE_DIGITAL_PCFG | RIGHT_TAPE_DIGITAL_PCFG);
+
+    return tapeDigital;
+}
+
+
+
+
+char PS_Forward(char power)
+{
     PS_RightMtrSpeed(power);
     PS_LeftMtrSpeed(power);
 
-    // crude distance timing estimate
-    for(delay = 0; delay < dist * 50000; delay++) {
+    return SUCCESS;
+}
+
+char PS_Backward(char power)
+{
+    power = -1 * power;
+    PS_RightMtrSpeed(power);
+    PS_LeftMtrSpeed(power);
+
+    return SUCCESS;
+}
+
+char PS_ForwardDist(char power, char dist)
+{
+    unsigned int delay;
+
+    PS_Forward(power);
+
+    for (delay = 0; delay < dist * MOVE_TIME_PER_DIST; delay++) {
         asm("nop");
     }
 
@@ -124,16 +274,13 @@ char PS_Forward(char power, char dist)
     return SUCCESS;
 }
 
-char PS_Backward(char power, char dist)
+char PS_BackwardDist(char power, char dist)
 {
     unsigned int delay;
 
-    power = -1 * power;
-    PS_RightMtrSpeed(power);
-    PS_LeftMtrSpeed(power);
+    PS_Backward(power);
 
-    // crude distance timing estimate
-    for(delay = 0; delay < dist * 50000; delay++) {
+    for (delay = 0; delay < dist * MOVE_TIME_PER_DIST; delay++) {
         asm("nop");
     }
 
