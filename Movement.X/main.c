@@ -3,9 +3,9 @@
 #include "peashooter.h"
 #include <stdio.h>
 
-#define TEST 0
-#define TAPE_TEST 1
-#define MOTOR_TEST 0
+#define TEST 1
+#define TAPE_TEST 0
+#define MOTOR_TEST 1
 
 #define DELAY(x) for(delay = 0; delay < (x); delay++) {asm("nop");}
 
@@ -23,19 +23,11 @@ int main(void)
     printf("testing at %d\n", num);
     while (1) {
         
-        PS_Forward(num, 10);
+        PS_Forward(num);
 
         DELAY(1000000);
 
-        PS_Backward(num, 10);
-
-        DELAY(1000000);
-
-        PS_TurnRight(num);
-        
-        DELAY(1000000);
-
-        PS_TurnLeft(num);
+        PS_Backward(num);
 
         DELAY(1000000);
 

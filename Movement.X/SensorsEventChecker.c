@@ -106,7 +106,7 @@ uint8_t TemplateCheckBattery(void) {
         returnVal = TRUE;
         lastEvent = curEvent; // update history
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-        PostGenericService(thisEvent);
+//        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -154,7 +154,7 @@ uint8_t TemplateCheckSwitch(void) {
             returnVal = TRUE;
             lastEvent = curEvent; // update history
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-            PostGenericService(thisEvent);
+//            PostGenericService(thisEvent);
 #else
             SaveEvent(thisEvent);
 #endif
@@ -247,7 +247,7 @@ uint8_t TemplateCheckTape(void) {
         returnVal = TRUE;
         lastTapeState = tapeState; // update history
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-        PostGenericService(thisEvent);
+//        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif
@@ -291,7 +291,7 @@ void main(void) {
 
     printf("\r\nPeashooter event checking test harness for %s", __FILE__);
     printf("\r\nTesting switch and tape events...\r\n");
-
+    
     while (1) {
         if (IsTransmitEmpty()) {
             for (i = 0; i < sizeof(EventList) / sizeof(EventList[0]); i++) {
