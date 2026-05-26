@@ -1,13 +1,13 @@
 # shooter
 
-MPLAB X ES Framework project for driving one DC motor through an IBT-2/BTS7960
-motor driver from the PIC32MX320F128H / Uno32 I/O protection stack.
+MPLAB X ES Framework project for printing the raw beacon detector ADC value
+from the PIC32MX320F128H / Uno32 I/O protection stack.
 
-Default firmware command:
+Default firmware behavior:
 
-- Direction: forward
-- Duty cycle: `1000 / 1000`, or 100.0%
-- PWM frequency: `PWM_1KHZ`
+- Beacon detector analog output: `AD_PORTV3`
+- Serial output: `beacon_adc=<raw 10-bit ADC value>`
+- Shooter motor auto-start: disabled
 
 ## Wiring
 
@@ -36,9 +36,7 @@ Important notes:
 - Put a fuse or current-limited supply on the motor `B+` lead while testing.
 - Keep the motor mechanically unloaded for the first 20% duty-cycle test.
 
-With the default code, `R_EN` and `L_EN` are driven high, `RPWM` is driven at
-100% duty, and `LPWM` is held at 0% duty. If the motor spins the wrong direction,
-swap `M+` and `M-`, or swap the `RPWM` and `LPWM` behavior in
-`ShooterService.c`.
+With the default code, the motor driver is initialized but left disabled. The
+event checker only prints the beacon detector ADC reading.
 
-To change the pins, frequency, or duty cycle, edit `ShooterService.h`.
+To change the beacon ADC pin or print rate, edit `ShooterEventChecker.h`.

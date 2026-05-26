@@ -1,7 +1,7 @@
 /*
  * BeaconDetectorService.c
  *
- * ES service that receives analog beacon strength and threshold events.
+ * ES service that prints raw beacon ADC readings.
  */
 
 #include "BeaconDetectorService.h"
@@ -13,17 +13,12 @@
 #include "ES_Framework.h"
 
 static uint8_t MyPriority;
-static uint8_t BeaconPresent;
-static uint16_t BeaconStrength;
 
 uint8_t InitBeaconDetectorService(uint8_t priority)
 {
     ES_Event initEvent;
 
     MyPriority = priority;
-    BeaconPresent = FALSE;
-    BeaconStrength = 0;
-
     if (InitBeaconEventChecker() != TRUE) {
         return FALSE;
     }
@@ -47,24 +42,11 @@ ES_Event RunBeaconDetectorService(ES_Event thisEvent)
 
     switch (thisEvent.EventType) {
     case ES_INIT:
-        printf("BeaconDetectorService initialized; reading analog beacon strength\r\n");
+        printf("adc_pin=%s\r\n", BEACON_DETECTOR_PIN_NAME);
         break;
 
     case BEACON_STRENGTH_CHANGED:
-        BeaconStrength = thisEvent.EventParam;
-        printf("Beacon strength ADC: %u\r\n", BeaconStrength);
-        break;
-
-    case BEACON_DETECTED:
-        BeaconPresent = TRUE;
-        BeaconStrength = thisEvent.EventParam;
-        printf("Beacon detected, ADC: %u\r\n", BeaconStrength);
-        break;
-
-    case BEACON_LOST:
-        BeaconPresent = FALSE;
-        BeaconStrength = thisEvent.EventParam;
-        printf("Beacon lost, ADC: %u\r\n", BeaconStrength);
+        printf("%u\r\n", thisEvent.EventParam);
         break;
 
     default:

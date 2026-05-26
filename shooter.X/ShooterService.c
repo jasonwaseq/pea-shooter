@@ -10,6 +10,7 @@
 
 #include "BOARD.h"
 #include "ES_Framework.h"
+#include "ShooterEventChecker.h"
 
 typedef enum {
     SHOOTER_DISABLED,
@@ -88,6 +89,9 @@ uint8_t InitShooterService(uint8_t priority)
         return FALSE;
     }
     if (StopMotorOutput() != TRUE) {
+        return FALSE;
+    }
+    if (InitShooterEventChecker() != TRUE) {
         return FALSE;
     }
 

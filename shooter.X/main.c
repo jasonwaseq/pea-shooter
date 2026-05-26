@@ -23,13 +23,10 @@ int main(void)
     printf("IBT-2 RPWM: %s, LPWM: %s\r\n",
             SHOOTER_RPWM_PIN_NAME,
             SHOOTER_LPWM_PIN_NAME);
-    printf("Initial motor command is forward at %u.%u%% duty\r\n",
-            SHOOTER_FORWARD_DUTY / 10,
-            SHOOTER_FORWARD_DUTY % 10);
+    printf("Motor auto-start disabled; printing beacon detector ADC only.\r\n");
 
     errorType = ES_Initialize();
     if (errorType == Success) {
-        StartShooterMotor();
         errorType = ES_Run();
     }
 

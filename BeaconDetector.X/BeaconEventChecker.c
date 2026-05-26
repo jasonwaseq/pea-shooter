@@ -1,7 +1,7 @@
 /*
  * BeaconEventChecker.c
  *
- * Converts analog beacon detector voltage readings into ES events.
+ * Posts raw beacon detector ADC readings.
  */
 
 #include "BeaconEventChecker.h"
@@ -11,20 +11,11 @@
 #include "ES_Events.h"
 #include "BeaconDetectorService.h"
 
-static uint16_t LastBeaconReading;
-static uint8_t LastBeaconPresent;
+static uint16_t PrintCounter;
 
 static uint16_t ReadBeaconStrength(void)
 {
     return AD_ReadADPin(BEACON_DETECTOR_AD_PIN);
-}
-
-static uint8_t IsBeaconPresent(uint16_t reading)
-{
-    if (LastBeaconPresent == TRUE) {
-        return (reading > (BEACON_PRESENT_THRESHOLD - BEACON_LOST_HYSTERESIS)) ? TRUE : FALSE;
-    }
-    return (reading >= BEACON_PRESENT_THRESHOLD) ? TRUE : FALSE;
 }
 
 uint8_t InitBeaconEventChecker(void)
@@ -38,12 +29,11 @@ uint8_t InitBeaconEventChecker(void)
         }
     }
 
-    LastBeaconReading = ReadBeaconStrength();
-    if (LastBeaconReading == (uint16_t) ERROR) {
+    if (ReadBeaconStrength() == (uint16_t) ERROR) {
         return FALSE;
     }
 
-    LastBeaconPresent = IsBeaconPresent(LastBeaconReading);
+    PrintCounter = 0;
     return TRUE;
 }
 
@@ -51,8 +41,6 @@ uint8_t CheckBeaconDetector(void)
 {
     ES_Event thisEvent;
     uint16_t currentReading;
-    uint8_t currentBeaconPresent;
-    uint16_t readingDelta;
 
     if (AD_IsNewDataReady() != TRUE) {
         return FALSE;
@@ -63,24 +51,12 @@ uint8_t CheckBeaconDetector(void)
         return FALSE;
     }
 
-    currentBeaconPresent = IsBeaconPresent(currentReading);
-    if (currentBeaconPresent != LastBeaconPresent) {
-        LastBeaconPresent = currentBeaconPresent;
-        LastBeaconReading = currentReading;
-        thisEvent.EventType = currentBeaconPresent ? BEACON_DETECTED : BEACON_LOST;
-        thisEvent.EventParam = currentReading;
-        PostBeaconDetectorService(thisEvent);
-        return TRUE;
-    }
-
-    readingDelta = (currentReading > LastBeaconReading)
-            ? (currentReading - LastBeaconReading)
-            : (LastBeaconReading - currentReading);
-    if (readingDelta < BEACON_STRENGTH_DELTA) {
+    PrintCounter++;
+    if (PrintCounter < BEACON_ADC_PRINT_DIVIDER) {
         return FALSE;
     }
+    PrintCounter = 0;
 
-    LastBeaconReading = currentReading;
     thisEvent.EventType = BEACON_STRENGTH_CHANGED;
     thisEvent.EventParam = currentReading;
     PostBeaconDetectorService(thisEvent);

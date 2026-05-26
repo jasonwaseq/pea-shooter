@@ -1,8 +1,7 @@
 /*
  * BeaconDetector.X
  *
- * ES Framework application entry point for reading an analog 2 kHz beacon
- * detector strength output on the Uno32/PIC32 I/O protection board.
+ * ES Framework application entry point for printing the beacon detector ADC.
  */
 
 #include <BOARD.h>
@@ -18,8 +17,7 @@ int main(void)
 
     BOARD_Init();
 
-    printf("\r\nStarting Beacon Detector ES Framework project\r\n");
-    printf("Beacon input defaults to AD_PORTV3; edit BeaconEventChecker.h if rewired.\r\n");
+    printf("\r\nStarting BeaconDetector ADC monitor\r\n");
 
     errorType = ES_Initialize();
     if (errorType == Success) {
