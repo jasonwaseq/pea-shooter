@@ -48,6 +48,7 @@ unsigned char PS_ReadTapeDigitalAll(void);
 
 char PS_Forward(char power);
 char PS_Backward(char power);
+char PS_Stop(void);
 char PS_ForwardDist(char power, char dist);
 char PS_BackwardDist(char power, char dist);
 char PS_TurnLeft(char power);

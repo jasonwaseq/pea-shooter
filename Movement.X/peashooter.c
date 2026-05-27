@@ -390,6 +390,17 @@ char PS_Backward(char power)
     return SUCCESS;
 }
 
+// Stops both drive motors by commanding zero power.
+char PS_Stop(void)
+{
+    // Zero duty cycle on both motors stops the drive base.
+    PS_RightMtrSpeed(0);
+    PS_LeftMtrSpeed(0);
+
+    // Report success after issuing the stop commands.
+    return SUCCESS;
+}
+
 // Drives forward for an approximate distance using a blocking delay.
 char PS_ForwardDist(char power, char dist)
 {
@@ -404,8 +415,7 @@ char PS_ForwardDist(char power, char dist)
     }
 
     // Stop both drive motors after the delay finishes.
-    PS_RightMtrSpeed(0);
-    PS_LeftMtrSpeed(0);
+    PS_Stop();
 
     // Report success after the move completes.
     return SUCCESS;
@@ -425,8 +435,7 @@ char PS_BackwardDist(char power, char dist)
     }
 
     // Stop both drive motors after the delay finishes.
-    PS_RightMtrSpeed(0);
-    PS_LeftMtrSpeed(0);
+    PS_Stop();
 
     // Report success after the move completes.
     return SUCCESS;
@@ -445,8 +454,7 @@ char PS_TurnLeft(char power)
     DELAY_COUNTS(TURN_LEFT_TIME);
 
     // Stop both drive motors after the turn delay.
-    PS_RightMtrSpeed(0);
-    PS_LeftMtrSpeed(0);
+    PS_Stop();
 
     // Report success after the turn completes.
     return SUCCESS;
@@ -465,8 +473,7 @@ char PS_TurnRight(char power)
     DELAY_COUNTS(TURN_RIGHT_TIME);
 
     // Stop both drive motors after the turn delay.
-    PS_RightMtrSpeed(0);
-    PS_LeftMtrSpeed(0);
+    PS_Stop();
 
     // Report success after the turn completes.
     return SUCCESS;

@@ -8,6 +8,9 @@
 #define MOTOR_TEST 1
 
 #define DELAY(x) for(delay = 0; delay < (x); delay++) {asm("nop");}
+#define ONE_SECOND_DELAY 1000000
+#define MOTOR_RUN_TIME (2 * ONE_SECOND_DELAY)
+#define MOTOR_STOP_TIME (5 * ONE_SECOND_DELAY)
 
 #if TEST
 int main(void)
@@ -22,14 +25,18 @@ int main(void)
     int num = 99;
     printf("testing at %d\n", num);
     while (1) {
-        
-        PS_Forward(num);
 
-        DELAY(1000000);
+        PS_Forward(num);
+        DELAY(MOTOR_RUN_TIME);
+
+        PS_Stop();
+        DELAY(MOTOR_STOP_TIME);
 
         PS_Backward(num);
+        DELAY(MOTOR_RUN_TIME);
 
-        DELAY(1000000);
+        PS_Stop();
+        DELAY(MOTOR_STOP_TIME);
 
     }
     #endif
