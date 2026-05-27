@@ -8,35 +8,11 @@
 #include "HSMService.h"
 
 #include <stdio.h>
-#include <xc.h>
 
-#include "AD.h"
-#include "BOARD.h"
+#include "peashooter.h"
 #include "BeaconEventChecker.h"
 #include "ES_Framework.h"
 #include "ES_Timers.h"
-#include "pwm.h"
-
-/*
- * Movement hardware mapping copied from Movement.X/peashooter.c so the HSM can
- * issue nonblocking tank turns while ADC event checks continue to run.
- */
-#define LEFT_PWM PWM_PORTY10
-#define RIGHT_PWM PWM_PORTY04
-
-#define LEFT_IN1 LATEbits.LATE6
-#define LEFT_IN2 LATEbits.LATE5
-#define RIGHT_IN1 LATDbits.LATD11
-#define RIGHT_IN2 LATDbits.LATD5
-
-#define LEFT_IN1_TRIS _TRISE6
-#define LEFT_IN2_TRIS _TRISE5
-#define RIGHT_IN1_TRIS _TRISD11
-#define RIGHT_IN2_TRIS _TRISD5
-
-#define PS_NOMINAL_BATTERY_VOLTAGE 310
-#define PS_MIN_BATTERY_COMP_VOLTAGE 263
-#define PEASHOOTER_MAX_SPEED 100
 
 #define HSM_TANK_TURN_POWER 65
 #define HSM_FULL_ROTATION_TIME_MS 3200
@@ -62,11 +38,6 @@ static uint32_t SurveyStartTime;
 static uint32_t MaxBeaconOffset;
 static uint32_t AlignmentSpinTime;
 
-static uint8_t InitMovementHardware(void);
-static uint8_t SetLeftMotorSpeed(char power);
-static uint8_t SetRightMotorSpeed(char power);
-static void StartTankTurnLeft(char power);
-static void StopDrive(void);
 static void StartSurveySpin(void);
 static void RecordBeaconSample(uint16_t beaconValue);
 static void StartAlignmentSpin(void);
@@ -78,9 +49,12 @@ uint8_t InitHSMService(uint8_t priority)
     MyPriority = priority;
     CurrentState = InitPState;
 
-    if (InitMovementHardware() != TRUE) {
-        return FALSE;
-    }
+    PS_Init();
+    PS_Stop();
+
+    printf("HSM beacon ADC pin=%s tank_power=%d full_rotation=%u ms\r\n",
+            BEACON_DETECTOR_PIN_NAME, HSM_TANK_TURN_POWER,
+            HSM_FULL_ROTATION_TIME_MS);
 
     if (InitBeaconEventChecker() != TRUE) {
         return FALSE;
@@ -170,7 +144,7 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent)
 
         case ES_TIMEOUT:
             if (thisEvent.EventParam == HSM_ROTATION_TIMER) {
-                StopDrive();
+                PS_Stop();
                 nextState = AlignSpinState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
@@ -191,7 +165,7 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent)
 
         case ES_TIMEOUT:
             if (thisEvent.EventParam == HSM_ROTATION_TIMER) {
-                StopDrive();
+                PS_Stop();
                 nextState = AlignedState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
@@ -205,7 +179,7 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent)
 
     case AlignedState:
         if (thisEvent.EventType == ES_ENTRY) {
-            StopDrive();
+            PS_Stop();
             printf("Aligned to max beacon=%u at survey_offset=%lu ms\r\n",
                     MaxBeaconValue, (unsigned long) MaxBeaconOffset);
             thisEvent.EventType = ES_NO_EVENT;
@@ -227,115 +201,6 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent)
     return thisEvent;
 }
 
-static uint8_t InitMovementHardware(void)
-{
-    if ((AD_ActivePins() == 0) && (AD_Init() != SUCCESS)) {
-        printf("HSM init failed: AD_Init\r\n");
-        return FALSE;
-    }
-
-    if (PWM_Init() != SUCCESS) {
-        printf("HSM init failed: PWM_Init\r\n");
-        return FALSE;
-    }
-
-    if (PWM_SetFrequency(1000) != SUCCESS) {
-        printf("HSM init failed: PWM_SetFrequency\r\n");
-        return FALSE;
-    }
-
-    if (PWM_AddPins(LEFT_PWM | RIGHT_PWM) != SUCCESS) {
-        printf("HSM init failed: PWM_AddPins\r\n");
-        return FALSE;
-    }
-
-    LEFT_IN1_TRIS = 0;
-    LEFT_IN2_TRIS = 0;
-    RIGHT_IN1_TRIS = 0;
-    RIGHT_IN2_TRIS = 0;
-    StopDrive();
-
-    printf("HSM beacon ADC pin=%s tank_power=%d full_rotation=%u ms\r\n",
-            BEACON_DETECTOR_PIN_NAME, HSM_TANK_TURN_POWER,
-            HSM_FULL_ROTATION_TIME_MS);
-
-    return TRUE;
-}
-
-static uint16_t CompensateDutyForBattery(uint16_t dutyCycle)
-{
-    uint16_t batteryVoltage = AD_ReadADPin(BAT_VOLTAGE);
-    uint32_t compensatedDuty;
-
-    if (batteryVoltage < PS_MIN_BATTERY_COMP_VOLTAGE) {
-        batteryVoltage = PS_MIN_BATTERY_COMP_VOLTAGE;
-    }
-
-    compensatedDuty = ((uint32_t) dutyCycle * PS_NOMINAL_BATTERY_VOLTAGE)
-            / batteryVoltage;
-    if (compensatedDuty > MAX_PWM) {
-        compensatedDuty = MAX_PWM;
-    }
-
-    return (uint16_t) compensatedDuty;
-}
-
-static uint8_t SetLeftMotorSpeed(char power)
-{
-    uint16_t dutyCycle;
-
-    if ((power < -PEASHOOTER_MAX_SPEED) || (power > PEASHOOTER_MAX_SPEED)) {
-        return ERROR;
-    }
-
-    if (power < 0) {
-        LEFT_IN1 = 0;
-        LEFT_IN2 = 1;
-        power = -power;
-    } else {
-        LEFT_IN1 = 1;
-        LEFT_IN2 = 0;
-    }
-
-    dutyCycle = power * (MAX_PWM / PEASHOOTER_MAX_SPEED);
-    dutyCycle = CompensateDutyForBattery(dutyCycle);
-    return PWM_SetDutyCycle(LEFT_PWM, dutyCycle);
-}
-
-static uint8_t SetRightMotorSpeed(char power)
-{
-    uint16_t dutyCycle;
-
-    if ((power < -PEASHOOTER_MAX_SPEED) || (power > PEASHOOTER_MAX_SPEED)) {
-        return ERROR;
-    }
-
-    if (power < 0) {
-        RIGHT_IN1 = 0;
-        RIGHT_IN2 = 1;
-        power = -power;
-    } else {
-        RIGHT_IN1 = 1;
-        RIGHT_IN2 = 0;
-    }
-
-    dutyCycle = power * (MAX_PWM / PEASHOOTER_MAX_SPEED);
-    dutyCycle = CompensateDutyForBattery(dutyCycle);
-    return PWM_SetDutyCycle(RIGHT_PWM, dutyCycle);
-}
-
-static void StartTankTurnLeft(char power)
-{
-    SetRightMotorSpeed(power);
-    SetLeftMotorSpeed(-power);
-}
-
-static void StopDrive(void)
-{
-    SetRightMotorSpeed(0);
-    SetLeftMotorSpeed(0);
-}
-
 static void StartSurveySpin(void)
 {
     MaxBeaconValue = 0;
@@ -344,7 +209,7 @@ static void StartSurveySpin(void)
     SurveyStartTime = ES_Timer_GetTime();
 
     printf("Survey spin started\r\n");
-    StartTankTurnLeft(HSM_TANK_TURN_POWER);
+    PS_TurnLeft(HSM_TANK_TURN_POWER);
     ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_FULL_ROTATION_TIME_MS);
 }
 
@@ -375,6 +240,6 @@ static void StartAlignmentSpin(void)
     printf("Alignment spin started max=%u offset=%lu ms\r\n",
             MaxBeaconValue, (unsigned long) MaxBeaconOffset);
 
-    StartTankTurnLeft(HSM_TANK_TURN_POWER);
+    PS_TurnLeft(HSM_TANK_TURN_POWER);
     ES_Timer_InitTimer(HSM_ROTATION_TIMER, AlignmentSpinTime);
 }
