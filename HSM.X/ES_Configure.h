@@ -29,29 +29,56 @@ typedef enum {
     ES_TIMERSTOPPED,
     BEACON_SAMPLE_READY,
     NUMBEROFEVENTS,
+    BATTERY_CONNECTED,
+    BATTERY_DISCONNECTED,
+    BUMPER_TRIPPED,
+    BUMPER_NOT_TRIPPED,
+    RIGHT_TAPE_DETECTED,
+    RIGHT_TAPE_NOT_DETECTED,
+    MIDDLE_TAPE_DETECTED,
+    MIDDLE_TAPE_NOT_DETECTED,
+    LEFT_TAPE_DETECTED,
+    LEFT_TAPE_NOT_DETECTED,
+    NO_TAPE_DETECTED,
+    BORDER_FOUND,
+    FRONT_BORDER_DONE,
+    SIDE_BORDER_DONE,
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
-    "ES_NO_EVENT",
-    "ES_ERROR",
-    "ES_INIT",
-    "ES_ENTRY",
-    "ES_EXIT",
-    "ES_KEYINPUT",
-    "ES_LISTEVENTS",
-    "ES_TIMEOUT",
-    "ES_TIMERACTIVE",
-    "ES_TIMERSTOPPED",
-    "BEACON_SAMPLE_READY",
-    "NUMBEROFEVENTS",
+	"ES_NO_EVENT",
+	"ES_ERROR",
+	"ES_INIT",
+	"ES_ENTRY",
+	"ES_EXIT",
+	"ES_KEYINPUT",
+	"ES_LISTEVENTS",
+	"ES_TIMEOUT",
+	"ES_TIMERACTIVE",
+	"ES_TIMERSTOPPED",
+	"BEACON_SAMPLE_READY",
+	"NUMBEROFEVENTS",
+	"BATTERY_CONNECTED",
+	"BATTERY_DISCONNECTED",
+	"BUMPER_TRIPPED",
+	"BUMPER_NOT_TRIPPED",
+	"RIGHT_TAPE_DETECTED",
+	"RIGHT_TAPE_NOT_DETECTED",
+	"MIDDLE_TAPE_DETECTED",
+	"MIDDLE_TAPE_NOT_DETECTED",
+	"LEFT_TAPE_DETECTED",
+	"LEFT_TAPE_NOT_DETECTED",
+	"NO_TAPE_DETECTED",
+	"BORDER_FOUND",
+    "FRONT_BORDER_DONE",
+    "SIDE_BORDER_DONE",
 };
 
 /****************************************************************************/
 // User event checker list.
 
-#define EVENT_CHECK_HEADER "BeaconEventChecker.h"
-#define EVENT_CHECK_LIST CheckBeaconDetector
-
+#define EVENT_CHECK_HEADER "SensorsEventChecker.h"
+#define EVENT_CHECK_LIST TemplateCheckBattery, TemplateCheckTape, TemplateCheckSwitch
 /****************************************************************************/
 // Timer routing.
 

@@ -4,6 +4,8 @@
  * ES Framework application entry point for the startup beacon alignment HSM.
  */
 
+#ifdef RUN_HSM
+
 #include <BOARD.h>
 #include <stdio.h>
 #include <xc.h>
@@ -40,3 +42,5 @@ int main(void)
         ;
     }
 }
+
+#endif

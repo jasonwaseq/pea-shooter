@@ -32,12 +32,14 @@
 #include "serial.h"
 #include "AD.h"
 #include "peashooter.h"
+#include "HSMService.h"
+#include "pwm.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 #define BATTERY_DISCONNECT_THRESHOLD 175
-#define TAPE_SAMPE_SIZE 5
+#define SENSOR_STATE_UNKNOWN 0xFF
 
 /* peashooter.h uses SWITCH_TRIPPED / SWITCH_NOT_TRIPPED as raw switch states.
  * ES_Configure.h also uses those names as event types, so keep the raw values
@@ -90,6 +92,7 @@ static ES_Event storedEvent;
  * @modified Gabriel H Elkaim/Max Dunne, 2016.09.12 20:08 */
 uint8_t TemplateCheckBattery(void) {
     static ES_EventTyp_t lastEvent = BATTERY_DISCONNECTED;
+    static uint8_t initialized = FALSE;
     ES_EventTyp_t curEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
@@ -100,33 +103,51 @@ uint8_t TemplateCheckBattery(void) {
     } else {
         curEvent = BATTERY_DISCONNECTED;
     }
+
+    if (initialized == FALSE) {
+        lastEvent = curEvent;
+        initialized = TRUE;
+        return returnVal;
+    }
+
     if (curEvent != lastEvent) { // check for change from last time
         thisEvent.EventType = curEvent;
         thisEvent.EventParam = batVoltage;
         returnVal = TRUE;
         lastEvent = curEvent; // update history
-#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-//        PostGenericService(thisEvent);
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+    PostHSMService(thisEvent);
 #else
-        SaveEvent(thisEvent);
-#endif   
+   SaveEvent(thisEvent);
+#endif  
     }
     return (returnVal);
 }
 
 uint8_t TemplateCheckSwitch(void) {
-    static ES_EventTyp_t lastEvent = BUMPER_NOT_TRIPPED;
-    static unsigned char debouncedState = SWITCH_NOT_TRIPPED;
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT;
+    static unsigned char debouncedState = SENSOR_STATE_UNKNOWN;
     static unsigned char lastSample = SWITCH_NOT_TRIPPED;
     static unsigned char sameSampleCount = 0;
+    static uint8_t initialized = FALSE;
     ES_EventTyp_t curEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
     unsigned char switchState = PS_ReadSwitch();
 
     enum {
-        SWITCH_DEBOUNCE_COUNT = 5
+        SWITCH_DEBOUNCE_COUNT = 150
     };
+
+    if (initialized == FALSE) {
+        debouncedState = switchState;
+        lastSample = switchState;
+        sameSampleCount = 0;
+        lastEvent = (switchState == SWITCH_TRIPPED)
+                ? BUMPER_TRIPPED : BUMPER_NOT_TRIPPED;
+        initialized = TRUE;
+        return returnVal;
+    }
 
     if (switchState == lastSample) {
         if (sameSampleCount < SWITCH_DEBOUNCE_COUNT) {
@@ -153,10 +174,10 @@ uint8_t TemplateCheckSwitch(void) {
             thisEvent.EventParam = debouncedState;
             returnVal = TRUE;
             lastEvent = curEvent; // update history
-#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-//            PostGenericService(thisEvent);
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+    PostHSMService(thisEvent);
 #else
-            SaveEvent(thisEvent);
+   SaveEvent(thisEvent);
 #endif
         }
     }
@@ -164,95 +185,102 @@ uint8_t TemplateCheckSwitch(void) {
 }
 
 uint8_t TemplateCheckTape(void) {
-    static unsigned char lastTapeState = 0;
-    static unsigned char leftSamples[TAPE_SAMPE_SIZE] = {0};
-    static unsigned char midSamples[TAPE_SAMPE_SIZE] = {0};
-    static unsigned char rightSamples[TAPE_SAMPE_SIZE] = {0};
-    static unsigned char sampleIndex = 0;
-    static unsigned char sampleCount = 0;
-    static unsigned char leftSum = 0;
-    static unsigned char midSum = 0;
-    static unsigned char rightSum = 0;
-    ES_EventTyp_t curEvent;
+    static unsigned char debouncedLeft = SENSOR_STATE_UNKNOWN;
+    static unsigned char debouncedMiddle = SENSOR_STATE_UNKNOWN;
+    static unsigned char debouncedRight = SENSOR_STATE_UNKNOWN;
+
+    static unsigned char lastLeftSample = SENSOR_STATE_UNKNOWN;
+    static unsigned char lastMiddleSample = SENSOR_STATE_UNKNOWN;
+    static unsigned char lastRightSample = SENSOR_STATE_UNKNOWN;
+
+    static unsigned char leftCount = 0;
+    static unsigned char middleCount = 0;
+    static unsigned char rightCount = 0;
+
+    static uint8_t initialized = FALSE;
+
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    unsigned char rawTapeState = PS_ReadTapeDigitalAll();
-    unsigned char tapeState = 0;
-    unsigned char changedTape;
-    unsigned char leftSample = (rawTapeState & LEFT_TAPE_MASK) ? 1 : 0;
-    unsigned char midSample = (rawTapeState & MID_TAPE_MASK) ? 1 : 0;
-    unsigned char rightSample = (rawTapeState & RIGHT_TAPE_MASK) ? 1 : 0;
 
-    leftSum -= leftSamples[sampleIndex];
-    midSum -= midSamples[sampleIndex];
-    rightSum -= rightSamples[sampleIndex];
+    unsigned char leftTape = PS_ReadLeftTape();
+    unsigned char middleTape = PS_ReadMidTape();
+    unsigned char rightTape = PS_ReadRightTape();
 
-    leftSamples[sampleIndex] = leftSample;
-    midSamples[sampleIndex] = midSample;
-    rightSamples[sampleIndex] = rightSample;
+#define TAPE_DEBOUNCE_COUNT 20
 
-    leftSum += leftSample;
-    midSum += midSample;
-    rightSum += rightSample;
+    if (initialized == FALSE) {
+        debouncedLeft = leftTape;
+        debouncedMiddle = middleTape;
+        debouncedRight = rightTape;
 
-    sampleIndex++;
-    if (sampleIndex >= TAPE_SAMPE_SIZE) {
-        sampleIndex = 0;
-    }
-    if (sampleCount < TAPE_SAMPE_SIZE) {
-        sampleCount++;
+        lastLeftSample = leftTape;
+        lastMiddleSample = middleTape;
+        lastRightSample = rightTape;
+
+        leftCount = 0;
+        middleCount = 0;
+        rightCount = 0;
+
+        initialized = TRUE;
+        return FALSE;
     }
 
-    if (sampleCount < TAPE_SAMPE_SIZE) {
-        return returnVal;
-    }
-
-    if ((leftSum * 2) >= sampleCount) {
-        tapeState |= LEFT_TAPE_MASK;
-    }
-    if ((midSum * 2) >= sampleCount) {
-        tapeState |= MID_TAPE_MASK;
-    }
-    if ((rightSum * 2) >= sampleCount) {
-        tapeState |= RIGHT_TAPE_MASK;
-    }
-
-    changedTape = tapeState ^ lastTapeState;
-
-    if (changedTape & LEFT_TAPE_MASK) {
-        if (tapeState & LEFT_TAPE_MASK) {
-            curEvent = LEFT_TAPE_NOT_DETECTED;
-        } else {
-            curEvent = LEFT_TAPE_DETECTED;
-        }
-    } else if (changedTape & MID_TAPE_MASK) {
-        if (tapeState & MID_TAPE_MASK) {
-            curEvent = MIDDLE_TAPE_NOT_DETECTED;
-        } else {
-            curEvent = MIDDLE_TAPE_DETECTED;
-        }
-    } else if (changedTape & RIGHT_TAPE_MASK) {
-        if (tapeState & RIGHT_TAPE_MASK) {
-            curEvent = RIGHT_TAPE_NOT_DETECTED;
-        } else {
-            curEvent = RIGHT_TAPE_DETECTED;
+    if (leftTape == lastLeftSample) {
+        if (leftCount < TAPE_DEBOUNCE_COUNT) {
+            leftCount++;
         }
     } else {
-        return returnVal;
+        lastLeftSample = leftTape;
+        leftCount = 1;
     }
 
-    if (tapeState != lastTapeState) { // check for change from last time
-        thisEvent.EventType = curEvent;
-        thisEvent.EventParam = tapeState;
+    if (middleTape == lastMiddleSample) {
+        if (middleCount < TAPE_DEBOUNCE_COUNT) {
+            middleCount++;
+        }
+    } else {
+        lastMiddleSample = middleTape;
+        middleCount = 1;
+    }
+
+    if (rightTape == lastRightSample) {
+        if (rightCount < TAPE_DEBOUNCE_COUNT) {
+            rightCount++;
+        }
+    } else {
+        lastRightSample = rightTape;
+        rightCount = 1;
+    }
+
+    if ((leftCount >= TAPE_DEBOUNCE_COUNT) && (leftTape != debouncedLeft)) {
+        debouncedLeft = leftTape;
+        thisEvent.EventType = (debouncedLeft == TAPE_DETECTED)
+                ? LEFT_TAPE_DETECTED : LEFT_TAPE_NOT_DETECTED;
+        thisEvent.EventParam = debouncedLeft;
         returnVal = TRUE;
-        lastTapeState = tapeState; // update history
-#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-//        PostGenericService(thisEvent);
+    } else if ((middleCount >= TAPE_DEBOUNCE_COUNT) && (middleTape != debouncedMiddle)) {
+        debouncedMiddle = middleTape;
+        thisEvent.EventType = (debouncedMiddle == TAPE_DETECTED)
+                ? MIDDLE_TAPE_DETECTED : MIDDLE_TAPE_NOT_DETECTED;
+        thisEvent.EventParam = debouncedMiddle;
+        returnVal = TRUE;
+    } else if ((rightCount >= TAPE_DEBOUNCE_COUNT) && (rightTape != debouncedRight)) {
+        debouncedRight = rightTape;
+        thisEvent.EventType = (debouncedRight == TAPE_DETECTED)
+                ? RIGHT_TAPE_DETECTED : RIGHT_TAPE_NOT_DETECTED;
+        thisEvent.EventParam = debouncedRight;
+        returnVal = TRUE;
+    }
+
+    if (returnVal == TRUE) {
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+        PostHSMService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif
     }
-    return (returnVal);
+
+    return returnVal;
 }
 
 /* 
@@ -305,7 +333,37 @@ void main(void) {
 }
 
 void PrintEvent(void) {
-    printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X", eventName,
+    printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X\r\n", eventName,
             EventNames[storedEvent.EventType], storedEvent.EventParam);
+    while (!IsTransmitEmpty()) {
+        ;
+    }
 }
+#endif
+
+#ifdef MOVING_TEST
+
+#include <stdio.h>
+#define MOVING_TEST_ONE_SECOND 1000000
+
+void main(void)
+{
+    unsigned int delay;
+
+    BOARD_Init();
+    SERIAL_Init();
+    PS_Init();
+
+    printf("\r\nTurn right 90 movement test\r\n");
+
+    while (1) {
+                            PS_TankTurnRightDist(500, 1);
+
+        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
+
+//        PS_Forward(500);
+//        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
+    }
+}
+
 #endif

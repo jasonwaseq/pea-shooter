@@ -10,6 +10,7 @@
       <itemPath>../include/AD.h</itemPath>
       <itemPath>../include/pwm.h</itemPath>
       <itemPath>peashooter.h</itemPath>
+      <itemPath>../HSM.X/ES_Configure.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -91,7 +92,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="..\include;..\src;C:\Users\asus\Documents\ece118\pea-shooter\Movement.X"/>
+                  value="..\include;..\src;C:\Users\asus\Documents\ece118\pea-shooter\Movement.X;..\HSM.X;..\BeaconDetector.X;..\HSM.X"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -100,7 +101,7 @@
         <property key="place-data-into-section" value="false"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value=""/>
+        <property key="preprocessor-macros" value="RUN_HSM"/>
         <property key="strict-ansi" value="false"/>
         <property key="support-ansi" value="false"/>
         <property key="tentative-definitions" value="-fno-common"/>
