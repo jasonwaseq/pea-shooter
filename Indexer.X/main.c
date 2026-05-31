@@ -22,7 +22,7 @@ int main(void)
     printf("\r\nStarting Indexer ES Framework project\r\n");
     printf("Indexer PWM output defaults to %s; edit IndexerService.h if rewired.\r\n",
             INDEXER_PWM_PIN_NAME);
-    printf("Beacon detector analog voltage must be wired to V3 by default, not X3.\r\n");
+    printf("Beacon detector logic lives in BeaconDetector.X.\r\n");
 
     errorType = ES_Initialize();
     if (errorType == Success) {

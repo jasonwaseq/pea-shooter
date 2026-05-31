@@ -9,28 +9,28 @@
 // PWM channels used to control speed for each motor.
 #define LEFT_PWM PWM_PORTY10
 #define RIGHT_PWM PWM_PORTY12
-#define INDEXER_PWM PWM_PORTY04
+#define INDEXER_PWM PWM_PORTZ06
 
 // Motor direction outputs use four consecutive Port Y pins: Y05-Y08.
-#define LEFT_IN1 PORTY05_LAT
-#define LEFT_IN2 PORTY06_LAT
+#define LEFT_IN1 PORTY06_LAT
+#define LEFT_IN2 PORTY05_LAT
 
-#define RIGHT_IN1 PORTY07_LAT
-#define RIGHT_IN2 PORTY08_LAT
+#define RIGHT_IN1 PORTY08_LAT
+#define RIGHT_IN2 PORTY07_LAT
 
 // TRIS bits that set the motor direction pins as inputs or outputs.
-#define LEFT_IN1_TRIS PORTY06_TRIS //in 2
-#define LEFT_IN2_TRIS PORTY05_TRIS //in 1
-#define RIGHT_IN1_TRIS PORTY08_TRIS //in 4
-#define RIGHT_IN2_TRIS PORTY07_TRIS // in 3
+#define LEFT_IN1_TRIS PORTY06_TRIS
+#define LEFT_IN2_TRIS PORTY05_TRIS
+#define RIGHT_IN1_TRIS PORTY08_TRIS
+#define RIGHT_IN2_TRIS PORTY07_TRIS
 
-// Analog input channel used by the peashooter switch sensor.
-#define SWITCH_SENSOR PORTZ04_BIT
+// Digital input pin used by the peashooter switch sensor.
+#define SWITCH_SENSOR PORTW04_BIT
 
-// Analog input channels used by the left, middle, and right tape sensors.
-#define LEFT_TAPE   PORTZ03_BIT
-#define MID_TAPE  PORTZ06_BIT
-#define RIGHT_TAPE   PORTZ05_BIT
+// Digital input pins used by the left, middle, and right tape sensors.
+#define LEFT_TAPE  PORTW03_BIT
+#define MID_TAPE   PORTW06_BIT
+#define RIGHT_TAPE PORTW05_BIT
 
 
 // Battery readings used to scale motor PWM duty cycle as the battery voltage changes.
@@ -174,11 +174,11 @@ void PS_Init(void) {
     PS_RightMotorInit();
     PS_IndexerMotorInit();
 
-    // Initialize ADC support for the switch and tape sensor analog channels.
-    PORTZ03_TRIS = 1;
-    PORTZ04_TRIS = 1;
-    PORTZ05_TRIS = 1;
-    PORTZ06_TRIS = 1;
+    // Configure switch and tape sensor pins as digital inputs.
+    PORTW03_TRIS = 1;
+    PORTW04_TRIS = 1;
+    PORTW05_TRIS = 1;
+    PORTW06_TRIS = 1;
 }
 
 // Reads the current battery voltage from the always-enabled battery monitor.

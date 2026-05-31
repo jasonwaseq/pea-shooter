@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>PwmOutput</name>
+            <name>Indexer</name>
             <creation-uuid>7c30b4af-0e7a-4f80-9d30-0ddc1d532a8d</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

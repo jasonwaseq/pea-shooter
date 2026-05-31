@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>shooter</name>
+            <name>Shooter</name>
             <creation-uuid>0d1d2682-e016-40d1-9b37-6c4fe56f42dc</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

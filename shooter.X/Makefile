@@ -1,5 +1,5 @@
 #
-# Project Makefile for shooter.X.
+# Project Makefile for Shooter.X.
 #
 # MPLAB X includes this file from generated nbproject makefiles, so keep project
 # customization here instead of editing generated files directly.

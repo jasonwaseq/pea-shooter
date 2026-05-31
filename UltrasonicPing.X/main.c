@@ -5,7 +5,7 @@
  *   HC-SR04 VCC  -> board 5V
  *   HC-SR04 GND  -> board GND
  *   HC-SR04 TRIG -> PortX-10 / RD7
- *   HC-SR04 ECHO -> PortX-11 / RD4 through a 5V-to-3.3V divider
+ *   HC-SR04 ECHO -> PortX-12 / RD6 through a 5V-to-3.3V divider
  */
 
 #include <BOARD.h>
@@ -19,12 +19,12 @@
 #define HCSR04_TRIG_PIN PIN10
 #define HCSR04_TRIG_BIT BIT_7
 #define HCSR04_TRIG_NAME "PortX-10 / RD7"
-#define HCSR04_ECHO_PORT_NAME "PortX-11 / RD4 / J5-01 / chipKIT D33"
+#define HCSR04_ECHO_PORT_NAME "PortX-12 / RD6"
 
 #define HCSR04_TRIG_TRIS TRISDbits.TRISD7
 #define HCSR04_TRIG_LAT LATDbits.LATD7
-#define HCSR04_ECHO_TRIS TRISDbits.TRISD4
-#define HCSR04_ECHO_PORT PORTDbits.RD4
+#define HCSR04_ECHO_TRIS TRISDbits.TRISD6
+#define HCSR04_ECHO_PORT PORTDbits.RD6
 
 #define HCSR04_TIMEOUT_US 60000u
 #define PING_INTERVAL_US 100000u

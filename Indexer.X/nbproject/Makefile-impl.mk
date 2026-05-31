@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=PwmOutput.X
+PROJECTNAME=Indexer.X
 
 # Active Configuration
 DEFAULTCONF=default

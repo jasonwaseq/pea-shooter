@@ -21,8 +21,6 @@ typedef enum {
 
 static uint8_t MyPriority;
 static IndexerState_t CurrentState;
-static uint16_t BeaconStrength;
-static uint8_t BeaconPresent;
 
 static uint8_t SetIndexerDuty(unsigned int duty)
 {
@@ -35,8 +33,6 @@ uint8_t InitIndexerService(uint8_t priority)
 
     MyPriority = priority;
     CurrentState = INDEXER_OFF;
-    BeaconStrength = 0;
-    BeaconPresent = FALSE;
 
     if (PWM_Init() != SUCCESS) {
         return FALSE;
@@ -94,44 +90,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
         printf("Indexer ready on %s at %u Hz\r\n",
                 INDEXER_PWM_PIN_NAME,
                 PWM_GetFrequency());
-        printf("Beacon ADC input defaults to V3, not X3. Detect delta: %u, lost delta: %u\r\n",
-                BEACON_DETECT_DELTA_THRESHOLD,
-                BEACON_LOST_DELTA_THRESHOLD);
-        printf("Reset with beacon blocked/off so baseline is true no-beacon ADC.\r\n");
-        break;
-
-    case BEACON_STRENGTH_CHANGED:
-        BeaconStrength = thisEvent.EventParam;
-        break;
-
-    case BEACON_SAMPLE:
-        printf("Beacon raw: %u filt: %u base: %u excess: %u score: %u present: %u\r\n",
-                thisEvent.EventParam,
-                BeaconFilteredReading(),
-                BeaconBaselineReading(),
-                BeaconExcessReading(),
-                BeaconConfidenceScore(),
-                BeaconPresent);
-        break;
-
-    case BEACON_DETECTED:
-        BeaconPresent = TRUE;
-        BeaconStrength = thisEvent.EventParam;
-        printf("Beacon detected, excess: %u raw: %u filt: %u base: %u\r\n",
-                BeaconStrength,
-                BeaconRawReading(),
-                BeaconFilteredReading(),
-                BeaconBaselineReading());
-        break;
-
-    case BEACON_LOST:
-        BeaconPresent = FALSE;
-        BeaconStrength = thisEvent.EventParam;
-        printf("Beacon lost, excess: %u raw: %u filt: %u base: %u\r\n",
-                BeaconStrength,
-                BeaconRawReading(),
-                BeaconFilteredReading(),
-                BeaconBaselineReading());
         break;
 
     case INDEXER_START:

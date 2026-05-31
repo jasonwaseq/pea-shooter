@@ -1,8 +1,7 @@
 /*
- * shooter
+ * Shooter.X
  *
- * ES Framework application entry point for driving an IBT-2/BTS7960 motor
- * driver from the Uno32 I/O protection stack.
+ * ES Framework application entry point for the shooter motor outputs.
  */
 
 #include <BOARD.h>
@@ -19,11 +18,15 @@ int main(void)
 
     BOARD_Init();
 
-    printf("\r\nStarting shooter ES Framework project\r\n");
+    printf("\r\nStarting Shooter ES Framework project\r\n");
     printf("IBT-2 RPWM: %s, LPWM: %s\r\n",
             SHOOTER_RPWM_PIN_NAME,
             SHOOTER_LPWM_PIN_NAME);
-    printf("Motor auto-start disabled; printing beacon detector ADC only.\r\n");
+    printf("IBT-2 R_EN: %s, L_EN: %s\r\n",
+            SHOOTER_REN_ENABLE_NAME,
+            SHOOTER_LEN_ENABLE_NAME);
+    printf("Secondary shooter PWM: %s\r\n", SECONDARY_SHOOTER_PWM_PIN_NAME);
+    printf("Primary motor auto-start disabled; secondary PWM auto-starts.\r\n");
 
     errorType = ES_Initialize();
     if (errorType == Success) {

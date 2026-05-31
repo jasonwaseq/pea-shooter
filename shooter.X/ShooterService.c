@@ -1,7 +1,8 @@
 /*
  * ShooterService.c
  *
- * ES service for commanding an IBT-2/BTS7960 motor driver.
+ * ES service for commanding the primary IBT-2/BTS7960 shooter motor driver
+ * and a fixed-duty secondary shooter PWM output.
  */
 
 #include "ShooterService.h"
@@ -10,6 +11,7 @@
 
 #include "BOARD.h"
 #include "ES_Framework.h"
+#include "ES_Timers.h"
 #include "ShooterEventChecker.h"
 
 typedef enum {
@@ -19,6 +21,22 @@ typedef enum {
 
 static uint8_t MyPriority;
 static ShooterState_t CurrentState;
+static unsigned int SecondaryShooterDuty;
+static uint8_t SecondaryShooterPwmActive;
+static uint8_t SecondaryShooterOutputHigh;
+
+static uint8_t ConfigureSecondaryShooterPin(void)
+{
+    if (IO_PortsSetPortOutputs(SECONDARY_SHOOTER_PWM_PORT,
+            SECONDARY_SHOOTER_PWM_BIT) != SUCCESS) {
+        return FALSE;
+    }
+    if (IO_PortsClearPortBits(SECONDARY_SHOOTER_PWM_PORT,
+            SECONDARY_SHOOTER_PWM_BIT) != SUCCESS) {
+        return FALSE;
+    }
+    return TRUE;
+}
 
 static uint8_t ConfigureEnablePins(void)
 {
@@ -69,12 +87,66 @@ static uint8_t StopMotorOutput(void)
     return DisableDriver();
 }
 
+static uint8_t SetSecondaryShooterDuty(unsigned int duty)
+{
+    uint32_t highTime;
+    uint32_t lowTime;
+
+    if (duty > MAX_PWM) {
+        return FALSE;
+    }
+
+    SecondaryShooterDuty = duty;
+
+    if (duty == MIN_PWM) {
+        SecondaryShooterPwmActive = FALSE;
+        ES_Timer_StopTimer(SHOOTER_TIMER);
+        return IO_PortsClearPortBits(SECONDARY_SHOOTER_PWM_PORT,
+                SECONDARY_SHOOTER_PWM_BIT) == SUCCESS;
+    }
+
+    if (duty == MAX_PWM) {
+        SecondaryShooterPwmActive = FALSE;
+        ES_Timer_StopTimer(SHOOTER_TIMER);
+        return IO_PortsSetPortBits(SECONDARY_SHOOTER_PWM_PORT,
+                SECONDARY_SHOOTER_PWM_BIT) == SUCCESS;
+    }
+
+    highTime = ((uint32_t) SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS * duty)
+            / MAX_PWM;
+    if (highTime == 0) {
+        highTime = 1;
+    }
+    lowTime = SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS - highTime;
+    if (lowTime == 0) {
+        lowTime = 1;
+    }
+
+    SecondaryShooterPwmActive = TRUE;
+    SecondaryShooterOutputHigh = TRUE;
+
+    if (IO_PortsSetPortBits(SECONDARY_SHOOTER_PWM_PORT,
+            SECONDARY_SHOOTER_PWM_BIT) != SUCCESS) {
+        SecondaryShooterPwmActive = FALSE;
+        return FALSE;
+    }
+    return ES_Timer_InitTimer(SHOOTER_TIMER, highTime) == ES_Timer_OK;
+}
+
+static uint8_t StopSecondaryShooterOutput(void)
+{
+    return SetSecondaryShooterDuty(MIN_PWM);
+}
+
 uint8_t InitShooterService(uint8_t priority)
 {
     ES_Event initEvent;
 
     MyPriority = priority;
     CurrentState = SHOOTER_DISABLED;
+    SecondaryShooterDuty = MIN_PWM;
+    SecondaryShooterPwmActive = FALSE;
+    SecondaryShooterOutputHigh = FALSE;
 
     if (PWM_Init() != SUCCESS) {
         return FALSE;
@@ -88,7 +160,13 @@ uint8_t InitShooterService(uint8_t priority)
     if (ConfigureEnablePins() != TRUE) {
         return FALSE;
     }
+    if (ConfigureSecondaryShooterPin() != TRUE) {
+        return FALSE;
+    }
     if (StopMotorOutput() != TRUE) {
+        return FALSE;
+    }
+    if (StartSecondaryShooterMotor() != TRUE) {
         return FALSE;
     }
     if (InitShooterEventChecker() != TRUE) {
@@ -123,6 +201,16 @@ uint8_t StopShooterMotor(void)
     return PostShooterService(stopEvent);
 }
 
+uint8_t StartSecondaryShooterMotor(void)
+{
+    return SetSecondaryShooterDuty(SECONDARY_SHOOTER_DUTY_CYCLE);
+}
+
+uint8_t StopSecondaryShooterMotor(void)
+{
+    return StopSecondaryShooterOutput();
+}
+
 ES_Event RunShooterService(ES_Event thisEvent)
 {
     ES_Event returnEvent;
@@ -137,6 +225,10 @@ ES_Event RunShooterService(ES_Event thisEvent)
                 SHOOTER_LPWM_PIN_NAME,
                 SHOOTER_REN_ENABLE_NAME,
                 SHOOTER_LEN_ENABLE_NAME);
+        printf("Secondary shooter PWM: %s at %u.%u%% duty\r\n",
+                SECONDARY_SHOOTER_PWM_PIN_NAME,
+                SECONDARY_SHOOTER_DUTY_CYCLE / 10,
+                SECONDARY_SHOOTER_DUTY_CYCLE % 10);
         printf("PWM frequency: %u Hz\r\n", PWM_GetFrequency());
         break;
 
@@ -165,7 +257,36 @@ ES_Event RunShooterService(ES_Event thisEvent)
         printf("Shooter motor stopped\r\n");
         break;
 
+    case ES_TIMEOUT:
+        if ((thisEvent.EventParam == SHOOTER_TIMER)
+                && (SecondaryShooterPwmActive == TRUE)) {
+            uint32_t highTime = ((uint32_t) SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS
+                    * SecondaryShooterDuty) / MAX_PWM;
+            uint32_t lowTime = SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS - highTime;
+
+            if (highTime == 0) {
+                highTime = 1;
+            }
+            if (lowTime == 0) {
+                lowTime = 1;
+            }
+
+            if (SecondaryShooterOutputHigh == TRUE) {
+                IO_PortsClearPortBits(SECONDARY_SHOOTER_PWM_PORT,
+                        SECONDARY_SHOOTER_PWM_BIT);
+                SecondaryShooterOutputHigh = FALSE;
+                ES_Timer_InitTimer(SHOOTER_TIMER, lowTime);
+            } else {
+                IO_PortsSetPortBits(SECONDARY_SHOOTER_PWM_PORT,
+                        SECONDARY_SHOOTER_PWM_BIT);
+                SecondaryShooterOutputHigh = TRUE;
+                ES_Timer_InitTimer(SHOOTER_TIMER, highTime);
+            }
+        }
+        break;
+
     case ES_EXIT:
+        StopSecondaryShooterOutput();
         StopMotorOutput();
         PWM_End();
         CurrentState = SHOOTER_DISABLED;

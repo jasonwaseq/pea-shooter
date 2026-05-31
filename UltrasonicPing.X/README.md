@@ -12,7 +12,7 @@ Use these connections:
 | `VCC` | Board `5V` |
 | `GND` | Board `GND` |
 | `TRIG` | `PortX-10` / `RD7` |
-| `ECHO` | `PortX-11` / `RD4` / Uno32 `J5-01` / chipKIT digital `33`, through the divider below |
+| `ECHO` | `PortX-12` / `RD6`, through the divider below |
 
 Do not connect `ECHO` directly to the PIC32 input. The HC-SR04 drives `ECHO`
 near 5 V, while the PIC32 I/O input should see about 3.3 V.
@@ -20,23 +20,22 @@ near 5 V, while the PIC32 I/O input should see about 3.3 V.
 Use this divider:
 
 ```text
-HC-SR04 ECHO --- 1.2 kOhm ---+--- PortX-11 / RD4 / J5-01 / chipKIT D33
+HC-SR04 ECHO --- 1.2 kOhm ---+--- PortX-12 / RD6
                              |
                            2.2 kOhm
                              |
                             GND
 ```
 
-If you use the Uno32 headers directly, `ECHO` is chipKIT digital pin 33 on
-shield connector J5. The course I/O protection board labels are usually the
-least ambiguous path: `TRIG` on `PortX-10`, `ECHO` on `PortX-11`.
+The course I/O protection board labels are usually the least ambiguous path:
+`TRIG` on `PortX-10`, `ECHO` on `PortX-12`.
 
 The sensor, divider, and Uno32 must share ground.
 
 ## What the Firmware Does
 
 - Sends a 10 us trigger pulse on `PortX-10`.
-- Measures the returning `ECHO` pulse on `PortX-11` / `J5-01` / chipKIT `D33`.
+- Measures the returning `ECHO` pulse on `PortX-12`.
 - Converts pulse width to distance using 343 m/s for speed of sound.
 - Smooths readings with an 8-sample moving average.
 - Captures a reference distance from 16 good samples at startup.
@@ -56,7 +55,7 @@ Example output:
 ```text
 HC-SR04 ultrasonic ping demo
 TRIG: PortX-10 / RD7
-ECHO: PortX-11 / RD4 / J5-01 / chipKIT D33
+ECHO: PortX-12 / RD6
 reference_cm=20.1
 raw_cm=18.9 avg_cm=19.5 avg_in=7.7 ref_cm=20.1 state=near_reference
 raw_cm=8.7 avg_cm=9.8 avg_in=3.9 ref_cm=20.1 state=really_close

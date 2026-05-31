@@ -6,5 +6,5 @@
 CND_BASEDIR=`pwd`
 # default configuration
 CND_ARTIFACT_DIR_default=dist/default/production
-CND_ARTIFACT_NAME_default=PwmOutput.X.production.hex
-CND_ARTIFACT_PATH_default=dist/default/production/PwmOutput.X.production.hex
+CND_ARTIFACT_NAME_default=Indexer.X.production.hex
+CND_ARTIFACT_PATH_default=dist/default/production/Indexer.X.production.hex

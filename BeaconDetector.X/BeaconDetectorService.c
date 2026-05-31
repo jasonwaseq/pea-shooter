@@ -42,11 +42,13 @@ ES_Event RunBeaconDetectorService(ES_Event thisEvent)
 
     switch (thisEvent.EventType) {
     case ES_INIT:
-        printf("adc_pin=%s\r\n", BEACON_DETECTOR_PIN_NAME);
+        printf("adc1_pin=%s adc2_pin=%s\r\n",
+                BEACON_1_DETECTOR_PIN_NAME,
+                BEACON_2_DETECTOR_PIN_NAME);
         break;
 
     case BEACON_STRENGTH_CHANGED:
-        printf("%u\r\n", thisEvent.EventParam);
+        printf("%u,%u\r\n", Beacon1ADCReading(), Beacon2ADCReading());
         break;
 
     default:

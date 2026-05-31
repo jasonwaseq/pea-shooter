@@ -1,5 +1,5 @@
 #
-# Project Makefile for PwmOutput.X.
+# Project Makefile for Indexer.X.
 #
 # MPLAB X includes this file from generated nbproject makefiles, so keep project
 # customization here instead of editing generated files directly.
