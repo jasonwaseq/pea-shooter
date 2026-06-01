@@ -43,6 +43,12 @@ typedef enum {
     BORDER_FOUND,
     FRONT_BORDER_DONE,
     SIDE_BORDER_DONE,
+    FRONT_BORDER_ALIGNED,
+    FOUND_OBSTACLE,
+    OBSTACLE_CLEARED,
+    FIRST_BORDER_DONE,
+    SECOND_BORDER_DONE,
+    ISZ_BORDER,
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -71,7 +77,13 @@ static const char *EventNames[] = {
 	"NO_TAPE_DETECTED",
 	"BORDER_FOUND",
     "FRONT_BORDER_DONE",
+    "FRONT_BORDER_ALIGNED",
     "SIDE_BORDER_DONE",
+    "FOUND_OBSTACLE",
+    "OBSTACLE_CLEARED",
+    "FIRST_BORDER_DONE",
+    "SECOND_BORDER_DONE",
+    "ISZ_BORDER",
 };
 
 /****************************************************************************/

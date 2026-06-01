@@ -354,15 +354,22 @@ void main(void)
     SERIAL_Init();
     PS_Init();
 
-    printf("\r\nTurn right 90 movement test\r\n");
+    printf("\r\nRight motor then left motor movement test\r\n");
 
     while (1) {
-                            PS_TankTurnRightDist(500, 1);
+        printf("\r\nRight motor forward\r\n");
+        PS_RightMtrSpeed(900);
 
         DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
 
-//        PS_Forward(500);
-//        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
+        PS_RightMtrSpeed(100);
+
+        printf("\r\nLeft motor forward\r\n"); 
+        PS_LeftMtrSpeed(900);
+
+        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
+
+        PS_LeftMtrSpeed(100);
     }
 }
 

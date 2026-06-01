@@ -76,11 +76,11 @@ static char PS_SetLeftMotor(unsigned int speed, unsigned char reverse) {
     }
 
     if (reverse) {
-        LEFT_IN1 = 0;
-        LEFT_IN2 = 1;
-    } else {
         LEFT_IN1 = 1;
         LEFT_IN2 = 0;
+    } else {
+        LEFT_IN1 = 0;
+        LEFT_IN2 = 1;
     }
 
     dutyCycle = speed * (MAX_PWM / PEASHOOTER_MAX_SPEED);
@@ -102,11 +102,11 @@ static char PS_SetRightMotor(unsigned int speed, unsigned char reverse) {
     }
 
     if (reverse) {
-        RIGHT_IN1 = 0;
-        RIGHT_IN2 = 1;
-    } else {
         RIGHT_IN1 = 1;
         RIGHT_IN2 = 0;
+    } else {
+        RIGHT_IN1 = 0;
+        RIGHT_IN2 = 1;
     }
 
     dutyCycle = speed * (MAX_PWM / PEASHOOTER_MAX_SPEED);
@@ -444,8 +444,25 @@ char PS_TurnRight90(){
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
-    PS_SetRightMotor(500, 1);
-    PS_SetLeftMotor(500, 0);
+    PS_SetRightMotor(700, 1);
+    PS_SetLeftMotor(700, 0);
+
+    // Hold the turn for the calibrated right-turn delay.
+    DELAY_COUNTS(TURN_90_TIME);
+
+    // Stop both drive motors after the turn delay.
+    PS_Stop();
+
+    // Report success after the turn completes.
+    return SUCCESS;
+}
+
+char PS_TurnLeft90(){
+    unsigned int delay;
+
+    // Right motor reverse and left motor forward creates a right turn.
+    PS_SetRightMotor(700, 0);
+    PS_SetLeftMotor(700, 1);
 
     // Hold the turn for the calibrated right-turn delay.
     DELAY_COUNTS(TURN_90_TIME);
@@ -462,6 +479,17 @@ char PS_AngledForward(unsigned int power) {
     // Left motor faster, right motor slower = slight right curve
     PS_LeftMtrSpeed(power);
     PS_RightMtrSpeed(power-100);
+    
+
+    return SUCCESS;
+}
+
+
+char PS_AngledForward2(unsigned int power) {
+    unsigned int delay;
+    // Left motor faster, right motor slower = slight right curve
+    PS_LeftMtrSpeed(power - 100);
+    PS_RightMtrSpeed(power);
     
 
     return SUCCESS;

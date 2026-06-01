@@ -30,7 +30,7 @@
 
 #define TURN_LEFT_TIME  800000
 #define TURN_RIGHT_TIME 800000
-#define TURN_90_TIME 1200000
+#define TURN_90_TIME 900000
 
 // Busy-wait delay macro used by the turn helper functions.
 #define DELAY_COUNTS(x) for(delay = 0; delay < (x); delay++) {asm("nop");}
@@ -105,7 +105,10 @@ char PS_PivotTurnLeft(unsigned int power);
 char PS_PivotTurnRight(unsigned int power);
 
 char PS_TurnRight90(void);
+char PS_TurnLeft90(void);
 
 char PS_AngledForward(unsigned int power);
+
+char PS_AngledForward2(unsigned int power);
 
 #endif
