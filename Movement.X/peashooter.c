@@ -37,6 +37,10 @@
 #define PS_NOMINAL_BATTERY_VOLTAGE 310
 #define PS_MIN_BATTERY_COMP_VOLTAGE 263
 
+// Wheel offsets
+#define LEFT_MTR_OFFSET 1
+#define RIGHT_MTR_OFFSET 1.11 //105% aka 5% higher
+
 // Adjusts a requested PWM duty cycle upward as battery voltage drops.
 
 static unsigned int PS_CompensateDutyForBattery(unsigned int dutyCycle) {
@@ -64,6 +68,7 @@ static unsigned int PS_CompensateDutyForBattery(unsigned int dutyCycle) {
 
 static char PS_SetLeftMotor(unsigned int speed, unsigned char reverse) {
     unsigned int dutyCycle;
+    speed *= LEFT_MTR_OFFSET;
 
     if (speed > PEASHOOTER_MAX_SPEED) {
         return ERROR;
@@ -89,6 +94,7 @@ static char PS_SetLeftMotor(unsigned int speed, unsigned char reverse) {
 }
 
 static char PS_SetRightMotor(unsigned int speed, unsigned char reverse) {
+    speed *= RIGHT_MTR_OFFSET;
     unsigned int dutyCycle;
 
     if (speed > PEASHOOTER_MAX_SPEED) {

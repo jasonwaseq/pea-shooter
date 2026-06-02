@@ -354,22 +354,14 @@ void main(void)
     SERIAL_Init();
     PS_Init();
 
-    printf("\r\nRight motor then left motor movement test\r\n");
+    printf("Testing Moving Functions\n");
 
     while (1) {
-        printf("\r\nRight motor forward\r\n");
-        PS_RightMtrSpeed(900);
-
+        PS_TurnRight90();
         DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
 
-        PS_RightMtrSpeed(100);
-
-        printf("\r\nLeft motor forward\r\n"); 
-        PS_LeftMtrSpeed(900);
-
+        PS_TurnLeft90();
         DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
-
-        PS_LeftMtrSpeed(100);
     }
 }
 

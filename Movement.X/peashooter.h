@@ -30,7 +30,7 @@
 
 #define TURN_LEFT_TIME  800000
 #define TURN_RIGHT_TIME 800000
-#define TURN_90_TIME 900000
+#define TURN_90_TIME 600000
 
 // Busy-wait delay macro used by the turn helper functions.
 #define DELAY_COUNTS(x) for(delay = 0; delay < (x); delay++) {asm("nop");}
