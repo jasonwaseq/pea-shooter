@@ -49,6 +49,7 @@
 #define RC_PORTV04 0x080
 #define RC_PORTW07 0x100
 #define RC_PORTW08 0x200
+#define RC_PORTZ04 0x400
 
 
 /*******************************************************************************

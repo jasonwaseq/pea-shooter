@@ -26,8 +26,8 @@ typedef enum {
     ES_TIMEOUT,
     ES_TIMERACTIVE,
     ES_TIMERSTOPPED,
-    SHOOTER_START,
-    SHOOTER_STOP,
+    PRIMARY_SHOOTER_START,
+    PRIMARY_SHOOTER_STOP,
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
 
@@ -42,8 +42,8 @@ static const char *EventNames[] = {
     "ES_TIMEOUT",
     "ES_TIMERACTIVE",
     "ES_TIMERSTOPPED",
-    "SHOOTER_START",
-    "SHOOTER_STOP",
+    "PRIMARY_SHOOTER_START",
+    "PRIMARY_SHOOTER_STOP",
     "NUMBEROFEVENTS",
 };
 

@@ -8,8 +8,8 @@ Simple current robot wiring map.
 | Beacon detector 2 | `V5` | `AD_PORTV5` |
 | Left drive PWM | `Y10` | `PWM_PORTY10` |
 | Right drive PWM | `Y12` | `PWM_PORTY12` |
-| Indexer PWM | `Z6` | `PWM_PORTZ06` |
-| Secondary shooter | `Z4` | `PORTZ`, `PIN4` |
+| Indexer PWM | `Z4` | `RC_PORTZ04` |
+| Secondary shooter PWM | `Z6` | `PWM_PORTZ06` |
 | Left tape | `W3` | `PORTW03_BIT` |
 | Switch sensor | `W4` | `PORTW04_BIT` |
 | Right tape | `W5` | `PORTW05_BIT` |
@@ -20,12 +20,13 @@ Simple current robot wiring map.
 | Left motor IN2 | `Y5` | `PORTY05_LAT` |
 | Right motor IN1 | `Y8` | `PORTY08_LAT` |
 | Right motor IN2 | `Y7` | `PORTY07_LAT` |
-| Shooter LPWM | `X11` | `PWM_PORTX11` |
-| Shooter RPWM | `Y4` | `PWM_PORTY04` |
-| Shooter R_EN | `X3` | `PORTX`, `PIN3` |
-| Shooter L_EN | `X4` | `PORTX`, `PIN4` |
+| Primary shooter LPWM | `X11` | `PWM_PORTX11` |
+| Primary shooter RPWM | `Y4` | `PWM_PORTY04` |
+| Primary shooter R_EN | `X3` | `PORTX`, `PIN3` |
+| Primary shooter L_EN | `X4` | `PORTX`, `PIN4` |
 
 ## Notes
 
 - `Z6`, `Y12`, `Y10`, `Y4`, and `X11` are the hardware PWM-capable pins used by this codebase.
+- The indexer uses `RC_Servo` on `Z4` so `Z6` is free for the secondary shooter.
 - HC-SR04 `ECHO` must go through a 5 V to 3.3 V divider before reaching `X12`.

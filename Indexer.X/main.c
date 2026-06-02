@@ -20,8 +20,8 @@ int main(void)
     BOARD_Init();
 
     printf("\r\nStarting Indexer ES Framework project\r\n");
-    printf("Indexer PWM output defaults to %s; edit IndexerService.h if rewired.\r\n",
-            INDEXER_PWM_PIN_NAME);
+    printf("Indexer output defaults to %s; edit IndexerService.h if rewired.\r\n",
+            INDEXER_OUTPUT_PIN_NAME);
     printf("Beacon detector logic lives in BeaconDetector.X.\r\n");
 
     errorType = ES_Initialize();
