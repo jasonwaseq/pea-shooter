@@ -6,10 +6,11 @@ motor outputs from the PIC32MX320F128H / Uno32 I/O protection stack.
 Default firmware behavior:
 
 - Primary shooter motor auto-start: disabled
-- Secondary shooter software PWM output: `PortZ-04`
+- Primary shooter direction: drives `RPWM`/`PortY-04`, holds `LPWM`/`PortX-11` low
+- Primary shooter duty cycle: `900 / 1000`, or 90.0%
+- Secondary shooter hardware PWM output: `PortZ-06`
 - Secondary shooter duty cycle: `500 / 1000`, or 50.0%
 - Hardware PWM frequency: `PWM_1KHZ`
-- Secondary software PWM period: `20 ms`
 
 ## Wiring
 
@@ -17,11 +18,11 @@ Power everything off before wiring.
 
 Uno32 stack control wiring:
 
-- Uno32 `PortY-04` -> IBT-2 `RPWM`
-- Uno32 `PortX-11` -> IBT-2 `LPWM`
-- Uno32 `PortX-03` -> IBT-2 `R_EN`
-- Uno32 `PortX-04` -> IBT-2 `L_EN`
-- Uno32 `PortZ-04` -> secondary shooter motor driver PWM/control input
+- Primary shooter: Uno32 `PortY-04` -> IBT-2 `RPWM`
+- Primary shooter: Uno32 `PortX-11` -> IBT-2 `LPWM`
+- Primary shooter: Uno32 `PortX-03` -> IBT-2 `R_EN`
+- Primary shooter: Uno32 `PortX-04` -> IBT-2 `L_EN`
+- Secondary shooter: Uno32 `PortZ-06` -> motor driver PWM/control input
 - Uno32 `GND` -> IBT-2 logic `GND`
 - Uno32 `5V` -> IBT-2 logic `VCC`
 
@@ -41,12 +42,14 @@ Important notes:
 - Do not power either motor directly from an Uno32 pin.
 - The local hardware PWM module only supports
   `PWM_PORTZ06`, `PWM_PORTY12`, `PWM_PORTY10`, `PWM_PORTY04`, and
-  `PWM_PORTX11`. The secondary shooter uses software PWM so it can run on
-  digital `PortZ-04` instead of hardware PWM `PortZ-06`.
+  `PWM_PORTX11`.
 
 With the default code, the primary shooter motor driver is initialized but left
-disabled. The secondary shooter PWM output starts at the fixed duty cycle after
-initialization.
+disabled. The secondary shooter hardware PWM output starts at the fixed duty
+cycle after initialization.
+
+When the primary shooter is started, the service drives `RPWM` and holds `LPWM`
+low on the primary IBT-2 motor driver.
 
 Beacon detector ADC logic is intentionally kept in `BeaconDetector.X`.
 

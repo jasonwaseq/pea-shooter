@@ -58,9 +58,9 @@
 #define TIMER_LED   LATGbits.LATG6
 #endif
 
-#define RCPINCOUNT      10
+#define RCPINCOUNT      11
 #define SERVOCENTER     1500
-#define RCPERIODTIME    (RCPINCOUNT * MAXPULSE)
+#define RCPERIODTIME    20000
 #define FULLOVERFLOW    0xFFFF
 
 #define RC_TRISX03  TRISFbits.TRISF5
@@ -96,7 +96,7 @@
 #define F_PB_IN_KHZ (F_PB/1000)
 #define PRESCALE    2
 #define uSEC        (F_PB_IN_KHZ / (PRESCALE * 1000))
-#define ALLRCPINS   0x3FF
+#define ALLRCPINS   0x7FF
 
 /* Code readability Macros, information hiding */
 #define RC_SetOutput(pin)   *RC_TRISCLR[pin] = rcBitsMap[pin]
@@ -113,23 +113,24 @@
 static volatile unsigned int * const RC_TRISCLR[] = {&TRISFCLR, &TRISBCLR, &TRISDCLR,
     &TRISECLR, &TRISDCLR, &TRISECLR,
     &TRISBCLR, &TRISBCLR, &TRISBCLR,
-    &TRISBCLR};
+    &TRISBCLR, &TRISFCLR};
 
 static volatile unsigned int * const RC_TRISSET[] = {&TRISFSET, &TRISBSET, &TRISDSET,
     &TRISESET, &TRISDSET, &TRISESET,
     &TRISBSET, &TRISBSET, &TRISBSET,
-    &TRISBSET};
+    &TRISBSET, &TRISFSET};
 
 static volatile unsigned int * const RC_LATSET[] = {&LATFSET, &LATBSET, &LATDSET,
     &LATESET, &LATDSET, &LATESET,
     &LATBSET, &LATBSET, &LATBSET,
-    &LATBSET};
+    &LATBSET, &LATFSET};
 static volatile unsigned int * const RC_LATCLR[] = {&LATFCLR, &LATBCLR, &LATDCLR,
     &LATECLR, &LATDCLR, &LATECLR,
     &LATBCLR, &LATBCLR, &LATBCLR,
-    &LATBCLR};
+    &LATBCLR, &LATFCLR};
 static unsigned short int rcBitsMap[] = {BIT_5, BIT_0, BIT_10, BIT_7, BIT_8,
-    BIT_1, BIT_2, BIT_3, BIT_15, BIT_14};
+    BIT_1, BIT_2, BIT_3, BIT_15, BIT_14,
+    BIT_1};
 
 unsigned char RCenabled = FALSE;
 

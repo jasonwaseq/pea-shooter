@@ -203,9 +203,9 @@ ES_Event RunHSMService(ES_Event thisEvent) {
         case InitPState:
             if (thisEvent.EventType == ES_INIT) {
                 printf("RunHSMService: InitPState\r\n");
-                // nextState = BeaconAlignmentState;
+                nextState = BeaconAlignmentState;
                 // nextState = SearchForFrontBorderState;
-                nextState = RideRIghtTapeState;
+                // nextState = RideTapeState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
             }

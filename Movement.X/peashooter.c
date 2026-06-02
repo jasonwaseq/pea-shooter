@@ -9,7 +9,6 @@
 // PWM channels used to control speed for each motor.
 #define LEFT_PWM PWM_PORTY10
 #define RIGHT_PWM PWM_PORTY12
-#define INDEXER_PWM PWM_PORTZ06
 
 // Motor direction outputs use four consecutive Port Y pins: Y05-Y08.
 #define LEFT_IN1 PORTY06_LAT
@@ -156,14 +155,11 @@ void PS_RightMotorInit(void) {
     PWM_SetDutyCycle(RIGHT_PWM, 0);
 }
 
-// Initializes the indexer motor PWM pin and leaves it stopped.
+// Initializes the indexer motor output.
 
 void PS_IndexerMotorInit(void) {
-    // Enable PWM output on the indexer motor speed-control pin.
-    PWM_AddPins(INDEXER_PWM);
-
-    // Start the indexer stopped until a feed command sets its duty cycle.
-    PWM_SetDutyCycle(INDEXER_PWM, 0);
+    // Indexer moved off hardware PWM Z6. The standalone Indexer.X project
+    // drives it on Z4 through RC_Servo when indexer testing is needed.
 }
 
 // Initializes all peashooter hardware used by motors and sensors.
