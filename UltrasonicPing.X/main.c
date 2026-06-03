@@ -5,7 +5,7 @@
  *   HC-SR04 VCC  -> board 5V
  *   HC-SR04 GND  -> board GND
  *   HC-SR04 TRIG -> PortX-10 / RD7
- *   HC-SR04 ECHO -> PortX-12 / RD6 through a 5V-to-3.3V divider
+ *   HC-SR04 ECHO -> PortY-11 / RE5 through a 5V-to-3.3V divider
  */
 
 #include <BOARD.h>
@@ -19,12 +19,16 @@
 #define HCSR04_TRIG_PIN PIN10
 #define HCSR04_TRIG_BIT BIT_7
 #define HCSR04_TRIG_NAME "PortX-10 / RD7"
-#define HCSR04_ECHO_PORT_NAME "PortX-12 / RD6"
+#define HCSR04_ECHO_PORT_NAME "PortY-11 / RE5"
 
 #define HCSR04_TRIG_TRIS TRISDbits.TRISD7
 #define HCSR04_TRIG_LAT LATDbits.LATD7
-#define HCSR04_ECHO_TRIS TRISDbits.TRISD6
-#define HCSR04_ECHO_PORT PORTDbits.RD6
+#define HCSR04_ECHO_TRIS TRISEbits.TRISE5
+#define HCSR04_ECHO_LAT LATEbits.LATE5
+#define HCSR04_ECHO_PORT PORTEbits.RE5
+#define HCSR04_ECHO_LAT_CLR LATECLR
+#define HCSR04_ECHO_BIT BIT_5
+#define HCSR04_ECHO_IO_PORT PORTY
 
 #define HCSR04_TIMEOUT_US 60000u
 #define PING_INTERVAL_US 100000u
@@ -112,9 +116,25 @@ static void HCSR04_Init(void)
     TriggerLow();
     IO_PortsSetPortOutputs(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN);
     HCSR04_TRIG_TRIS = 0;
+    HCSR04_ECHO_LAT_CLR = HCSR04_ECHO_BIT;
     HCSR04_ECHO_TRIS = 1;
     TriggerLow();
     DelayUs(10000u);
+}
+
+static void HCSR04_PrintPinConfig(void)
+{
+    const uint16_t echoPort = (uint16_t) IO_PortsReadPort(HCSR04_ECHO_IO_PORT);
+
+    printf("pin_diag trig_tris=%u trig_lat=%u trig_port=%u echo_tris=%u echo_lat=%u echo_port=%u echo_io=0x%04X y11_high=%u\r\n",
+            HCSR04_TRIG_TRIS,
+            HCSR04_TRIG_LAT,
+            PORTDbits.RD7,
+            HCSR04_ECHO_TRIS,
+            HCSR04_ECHO_LAT,
+            HCSR04_ECHO_PORT,
+            echoPort,
+            (echoPort & PIN11) != 0);
 }
 
 static HCSR04_Status HCSR04_ReadEchoUs(uint32_t *echoUs)
@@ -202,6 +222,22 @@ static uint8_t HCSR04_ReadDistanceMm(uint32_t *distanceMm)
 
     *distanceMm = EchoUsToMillimeters(echoUs);
     return TRUE;
+}
+
+static const char *HCSR04_StatusName(HCSR04_Status status)
+{
+    switch (status) {
+    case HCSR04_OK:
+        return "ok";
+    case HCSR04_ECHO_STUCK_HIGH_BEFORE_TRIGGER:
+        return "echo_stuck_high_before_trigger";
+    case HCSR04_TIMEOUT_WAITING_FOR_RISE:
+        return "timeout_waiting_for_echo_rise";
+    case HCSR04_TIMEOUT_WAITING_FOR_FALL:
+        return "timeout_waiting_for_echo_fall";
+    default:
+        return "unknown";
+    }
 }
 
 static uint8_t HCSR04_ZeroReference(uint32_t *referenceMm)
@@ -295,6 +331,7 @@ int main(void)
     printf("\r\nHC-SR04 ultrasonic ping demo\r\n");
     printf("TRIG: %s\r\n", HCSR04_TRIG_NAME);
     printf("ECHO: %s\r\n", HCSR04_ECHO_PORT_NAME);
+    HCSR04_PrintPinConfig();
     printf("Use a voltage divider on ECHO before it reaches the PIC32 input.\r\n\r\n");
     printf("Type z in the serial terminal to zero the current object as reference.\r\n");
 
@@ -309,13 +346,26 @@ int main(void)
             TryZeroReference();
         }
 
-        if (HCSR04_ReadDistanceMm(&rawMm)) {
+        HCSR04_Status echoStatus;
+        uint32_t echoUs;
+
+        echoStatus = HCSR04_ReadEchoUs(&echoUs);
+        if (echoStatus == HCSR04_OK) {
+            rawMm = EchoUsToMillimeters(echoUs);
             DistanceFilter_Add(&DistanceAverage, rawMm);
             if (DistanceFilter_GetAverage(&DistanceAverage, &averageMm)) {
                 PrintDistanceLine(rawMm, averageMm);
             }
         } else {
-            printf("distance_cm=ERR no_valid_echo\r\n");
+            const uint16_t echoPort = (uint16_t) IO_PortsReadPort(HCSR04_ECHO_IO_PORT);
+
+            printf("distance_cm=ERR no_valid_echo reason=%s echo=%u echo_tris=%u echo_lat=%u echo_io=0x%04X y11_high=%u\r\n",
+                    HCSR04_StatusName(echoStatus),
+                    HCSR04_ECHO_PORT,
+                    HCSR04_ECHO_TRIS,
+                    HCSR04_ECHO_LAT,
+                    echoPort,
+                    (echoPort & PIN11) != 0);
         }
 
         DelayUs(PING_INTERVAL_US);
