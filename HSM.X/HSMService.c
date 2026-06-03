@@ -16,14 +16,14 @@
 #include "ES_Timers.h"
 
 //called in pivotturn
-#define ALIGN_TO_FRONT_BORDER_POWER 900
-#define ALIGN_TO_RIGHT_BORDER_POWER 900
+#define ALIGN_TO_FRONT_BORDER_POWER 700
+#define ALIGN_TO_RIGHT_BORDER_POWER 700
 
 
 #define HSM_FULL_ROTATION_TIME_MS 5000
 
 //called in forward
-#define SEARCH_FOR_FRONT_BORDER_POWER 900
+#define SEARCH_FOR_FRONT_BORDER_POWER 700
 #define SEARCH_FOR_RIGHT_BORDER_POWER 900
 
 //called in forwarddist
@@ -48,7 +48,10 @@
 
 //called in tankturn
 #define ALIGN_TO_FRONT_BORDER_TANK_POWER 900
-#define ALIGN_TO_FRONT_BORDER_TANK_DIST 4
+#define ALIGN_TO_FRONT_BORDERRIGHT_TANK_DIST 4
+#define ALIGN_TO_FRONT_BORDERLEFT_TANK_DIST 5
+
+
 #define FRONT_TO_LEFT_BORDER_TANK_POWER 900
 #define FRONT_TO_LEFT_BORDER_TANK_DIST 4
 #define LEFT_TO_OBSTACLE_TANK_POWER 700
@@ -90,7 +93,8 @@ typedef enum {
     LeftFrontTapeFoundSubState,
     RightFrontTapeFoundSubState,
     FrontBorderFoundSubState,
-    FrontToLeftBorderSubState,
+    FrontToLeftBorderFromLeftSubState,
+    FrontToLeftBorderFromRightSubState,
 } SearchForFrontBorderSubState_t;
 
 typedef enum {
@@ -203,8 +207,8 @@ ES_Event RunHSMService(ES_Event thisEvent) {
         case InitPState:
             if (thisEvent.EventType == ES_INIT) {
                 printf("RunHSMService: InitPState\r\n");
-                nextState = BeaconAlignmentState;
-                // nextState = SearchForFrontBorderState;
+                // nextState = BeaconAlignmentState;
+                nextState = SearchForFrontBorderState;
                 // nextState = RideTapeState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
@@ -581,7 +585,7 @@ static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent) {
                     break;
 
                 case RIGHT_TAPE_DETECTED:
-                    nextState = FrontBorderFoundSubState;
+                    nextState = FrontToLeftBorderFromLeftSubState;
                     makeTransition = TRUE;
                     thisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -599,7 +603,7 @@ static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent) {
                     break;
 
                 case LEFT_TAPE_DETECTED:
-                    nextState = FrontToLeftBorderSubState;
+                    nextState = FrontToLeftBorderFromRightSubState;
                     makeTransition = TRUE;
                     thisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -609,11 +613,20 @@ static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent) {
             }
             break;
 
-        case FrontToLeftBorderSubState:
+        case FrontToLeftBorderFromRightSubState:
             if (thisEvent.EventType == ES_ENTRY) {
-                printf("RunSearchForFrontBorderSubHSM: FrontToLeftBorderSubState: ES_ENTRY\r\n");
+                printf("RunSearchForFrontBorderSubHSM: FrontToLeftBorderFromRightSubState: ES_ENTRY\r\n");
                 PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, ALIGN_TO_FRONT_BORDER_BACKWARD_DIST);
-                PS_TankTurnRightDist(ALIGN_TO_FRONT_BORDER_TANK_POWER, ALIGN_TO_FRONT_BORDER_TANK_DIST);
+                PS_TankTurnRightDist(ALIGN_TO_FRONT_BORDER_TANK_POWER, ALIGN_TO_FRONT_BORDERRIGHT_TANK_DIST);
+                thisEvent.EventType = FRONT_BORDER_ALIGNED;
+            }
+            break;
+
+        case FrontToLeftBorderFromLeftSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                printf("RunSearchForFrontBorderSubHSM: FrontToLeftBorderFromLeftSubState: ES_ENTRY\r\n");
+                PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, ALIGN_TO_FRONT_BORDER_BACKWARD_DIST);
+                PS_TankTurnRightDist(ALIGN_TO_FRONT_BORDER_TANK_POWER, ALIGN_TO_FRONT_BORDERLEFT_TANK_DIST);
                 thisEvent.EventType = FRONT_BORDER_ALIGNED;
             }
             break;
