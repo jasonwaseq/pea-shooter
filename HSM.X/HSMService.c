@@ -27,9 +27,9 @@
 #define HSM_DRIVE_POWER 700
 #define HSM_CORRECT_POWER 650
 
-#define ALIGN_TO_FRONT_BORDER_POWER 900
-#define ALIGN_TO_RIGHT_BORDER_POWER 900
-#define SEARCH_FOR_FRONT_BORDER_POWER 900
+#define ALIGN_TO_FRONT_BORDER_POWER 700
+#define ALIGN_TO_RIGHT_BORDER_POWER 700
+#define SEARCH_FOR_FRONT_BORDER_POWER 700
 #define SEARCH_FOR_RIGHT_BORDER_POWER 900
 #define OBSTACLE_TO_RIGHT_POWER 900
 #define OBSTACLE_TO_RIGHT_DIST 12
@@ -221,7 +221,10 @@ ES_Event RunHSMService(ES_Event thisEvent) {
     switch (CurrentState) {
         case InitPState:
             if (thisEvent.EventType == ES_INIT) {
-                nextState = HomeState;
+                printf("RunHSMService: InitPState\r\n");
+                // nextState = BeaconAlignmentState;
+                nextState = SearchForFrontBorderState;
+                // nextState = RideTapeState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
             }
