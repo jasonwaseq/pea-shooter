@@ -28,7 +28,6 @@ typedef enum {
     ES_TIMERACTIVE,
     ES_TIMERSTOPPED,
     BEACON_SAMPLE_READY,
-    NUMBEROFEVENTS,
     BATTERY_CONNECTED,
     BATTERY_DISCONNECTED,
     BUMPER_TRIPPED,
@@ -49,6 +48,8 @@ typedef enum {
     FIRST_BORDER_DONE,
     SECOND_BORDER_DONE,
     ISZ_BORDER,
+    HOME_COMPLETE,
+    NUMBEROFEVENTS,
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -63,7 +64,6 @@ static const char *EventNames[] = {
 	"ES_TIMERACTIVE",
 	"ES_TIMERSTOPPED",
 	"BEACON_SAMPLE_READY",
-	"NUMBEROFEVENTS",
 	"BATTERY_CONNECTED",
 	"BATTERY_DISCONNECTED",
 	"BUMPER_TRIPPED",
@@ -77,20 +77,22 @@ static const char *EventNames[] = {
 	"NO_TAPE_DETECTED",
 	"BORDER_FOUND",
     "FRONT_BORDER_DONE",
-    "FRONT_BORDER_ALIGNED",
     "SIDE_BORDER_DONE",
+    "FRONT_BORDER_ALIGNED",
     "FOUND_OBSTACLE",
     "OBSTACLE_CLEARED",
     "FIRST_BORDER_DONE",
     "SECOND_BORDER_DONE",
     "ISZ_BORDER",
+    "HOME_COMPLETE",
+    "NUMBEROFEVENTS",
 };
 
 /****************************************************************************/
 // User event checker list.
 
-#define EVENT_CHECK_HEADER "SensorsEventChecker.h"
-#define EVENT_CHECK_LIST TemplateCheckBattery, TemplateCheckTape, TemplateCheckSwitch
+#define EVENT_CHECK_HEADER "HSMEventCheckers.h"
+#define EVENT_CHECK_LIST CheckHSMEvents
 /****************************************************************************/
 // Timer routing.
 

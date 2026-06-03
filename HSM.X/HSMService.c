@@ -1,188 +1,134 @@
 /*
  * HSMService.c
  *
- * ES Framework service containing a hierarchical state machine for startup
- * beacon alignment.
+ * HOME hierarchical state machine for beacon lock and tape-based homing.
  */
 
 #include "HSMService.h"
 
 #include <stdio.h>
 
-#include "SensorsEventChecker.h"
-#include "peashooter.h"
 #include "BeaconEventChecker.h"
 #include "ES_Framework.h"
 #include "ES_Timers.h"
-
-//called in pivotturn
-#define ALIGN_TO_FRONT_BORDER_POWER 900
-#define ALIGN_TO_RIGHT_BORDER_POWER 900
-
+#include "peashooter.h"
 
 #define HSM_FULL_ROTATION_TIME_MS 5000
+#define HSM_LOCK_ON_START_DELAY_MS 250
+#define HSM_ON_FIELD_BACKUP_TIME_MS 500
+#define HSM_ON_FIELD_STOP_DELAY_MS 250
+#define HSM_LOCATE_TAPE_POLL_TIME_MS 50
+#define HSM_BEACON_AVG_WINDOW 8
+#define HSM_BEACON_LOCK_OFFSET 10
 
-//called in forward
-#define SEARCH_FOR_FRONT_BORDER_POWER 900
-#define SEARCH_FOR_RIGHT_BORDER_POWER 900
+#define HSM_SWEEP_TURN_POWER 500
+#define HSM_LOCK_TURN_POWER 500
+#define HSM_TAPE_TURN_POWER 500
+#define HSM_DRIVE_POWER 700
+#define HSM_CORRECT_POWER 650
 
-//called in forwarddist
-#define OBSTACLE_TO_RIGHT_POWER 900
-#define OBSTACLE_TO_RIGHT_DIST 12
-
-#define OBSTACLE_TO_RIGHT_DIST 12
-
-
-//called in backwarddist
-#define ALIGN_TO_FRONT_BORDER_BACKWARD_POWER 900
-#define ALIGN_TO_FRONT_BORDER_BACKWARD_DIST 2
-#define FRONT_TO_LEFT_BORDER_BACKWARD_POWER 900
-#define FRONT_TO_LEFT_BORDER_BACKWARD_DIST 2
-#define LEFT_TO_OBSTACLE_BACKWARD_POWER 900
-#define LEFT_TO_OBSTACLE_BACKWARD_DIST 2
-#define OBSTACLE_TO_RIGHT_BACKWARD_POWER 900
-#define OBSTACLE_TO_RIGHT_BACKWARD_DIST 2
-#define RIGHT_TO_OBSTACLE_BACKWARD_POWER 900
-#define RIGHT_TO_OBSTACLE_BACKWARD_DIST 2
-
-
-//called in tankturn
-#define ALIGN_TO_FRONT_BORDER_TANK_POWER 900
-#define ALIGN_TO_FRONT_BORDER_TANK_DIST 4
-#define FRONT_TO_LEFT_BORDER_TANK_POWER 900
-#define FRONT_TO_LEFT_BORDER_TANK_DIST 4
-#define LEFT_TO_OBSTACLE_TANK_POWER 700
-#define LEFT_TO_OBSTACLE_TANK_DIST 7.7
-#define OBSTACLE_TO_RIGHT_TANK_POWER 900
-#define OBSTACLE_TO_RIGHT_TANK_DIST 4
-#define RIGHT_TO_OBSTACLE_TANK_POWER 700
-#define RIGHT_TO_OBSTACLE_TANK_DIST 7.7
-
-//angledForward
-#define ANGLED_FORWARD_POWER 800
-
-#define HSM_CORRECT_TIMER 2
-#define LEAVE_OBSTACLE_TIME 6.5
+#define TAPE_NONE 0
+#define TAPE_ALL (LEFT_TAPE_MASK | MID_TAPE_MASK | RIGHT_TAPE_MASK)
+#define TAPE_LEFT_MID (LEFT_TAPE_MASK | MID_TAPE_MASK)
 
 typedef enum {
     InitPState,
-    BeaconAlignmentState,
-    SearchForFrontBorderState,
-    SearchForSideBorderState,
-    RideLeftTapeState,
-    RideRIghtTapeState,
-    RideFrontTapeState,
-    SearchForRightBorderState,
-    SearchForLeftBorderState,
-    STOPPEDState,
+    HomeState,
+    HomeCompleteState,
 } HSMState_t;
 
 typedef enum {
-    InitPSubState,
-    SurveySpinState,
-    AlignSpinState,
-    AlignedState,
-} BeaconAlignmentSubState_t;
+    InitHomeSubState,
+    SweepDataState,
+    LockOnState,
+    OnFieldState,
+    LocateTapeState,
+    TurnToCornerState,
+    DriveToCornerState,
+    TurnToEdgeState,
+    HomeDoneSubState,
+} HomeSubState_t;
 
 typedef enum {
-    InitFrontBorderSubState,
-    SearchForFrontBorderSubState,
-    LeftFrontTapeFoundSubState,
-    RightFrontTapeFoundSubState,
-    FrontBorderFoundSubState,
-    FrontToLeftBorderSubState,
-} SearchForFrontBorderSubState_t;
+    InitLocateTapeSubState,
+    LocateTapeForwardSubState,
+    LocateTapeFixRightSubState,
+    LocateTapeFixLeftSubState,
+} LocateTapeSubState_t;
 
 typedef enum {
-    InitSideBorderSubState,
-    SearchForSideBorderSubState,
-    LeftSideTapeFoundSubState,
-    SideBorderFoundSubState,
-    MoveAlongSideBorderSubState,
-} SearchForSideBorderSubState_t;
-
-typedef enum { //turn down motor on same side of sensor, then turn it back on when it doesnt detect
-    InitRideTapeSubState,
-    AngledForward,
-    CorrectLeftSubState,
-} RideLeftTapeSubState_t;
-
-typedef enum {
-    InitRideOtherTapeSubState,
-    AngledOtherForward,
-    CorrectRightSubState,
-} RideRightTapeSubState_t;
-
-typedef enum {
-    InitRideFrontTapeSubState,
-    AngledFrontForward,
-    CorrectLeftSubState1,
-} RideFrontTapeSubState_t;
-
-typedef enum {
-    InitFirstObstacleClearedSub,
-    SearchForBorderSubState,
-    LeftFrontTapeFoundSubState1,
-    RightFrontTapeFoundSubState1,
-    BorderFoundSubState,
-    MoveAlongBorderSubState1,
-} SearchForRightBorderSubState_t;
-
-typedef enum {
-    InitSecondObstacleClearedSub,
-    SearchForBorderSubState1,
-    LeftFrontTapeFoundSubState2,
-    RightFrontTapeFoundSubState2,
-    BorderFoundSubState1,
-    MoveAlongBorderSubState2,
-} SearchForLeftBorderSubState_t;
-
-
+    InitDriveToCornerSubState,
+    DriveToCornerForwardSubState,
+    DriveToCornerFixRightSubState,
+    DriveToCornerFixLeftSubState,
+    DriveToCornerHoldSubState,
+} DriveToCornerSubState_t;
 
 static uint8_t MyPriority;
 static HSMState_t CurrentState;
-static BeaconAlignmentSubState_t CurrentBeaconSubState;
-static SearchForFrontBorderSubState_t CurrentFrontBorderSubState;
-static SearchForSideBorderSubState_t CurrentSideBorderSubState;
-static RideLeftTapeSubState_t CurrentRideTapeSubState;
-static RideFrontTapeSubState_t CurrentRideFrontTapeSubState;
-static SearchForRightBorderSubState_t CurrentFirstObstacleClearedSubState;
-static RideRightTapeSubState_t CurrentRideOtherTapeSubState;
-static SearchForLeftBorderSubState_t CurrentSecondObstacleClearedSubState;
+static HomeSubState_t CurrentHomeSubState;
+static LocateTapeSubState_t CurrentLocateTapeSubState;
+static DriveToCornerSubState_t CurrentDriveToCornerSubState;
+static uint8_t TapeEventsEnabled;
 
-static uint16_t MaxBeaconValue;
-static uint32_t SurveyStartTime;
-static uint32_t MaxBeaconOffset;
-static uint32_t AlignmentSpinTime;
+static uint16_t BeaconSamples[HSM_BEACON_AVG_WINDOW];
+static uint8_t BeaconSampleIndex;
+static uint8_t BeaconSampleCount;
+static uint32_t BeaconSampleSum;
+static uint16_t MaxFilteredBeaconValue;
+static uint16_t BeaconLockThreshold;
+static uint8_t LockOnTurnStarted;
+static uint16_t LockOnRotationMax;
+static uint8_t OnFieldStopped;
 
-static void StartSurveySpin(void);
-static void RecordBeaconSample(uint16_t beaconValue);
-static void StartAlignmentSpin(void);
-static uint8_t InitBeaconAlignmentSubHSM(void);
-static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent);
-static uint8_t InitSearchForFrontBorderSubHSM(void);
-static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent);
-static uint8_t InitRideTapeSubHSM(void);
-static ES_Event RunRideLeftTapeSubHSM(ES_Event thisEvent);
-static uint8_t InitRideFrontTapeSubHSM(void);
-static ES_Event RunRideFrontTapeSubHSM(ES_Event thisEvent);
-static uint8_t InitRideOtherTapeSubHSM(void);
-static ES_Event RunRideRightTapeSubHSM(ES_Event thisEvent);
-static uint8_t InitSearchForRightBorderSubHSM(void);
-static ES_Event SearchForRightBorderSubHSM(ES_Event thisEvent);
-static uint8_t InitSearchForLeftBorderSubHSM(void);
-static ES_Event SearchForLeftBorderSubHSM(ES_Event thisEvent);
+static uint8_t InitHomeSubHSM(void);
+static ES_Event RunHomeSubHSM(ES_Event thisEvent);
+static uint8_t InitLocateTapeSubHSM(void);
+static uint8_t RunLocateTapeSubHSM(ES_Event thisEvent);
+static uint8_t InitDriveToCornerSubHSM(void);
+static uint8_t RunDriveToCornerSubHSM(ES_Event thisEvent);
+
+static ES_Event TransitionHomeSubState(HomeSubState_t nextState);
+static ES_Event CompleteHome(void);
+static uint8_t TransitionLocateTapeSubState(LocateTapeSubState_t nextState);
+static uint8_t TransitionDriveToCornerSubState(DriveToCornerSubState_t nextState);
+
+static void StartSweepData(void);
+static void StartLockOn(void);
+static void StartLockOnTurn(void);
+static void StartNextLockOnRotation(void);
+static void ResetBeaconFilter(void);
+static uint16_t FilterBeaconSample(uint16_t sample);
+
+static uint8_t IsTapeEvent(ES_EventTyp_t eventType);
+static uint8_t EvaluateLocateTape(void);
+static uint8_t EvaluateTurnToCorner(void);
+static uint8_t EvaluateDriveToCorner(void);
+static uint8_t EvaluateTurnToEdge(void);
+
+static void DriveForward(void);
+static void DriveBackward(void);
+static void DriveLeftOnly(void);
+static void DriveRightOnly(void);
+static void TankTurnLeft(void);
+static void ArmLocateTapePoll(void);
 
 uint8_t InitHSMService(uint8_t priority) {
     MyPriority = priority;
     CurrentState = InitPState;
+    CurrentHomeSubState = InitHomeSubState;
+    CurrentLocateTapeSubState = InitLocateTapeSubState;
+    CurrentDriveToCornerSubState = InitDriveToCornerSubState;
+    TapeEventsEnabled = FALSE;
+    LockOnTurnStarted = FALSE;
+    LockOnRotationMax = 0;
+    OnFieldStopped = FALSE;
 
     PS_Init();
     PS_Stop();
 
-    printf("InitHSMService: Started\r\n",
-            BEACON_DETECTOR_PIN_NAME, ALIGN_TO_FRONT_BORDER_POWER,
-            HSM_FULL_ROTATION_TIME_MS);
+    printf("InitHSMService: HOME HSM starting, beacon=%s\r\n",
+            BEACON_DETECTOR_PIN_NAME);
 
     if (InitBeaconEventChecker() != TRUE) {
         return FALSE;
@@ -202,180 +148,33 @@ ES_Event RunHSMService(ES_Event thisEvent) {
     switch (CurrentState) {
         case InitPState:
             if (thisEvent.EventType == ES_INIT) {
-                printf("RunHSMService: InitPState\r\n");
-                nextState = BeaconAlignmentState;
-                // nextState = SearchForFrontBorderState;
-                // nextState = RideTapeState;
+                nextState = HomeState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
             }
             break;
 
-        case BeaconAlignmentState:
+        case HomeState:
             if (thisEvent.EventType == ES_ENTRY) {
-                if (InitBeaconAlignmentSubHSM() != TRUE) {
+                if (InitHomeSubHSM() != TRUE) {
                     thisEvent.EventType = ES_ERROR;
                 } else {
                     thisEvent.EventType = ES_NO_EVENT;
                 }
             } else {
-                thisEvent = RunBeaconAlignmentSubHSM(thisEvent);
-
-                if (CurrentBeaconSubState == AlignedState) {
-                    nextState = SearchForFrontBorderState;
+                thisEvent = RunHomeSubHSM(thisEvent);
+                if (thisEvent.EventType == HOME_COMPLETE) {
+                    nextState = HomeCompleteState;
                     makeTransition = TRUE;
                     thisEvent.EventType = ES_NO_EVENT;
                 }
             }
             break;
-        case SearchForFrontBorderState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    if (InitSearchForFrontBorderSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
 
-                default:
-                    thisEvent = RunSearchForFrontBorderSubHSM(thisEvent);
-
-                    if (thisEvent.EventType == FRONT_BORDER_ALIGNED) {
-                        nextState = RideFrontTapeState;
-                        // nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-
-        case RideLeftTapeState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    if (InitRideTapeSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default:
-                    thisEvent = RunRideLeftTapeSubHSM(thisEvent);
-                    if (thisEvent.EventType == ISZ_BORDER) {
-                        nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    if (thisEvent.EventType == BUMPER_TRIPPED) {
-                        nextState = SearchForRightBorderState;
-                        // nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-
-        case RideFrontTapeState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    if (InitRideFrontTapeSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default:
-                    thisEvent = RunRideFrontTapeSubHSM(thisEvent);
-                    if (thisEvent.EventType == FRONT_BORDER_DONE) {
-                        nextState = RideLeftTapeState;
-                        // nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-
-        case RideRIghtTapeState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    if (InitRideOtherTapeSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default:
-                    thisEvent = RunRideRightTapeSubHSM(thisEvent);
-                    if (thisEvent.EventType == ISZ_BORDER) {
-                        nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    if (thisEvent.EventType == BUMPER_TRIPPED) {
-                        // nextState = SearchForLeftBorderState;
-                            nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-
-
-        case SearchForRightBorderState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunHSMService: SearchForRightBorderState\r\n");
-                    if (InitSearchForRightBorderSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default:
-                    thisEvent = SearchForRightBorderSubHSM(thisEvent);
-                    if (thisEvent.EventType == FIRST_BORDER_DONE) {
-                        nextState = RideRIghtTapeState;
-                        // nextState = STOPPEDState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-
-        case SearchForLeftBorderState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunHSMService: SearchForLeftBorderState\r\n");
-                    if (InitSearchForLeftBorderSubHSM() != TRUE) {
-                        thisEvent.EventType = ES_ERROR;
-                    } else {
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-
-                default:
-                    thisEvent = SearchForLeftBorderSubHSM(thisEvent);
-                    if (thisEvent.EventType == SECOND_BORDER_DONE) {
-                        nextState = RideLeftTapeState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-            }
-            break;
-        case STOPPEDState:
+        case HomeCompleteState:
             if (thisEvent.EventType == ES_ENTRY) {
                 PS_Stop();
-                printf("RunHSMService: STOPPEDState\r\n");
+                printf("RunHSMService: HOME_COMPLETE\r\n");
                 thisEvent.EventType = ES_NO_EVENT;
             }
             break;
@@ -393,95 +192,51 @@ ES_Event RunHSMService(ES_Event thisEvent) {
     return thisEvent;
 }
 
-static uint8_t InitBeaconAlignmentSubHSM(void) {
+uint8_t HSM_TapeEventsEnabled(void) {
+    return TapeEventsEnabled;
+}
+
+static uint8_t InitHomeSubHSM(void) {
     ES_Event returnEvent;
 
-    CurrentBeaconSubState = InitPSubState;
-    returnEvent = RunBeaconAlignmentSubHSM(INIT_EVENT);
+    CurrentHomeSubState = InitHomeSubState;
+    returnEvent = RunHomeSubHSM(INIT_EVENT);
     return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
 }
 
-static uint8_t InitRideTapeSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentRideTapeSubState = InitRideTapeSubState;
-    returnEvent = RunRideLeftTapeSubHSM(INIT_EVENT);
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static uint8_t InitRideFrontTapeSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentRideFrontTapeSubState = InitRideFrontTapeSubState;
-    returnEvent = RunRideFrontTapeSubHSM(INIT_EVENT);
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static uint8_t InitRideOtherTapeSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentRideOtherTapeSubState = InitRideOtherTapeSubState;
-    returnEvent = RunRideRightTapeSubHSM(INIT_EVENT);
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static uint8_t InitSearchForFrontBorderSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentFrontBorderSubState = InitFrontBorderSubState;
-    returnEvent = RunSearchForFrontBorderSubHSM(INIT_EVENT);
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static uint8_t InitSearchForRightBorderSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentFirstObstacleClearedSubState = InitFirstObstacleClearedSub;
-    returnEvent = SearchForRightBorderSubHSM(INIT_EVENT);
-
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static uint8_t InitSearchForLeftBorderSubHSM(void) {
-    ES_Event returnEvent;
-
-    CurrentSecondObstacleClearedSubState = InitSecondObstacleClearedSub;
-    returnEvent = SearchForLeftBorderSubHSM(INIT_EVENT);
-
-    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
-}
-
-static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    BeaconAlignmentSubState_t nextState = CurrentBeaconSubState;
-
-    switch (CurrentBeaconSubState) {
-        case InitPSubState:
+static ES_Event RunHomeSubHSM(ES_Event thisEvent) {
+    switch (CurrentHomeSubState) {
+        case InitHomeSubState:
             if (thisEvent.EventType == ES_INIT) {
-                nextState = SurveySpinState;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
+                thisEvent = TransitionHomeSubState(SweepDataState);
             }
             break;
 
-        case SurveySpinState:
+        case SweepDataState:
             switch (thisEvent.EventType) {
                 case ES_ENTRY:
-                    StartSurveySpin();
+                    StartSweepData();
                     thisEvent.EventType = ES_NO_EVENT;
                     break;
 
                 case BEACON_SAMPLE_READY:
-                    RecordBeaconSample(thisEvent.EventParam);
+                    {
+                        uint16_t filteredValue;
+
+                        filteredValue = FilterBeaconSample(thisEvent.EventParam);
+                        if (filteredValue > MaxFilteredBeaconValue) {
+                            MaxFilteredBeaconValue = filteredValue;
+                        }
+                    }
                     thisEvent.EventType = ES_NO_EVENT;
                     break;
 
                 case ES_TIMEOUT:
                     if (thisEvent.EventParam == HSM_ROTATION_TIMER) {
                         PS_Stop();
-                        nextState = AlignSpinState;
-                        makeTransition = TRUE;
-                        thisEvent.EventType = ES_NO_EVENT;
+                        printf("HOME: SWEEP_DATA complete max=%u\r\n",
+                                MaxFilteredBeaconValue);
+                        thisEvent = TransitionHomeSubState(LockOnState);
                     }
                     break;
 
@@ -490,19 +245,45 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent) {
             }
             break;
 
-        case AlignSpinState:
+        case LockOnState:
             switch (thisEvent.EventType) {
                 case ES_ENTRY:
-                    StartAlignmentSpin();
+                    StartLockOn();
                     thisEvent.EventType = ES_NO_EVENT;
                     break;
 
                 case ES_TIMEOUT:
-                    if (thisEvent.EventParam == HSM_ROTATION_TIMER) {
-                        PS_Stop();
-                        nextState = AlignedState;
-                        makeTransition = TRUE;
+                    if ((thisEvent.EventParam == HSM_ROTATION_TIMER)
+                            && (LockOnTurnStarted == FALSE)) {
+                        StartLockOnTurn();
                         thisEvent.EventType = ES_NO_EVENT;
+                    } else if ((thisEvent.EventParam == HSM_ROTATION_TIMER)
+                            && (LockOnTurnStarted == TRUE)) {
+                        StartNextLockOnRotation();
+                        thisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+
+                case BEACON_SAMPLE_READY:
+                    if (LockOnTurnStarted == FALSE) {
+                        thisEvent.EventType = ES_NO_EVENT;
+                    } else {
+                        uint16_t filteredValue;
+
+                        filteredValue = FilterBeaconSample(thisEvent.EventParam);
+                        if (filteredValue > LockOnRotationMax) {
+                            LockOnRotationMax = filteredValue;
+                        }
+
+                        if (filteredValue >= BeaconLockThreshold) {
+                            PS_Stop();
+                            printf("HOME: LOCK_ON complete adc=%u threshold=%u\r\n",
+                                    filteredValue, BeaconLockThreshold);
+                            TapeEventsEnabled = TRUE;
+                            thisEvent = TransitionHomeSubState(OnFieldState);
+                        } else {
+                            thisEvent.EventType = ES_NO_EVENT;
+                        }
                     }
                     break;
 
@@ -511,10 +292,115 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent) {
             }
             break;
 
-        case AlignedState:
+        case OnFieldState:
+            switch (thisEvent.EventType) {
+                case ES_ENTRY:
+                    OnFieldStopped = FALSE;
+                    DriveBackward();
+                    ES_Timer_InitTimer(HSM_ROTATION_TIMER,
+                            HSM_ON_FIELD_BACKUP_TIME_MS);
+                    thisEvent.EventType = ES_NO_EVENT;
+                    break;
+
+                case ES_TIMEOUT:
+                    if (thisEvent.EventParam != HSM_ROTATION_TIMER) {
+                        break;
+                    }
+
+                    if (OnFieldStopped == FALSE) {
+                        PS_Stop();
+                        OnFieldStopped = TRUE;
+                        ES_Timer_InitTimer(HSM_ROTATION_TIMER,
+                                HSM_ON_FIELD_STOP_DELAY_MS);
+                        thisEvent.EventType = ES_NO_EVENT;
+                    } else {
+                        thisEvent = TransitionHomeSubState(LocateTapeState);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
+        case LocateTapeState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                if (InitLocateTapeSubHSM() == TRUE) {
+                    thisEvent = TransitionHomeSubState(TurnToCornerState);
+                } else {
+                    thisEvent.EventType = ES_NO_EVENT;
+                }
+            } else if (RunLocateTapeSubHSM(thisEvent) == TRUE) {
+                ES_Timer_StopTimer(HSM_ROTATION_TIMER);
+                thisEvent = TransitionHomeSubState(TurnToCornerState);
+            } else {
+                thisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+
+        case TurnToCornerState:
+            switch (thisEvent.EventType) {
+                case ES_ENTRY:
+                    TankTurnLeft();
+                    if (EvaluateTurnToCorner() == TRUE) {
+                        thisEvent = TransitionHomeSubState(DriveToCornerState);
+                    } else {
+                        thisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+
+                default:
+                    if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                        if (EvaluateTurnToCorner() == TRUE) {
+                            thisEvent = TransitionHomeSubState(DriveToCornerState);
+                        } else {
+                            thisEvent.EventType = ES_NO_EVENT;
+                        }
+                    }
+                    break;
+            }
+            break;
+
+        case DriveToCornerState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                if (InitDriveToCornerSubHSM() == TRUE) {
+                    thisEvent = TransitionHomeSubState(TurnToEdgeState);
+                } else {
+                    thisEvent.EventType = ES_NO_EVENT;
+                }
+            } else if (RunDriveToCornerSubHSM(thisEvent) == TRUE) {
+                thisEvent = TransitionHomeSubState(TurnToEdgeState);
+            } else {
+                thisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+
+        case TurnToEdgeState:
+            switch (thisEvent.EventType) {
+                case ES_ENTRY:
+                    TankTurnLeft();
+                    if (EvaluateTurnToEdge() == TRUE) {
+                        thisEvent = CompleteHome();
+                    } else {
+                        thisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+
+                default:
+                    if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                        if (EvaluateTurnToEdge() == TRUE) {
+                            thisEvent = CompleteHome();
+                        } else {
+                            thisEvent.EventType = ES_NO_EVENT;
+                        }
+                    }
+                    break;
+            }
+            break;
+
+        case HomeDoneSubState:
             if (thisEvent.EventType == ES_ENTRY) {
                 PS_Stop();
-                printf("RunBeaconAlignmentSubHSM: AlignedState: ES_ENTRY\r\n");
                 thisEvent.EventType = ES_NO_EVENT;
             }
             break;
@@ -523,98 +409,82 @@ static ES_Event RunBeaconAlignmentSubHSM(ES_Event thisEvent) {
             break;
     }
 
-    if (makeTransition == TRUE) {
-        RunBeaconAlignmentSubHSM(EXIT_EVENT);
-        CurrentBeaconSubState = nextState;
-        RunBeaconAlignmentSubHSM(ENTRY_EVENT);
-    }
-
     return thisEvent;
 }
 
-static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    SearchForFrontBorderSubState_t nextState = CurrentFrontBorderSubState;
+static uint8_t InitLocateTapeSubHSM(void) {
+    CurrentLocateTapeSubState = InitLocateTapeSubState;
+    return RunLocateTapeSubHSM(INIT_EVENT);
+}
 
-    switch (CurrentFrontBorderSubState) {
-        case InitFrontBorderSubState:
+static uint8_t RunLocateTapeSubHSM(ES_Event thisEvent) {
+    uint8_t done = FALSE;
+
+    switch (CurrentLocateTapeSubState) {
+        case InitLocateTapeSubState:
             if (thisEvent.EventType == ES_INIT) {
-                nextState = SearchForFrontBorderSubState;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
+                done = TransitionLocateTapeSubState(LocateTapeForwardSubState);
             }
             break;
 
-        case SearchForFrontBorderSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunSearchForFrontBorderSubHSM: SearchForFrontBorderSubState: ES_ENTRY\r\n");
-                    //go forward until any of the tape sensors are tripped
-                    PS_Forward(SEARCH_FOR_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    printf("RunSearchForFrontBorderSubHSM: SearchForFrontBorderSubState: LEFT_TAPE_DETECTED\r\n");
-                    nextState = LeftFrontTapeFoundSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    printf("RunSearchForFrontBorderSubHSM: SearchForFrontBorderSubState: RIGHT_TAPE_DETECTED\r\n");
-                    nextState = RightFrontTapeFoundSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case LeftFrontTapeFoundSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnLeft(ALIGN_TO_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    nextState = FrontBorderFoundSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case RightFrontTapeFoundSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnRight(ALIGN_TO_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    nextState = FrontToLeftBorderSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case FrontToLeftBorderSubState:
+        case LocateTapeForwardSubState:
             if (thisEvent.EventType == ES_ENTRY) {
-                printf("RunSearchForFrontBorderSubHSM: FrontToLeftBorderSubState: ES_ENTRY\r\n");
-                PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, ALIGN_TO_FRONT_BORDER_BACKWARD_DIST);
-                PS_TankTurnRightDist(ALIGN_TO_FRONT_BORDER_TANK_POWER, ALIGN_TO_FRONT_BORDER_TANK_DIST);
-                thisEvent.EventType = FRONT_BORDER_ALIGNED;
+                DriveForward();
+                done = EvaluateLocateTape();
+                if (done == FALSE) {
+                    ArmLocateTapePoll();
+                }
+            } else if ((IsTapeEvent(thisEvent.EventType) == TRUE)
+                    || ((thisEvent.EventType == ES_TIMEOUT)
+                    && (thisEvent.EventParam == HSM_ROTATION_TIMER))) {
+                done = EvaluateLocateTape();
+                if ((done == FALSE)
+                        && (CurrentLocateTapeSubState == LocateTapeForwardSubState)) {
+                    DriveForward();
+                    ArmLocateTapePoll();
+                }
+            }
+            break;
+
+        case LocateTapeFixRightSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                PS_Stop();
+                done = EvaluateLocateTape();
+                if ((done == FALSE)
+                        && (CurrentLocateTapeSubState == LocateTapeFixRightSubState)) {
+                    DriveRightOnly();
+                    ArmLocateTapePoll();
+                }
+            } else if ((IsTapeEvent(thisEvent.EventType) == TRUE)
+                    || ((thisEvent.EventType == ES_TIMEOUT)
+                    && (thisEvent.EventParam == HSM_ROTATION_TIMER))) {
+                done = EvaluateLocateTape();
+                if ((done == FALSE)
+                        && (CurrentLocateTapeSubState == LocateTapeFixRightSubState)) {
+                    DriveRightOnly();
+                    ArmLocateTapePoll();
+                }
+            }
+            break;
+
+        case LocateTapeFixLeftSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                PS_Stop();
+                done = EvaluateLocateTape();
+                if ((done == FALSE)
+                        && (CurrentLocateTapeSubState == LocateTapeFixLeftSubState)) {
+                    DriveLeftOnly();
+                    ArmLocateTapePoll();
+                }
+            } else if ((IsTapeEvent(thisEvent.EventType) == TRUE)
+                    || ((thisEvent.EventType == ES_TIMEOUT)
+                    && (thisEvent.EventParam == HSM_ROTATION_TIMER))) {
+                done = EvaluateLocateTape();
+                if ((done == FALSE)
+                        && (CurrentLocateTapeSubState == LocateTapeFixLeftSubState)) {
+                    DriveLeftOnly();
+                    ArmLocateTapePoll();
+                }
             }
             break;
 
@@ -622,107 +492,57 @@ static ES_Event RunSearchForFrontBorderSubHSM(ES_Event thisEvent) {
             break;
     }
 
-    if (makeTransition == TRUE) {
-        RunSearchForFrontBorderSubHSM(EXIT_EVENT);
-        CurrentFrontBorderSubState = nextState;
-        thisEvent = RunSearchForFrontBorderSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+    return done;
 }
 
-static ES_Event SearchForLeftBorderSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    SearchForLeftBorderSubState_t nextState = CurrentSecondObstacleClearedSubState;
+static uint8_t InitDriveToCornerSubHSM(void) {
+    CurrentDriveToCornerSubState = InitDriveToCornerSubState;
+    return RunDriveToCornerSubHSM(INIT_EVENT);
+}
 
-    switch (CurrentSecondObstacleClearedSubState) {
-        case InitSecondObstacleClearedSub:
+static uint8_t RunDriveToCornerSubHSM(ES_Event thisEvent) {
+    uint8_t done = FALSE;
+
+    switch (CurrentDriveToCornerSubState) {
+        case InitDriveToCornerSubState:
             if (thisEvent.EventType == ES_INIT) {
-                nextState = SearchForBorderSubState1;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
+                done = TransitionDriveToCornerSubState(DriveToCornerForwardSubState);
             }
             break;
 
-        case SearchForBorderSubState1:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("SearchForLeftBorderSubHSM: SearchForBorderSubState1: ES_ENTRY\r\n");
-                    PS_Forward(SEARCH_FOR_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    printf("SearchForLeftBorderSubHSM: SearchForBorderSubState1: LEFT_TAPE_DETECTED\r\n");
-                    nextState = LeftFrontTapeFoundSubState2;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    printf("SearchForLeftBorderSubHSM: SearchForBorderSubState1: RIGHT_TAPE_DETECTED\r\n");
-                    nextState = RightFrontTapeFoundSubState2;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
+        case DriveToCornerForwardSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                DriveForward();
+                done = EvaluateDriveToCorner();
+            } else if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                done = EvaluateDriveToCorner();
             }
             break;
 
-        case LeftFrontTapeFoundSubState2:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnLeft(ALIGN_TO_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    nextState = BorderFoundSubState1;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
+        case DriveToCornerFixRightSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                DriveRightOnly();
+                done = EvaluateDriveToCorner();
+            } else if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                done = EvaluateDriveToCorner();
             }
             break;
 
-        case RightFrontTapeFoundSubState2:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnRight(ALIGN_TO_FRONT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    nextState = BorderFoundSubState1;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
+        case DriveToCornerFixLeftSubState:
+            if (thisEvent.EventType == ES_ENTRY) {
+                DriveLeftOnly();
+                done = EvaluateDriveToCorner();
+            } else if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                done = EvaluateDriveToCorner();
             }
             break;
 
-        case BorderFoundSubState1:
+        case DriveToCornerHoldSubState:
             if (thisEvent.EventType == ES_ENTRY) {
                 PS_Stop();
-                printf("SearchForLeftBorderSubHSM: BorderFoundSubState1: ES_ENTRY\r\n");
-                nextState = MoveAlongBorderSubState2;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-
-        case MoveAlongBorderSubState2:
-            if (thisEvent.EventType == ES_ENTRY) {
-                printf("SearchForLeftBorderSubHSM: MoveAlongBorderSubState2: ES_ENTRY\r\n");
-                PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, ALIGN_TO_FRONT_BORDER_BACKWARD_DIST);
-                PS_TurnRight90();
-                thisEvent.EventType = SECOND_BORDER_DONE;
+                done = EvaluateDriveToCorner();
+            } else if (IsTapeEvent(thisEvent.EventType) == TRUE) {
+                done = EvaluateDriveToCorner();
             }
             break;
 
@@ -730,438 +550,238 @@ static ES_Event SearchForLeftBorderSubHSM(ES_Event thisEvent) {
             break;
     }
 
-    if (makeTransition == TRUE) {
-        SearchForLeftBorderSubHSM(EXIT_EVENT);
-        CurrentSecondObstacleClearedSubState = nextState;
-        thisEvent = SearchForLeftBorderSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+    return done;
 }
 
-static ES_Event SearchForRightBorderSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    SearchForRightBorderSubState_t nextState = CurrentFirstObstacleClearedSubState;
+static ES_Event TransitionHomeSubState(HomeSubState_t nextState) {
+    ES_Event returnEvent;
 
-    switch (CurrentFirstObstacleClearedSubState) {
-        case InitFirstObstacleClearedSub:
-            if (thisEvent.EventType == ES_INIT) {
-                nextState = SearchForBorderSubState;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
+    RunHomeSubHSM(EXIT_EVENT);
+    CurrentHomeSubState = nextState;
+    returnEvent = RunHomeSubHSM(ENTRY_EVENT);
 
-        case SearchForBorderSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("SearchForRightBorderSubHSM: SearchForBorderSubState: ES_ENTRY\r\n");
-                    PS_Forward(SEARCH_FOR_RIGHT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    printf("SearchForRightBorderSubHSM: SearchForBorderSubState: LEFT_TAPE_DETECTED\r\n");
-                    nextState = LeftFrontTapeFoundSubState1;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    printf("SearchForRightBorderSubHSM: SearchForBorderSubState: RIGHT_TAPE_DETECTED\r\n");
-                    nextState = RightFrontTapeFoundSubState1;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case LeftFrontTapeFoundSubState1:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnLeft(ALIGN_TO_RIGHT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    nextState = BorderFoundSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case RightFrontTapeFoundSubState1:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    PS_PivotTurnRight(ALIGN_TO_RIGHT_BORDER_POWER);
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    nextState = BorderFoundSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case BorderFoundSubState:
-            if (thisEvent.EventType == ES_ENTRY) {
-                PS_Stop();
-                printf("SearchForRightBorderSubHSM: BorderFoundSubState: ES_ENTRY\r\n");
-                nextState = MoveAlongBorderSubState1;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-
-        case MoveAlongBorderSubState1:
-            if (thisEvent.EventType == ES_ENTRY) {
-                printf("SearchForRightBorderSubHSM: MoveAlongBorderSubState1: ES_ENTRY\r\n");
-                PS_BackwardDist(OBSTACLE_TO_RIGHT_BACKWARD_POWER, OBSTACLE_TO_RIGHT_BACKWARD_DIST);
-                PS_TankTurnLeftDist(OBSTACLE_TO_RIGHT_TANK_POWER, OBSTACLE_TO_RIGHT_TANK_DIST);
-                thisEvent.EventType = FIRST_BORDER_DONE;
-            }
-            break;
-
-        default:
-            break;
-    }
-
-    if (makeTransition == TRUE) {
-        SearchForRightBorderSubHSM(EXIT_EVENT);
-        CurrentFirstObstacleClearedSubState = nextState;
-        thisEvent = SearchForRightBorderSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+    return returnEvent;
 }
 
-static ES_Event RunRideFrontTapeSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    RideFrontTapeSubState_t nextState = CurrentRideFrontTapeSubState;
+static ES_Event CompleteHome(void) {
+    ES_Event completeEvent;
 
-    switch (CurrentRideFrontTapeSubState) {
-        case InitRideFrontTapeSubState:
-            if (thisEvent.EventType == ES_INIT) {
-                PS_Stop();
-                printf("RunRideFrontTapeSubHSM: InitRideFrontTapeSubState: ES_INIT\r\n");
-                nextState = AngledFrontForward;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
+    RunHomeSubHSM(EXIT_EVENT);
+    CurrentHomeSubState = HomeDoneSubState;
+    RunHomeSubHSM(ENTRY_EVENT);
 
-        case AngledFrontForward:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideFrontTapeSubHSM: AngledFrontForward: ES_ENTRY\r\n");
-
-                    PS_AngledForward(ANGLED_FORWARD_POWER);
-
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    printf("RunRideFrontTapeSubHSM: AngledFrontForward: RIGHT_TAPE_DETECTED\r\n");
-                    nextState = CorrectLeftSubState1;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideFrontTapeSubHSM: AngledFrontForward: MIDDLE_TAPE_DETECTED\r\n");
-                    PS_Stop();
-                    PS_BackwardDist(FRONT_TO_LEFT_BORDER_BACKWARD_POWER, FRONT_TO_LEFT_BORDER_BACKWARD_DIST);
-                    PS_TankTurnRightDist(FRONT_TO_LEFT_BORDER_TANK_POWER, FRONT_TO_LEFT_BORDER_TANK_DIST);
-                    thisEvent.EventType = FRONT_BORDER_DONE;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case CorrectLeftSubState1:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideFrontTapeSubHSM: CorrectLeftSubState1: ES_ENTRY\r\n");
-
-                    PS_TankTurnRightDist(500, 2);
-
-                    nextState = AngledFrontForward;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideFrontTapeSubHSM: CorrectLeftSubState1: MIDDLE_TAPE_DETECTED\r\n");
-                    PS_Stop();
-                    PS_BackwardDist(FRONT_TO_LEFT_BORDER_BACKWARD_POWER, FRONT_TO_LEFT_BORDER_BACKWARD_DIST);
-                    PS_TankTurnRightDist(FRONT_TO_LEFT_BORDER_TANK_POWER, FRONT_TO_LEFT_BORDER_TANK_DIST);
-                    thisEvent.EventType = FRONT_BORDER_DONE;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-    }
-
-    if (makeTransition == TRUE) {
-        RunRideFrontTapeSubHSM(EXIT_EVENT);
-        CurrentRideFrontTapeSubState = nextState;
-        RunRideFrontTapeSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+    completeEvent.EventType = HOME_COMPLETE;
+    completeEvent.EventParam = 0;
+    return completeEvent;
 }
 
-static ES_Event RunRideLeftTapeSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    RideLeftTapeSubState_t nextState = CurrentRideTapeSubState;
-
-    switch (CurrentRideTapeSubState) {
-        case InitRideTapeSubState:
-            if (thisEvent.EventType == ES_INIT) {
-                PS_Stop();
-                printf("RunRideLeftTapeSubHSM: InitRideTapeSubState: ES_INIT\r\n");
-                nextState = AngledForward;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-
-        case AngledForward:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideLeftTapeSubHSM: AngledForward: ES_ENTRY\r\n");
-
-                    // left motor faster, right motor slower = slight right curve
-                    PS_AngledForward(ANGLED_FORWARD_POWER);
-
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case RIGHT_TAPE_DETECTED:
-                    printf("RunRideLeftTapeSubHSM: AngledForward: RIGHT_TAPE_DETECTED\r\n");
-                    nextState = CorrectLeftSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case BUMPER_TRIPPED:
-                    printf("RunRideLeftTapeSubHSM: AngledForward: BUMPER_TRIPPED\r\n");
-                    PS_BackwardDist(LEFT_TO_OBSTACLE_BACKWARD_POWER, LEFT_TO_OBSTACLE_BACKWARD_DIST);
-
-                    PS_TankTurnRightDist(LEFT_TO_OBSTACLE_TANK_POWER, LEFT_TO_OBSTACLE_TANK_DIST);
-
-                    PS_ForwardDist(OBSTACLE_TO_RIGHT_POWER, OBSTACLE_TO_RIGHT_DIST);
-                    printf("RunRideLeftTapeSubHSM: AngledForward: Forward done\r\n");
-                    thisEvent.EventType = BUMPER_TRIPPED;
-                    break;
-
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideLeftTapeSubHSM: AngledForward: MIDDLE_TAPE_DETECTED\r\n");
-                    PS_Stop();
-                    thisEvent.EventType = ISZ_BORDER;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case CorrectLeftSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: ES_ENTRY\r\n");
-
-                    PS_TankTurnRightDist(500, 2);
-
-                    nextState = AngledForward;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case BUMPER_TRIPPED:
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: BUMPER_TRIPPED\r\n");
-                    PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, 1);
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: Backup done\r\n");
-
-                    PS_TurnRight90();
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: Turn done\r\n");
-
-                    PS_ForwardDist(SEARCH_FOR_FRONT_BORDER_POWER, 12);
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: Forward done\r\n");
-                    thisEvent.EventType = BUMPER_TRIPPED;
-                    break;
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: MIDDLE_TAPE_DETECTED\r\n");
-
-                    PS_Stop();
-                    thisEvent.EventType = ISZ_BORDER;
-                    break;
-                default:
-                    break;
-            }
-            break;
-    }
-
-    if (makeTransition == TRUE) {
-        RunRideLeftTapeSubHSM(EXIT_EVENT);
-        CurrentRideTapeSubState = nextState;
-        RunRideLeftTapeSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+static uint8_t TransitionLocateTapeSubState(LocateTapeSubState_t nextState) {
+    RunLocateTapeSubHSM(EXIT_EVENT);
+    CurrentLocateTapeSubState = nextState;
+    return RunLocateTapeSubHSM(ENTRY_EVENT);
 }
 
-static ES_Event RunRideRightTapeSubHSM(ES_Event thisEvent) {
-    uint8_t makeTransition = FALSE;
-    RideRightTapeSubState_t nextState = CurrentRideOtherTapeSubState;
-
-    switch (CurrentRideOtherTapeSubState) {
-        case InitRideOtherTapeSubState:
-            if (thisEvent.EventType == ES_INIT) {
-                PS_Stop();
-                printf("RunRideRightTapeSubHSM: InitRideOtherTapeSubState: ES_INIT\r\n");
-                nextState = AngledOtherForward;
-                makeTransition = TRUE;
-                thisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-
-        case AngledOtherForward:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: ES_ENTRY\r\n");
-
-                    // left motor faster, right motor slower = slight right curve
-                    PS_AngledForward2(ANGLED_FORWARD_POWER);
-
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case LEFT_TAPE_DETECTED:
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: LEFT_TAPE_DETECTED\r\n");
-                    nextState = CorrectRightSubState;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case BUMPER_TRIPPED:
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: BUMPER_TRIPPED\r\n");
-                    PS_BackwardDist(RIGHT_TO_OBSTACLE_BACKWARD_POWER, RIGHT_TO_OBSTACLE_BACKWARD_DIST);
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: Backup done\r\n");
-
-                    PS_TankTurnLeftDist(RIGHT_TO_OBSTACLE_TANK_POWER, RIGHT_TO_OBSTACLE_TANK_DIST);
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: Turn done\r\n");
-
-                    PS_ForwardDist(SEARCH_FOR_FRONT_BORDER_POWER, 10);
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: Forward done\r\n");
-                    thisEvent.EventType = BUMPER_TRIPPED;
-                    break;
-
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideRightTapeSubHSM: AngledOtherForward: MIDDLE_TAPE_DETECTED\r\n");
-                    PS_Stop();
-                    thisEvent.EventType = ISZ_BORDER;
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case CorrectRightSubState:
-            switch (thisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: ES_ENTRY\r\n");
-
-                    PS_TankTurnLeftDist(500, 2);
-
-                    nextState = AngledOtherForward;
-                    makeTransition = TRUE;
-                    thisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case BUMPER_TRIPPED:
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: BUMPER_TRIPPED\r\n");
-                    PS_BackwardDist(ALIGN_TO_FRONT_BORDER_BACKWARD_POWER, 1);
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: Backup done\r\n");
-
-                    PS_TurnLeft90();
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: Turn done\r\n");
-
-                    PS_ForwardDist(SEARCH_FOR_FRONT_BORDER_POWER, 12);
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: Forward done\r\n");
-                    thisEvent.EventType = BUMPER_TRIPPED;
-                    break;
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunRideRightTapeSubHSM: CorrectRightSubState: MIDDLE_TAPE_DETECTED\r\n");
-
-                    PS_Stop();
-                    thisEvent.EventType = ISZ_BORDER;
-                    break;
-                default:
-                    break;
-            }
-            break;
-    }
-
-    if (makeTransition == TRUE) {
-        RunRideRightTapeSubHSM(EXIT_EVENT);
-        CurrentRideOtherTapeSubState = nextState;
-        RunRideRightTapeSubHSM(ENTRY_EVENT);
-    }
-
-    return thisEvent;
+static uint8_t TransitionDriveToCornerSubState(DriveToCornerSubState_t nextState) {
+    RunDriveToCornerSubHSM(EXIT_EVENT);
+    CurrentDriveToCornerSubState = nextState;
+    return RunDriveToCornerSubHSM(ENTRY_EVENT);
 }
 
-static void StartSurveySpin(void) {
-    MaxBeaconValue = 0;
-    MaxBeaconOffset = 0;
-    AlignmentSpinTime = HSM_FULL_ROTATION_TIME_MS;
-    SurveyStartTime = ES_Timer_GetTime();
+static void StartSweepData(void) {
+    ResetBeaconFilter();
+    MaxFilteredBeaconValue = 0;
 
-    printf("RunSurveySpin: Survey spin started\r\n");
-    PS_TankTurnLeft(50);
+    printf("HOME: SWEEP_DATA start, right forward / left reverse\r\n");
+    PS_RightMtrSpeed(HSM_SWEEP_TURN_POWER);
+    PS_LeftMtrReverseSpeed(HSM_SWEEP_TURN_POWER);
     ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_FULL_ROTATION_TIME_MS);
 }
 
-static void RecordBeaconSample(uint16_t beaconValue) {
-    uint32_t elapsedTime;
+static void StartLockOn(void) {
+    ResetBeaconFilter();
+    PS_Stop();
+    LockOnTurnStarted = FALSE;
 
-    if (beaconValue <= MaxBeaconValue) {
-        return;
+    if (MaxFilteredBeaconValue > HSM_BEACON_LOCK_OFFSET) {
+        BeaconLockThreshold = MaxFilteredBeaconValue - HSM_BEACON_LOCK_OFFSET;
+    } else {
+        BeaconLockThreshold = 0;
     }
 
-    elapsedTime = ES_Timer_GetTime() - SurveyStartTime;
-    if (elapsedTime > HSM_FULL_ROTATION_TIME_MS) {
-        elapsedTime = HSM_FULL_ROTATION_TIME_MS;
-    }
-
-    MaxBeaconValue = beaconValue;
-    MaxBeaconOffset = elapsedTime;
+    printf("HOME: LOCK_ON start max=%u threshold=%u\r\n",
+            MaxFilteredBeaconValue, BeaconLockThreshold);
+    ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_LOCK_ON_START_DELAY_MS);
 }
 
-static void StartAlignmentSpin(void) {
-    AlignmentSpinTime = MaxBeaconOffset;
-    if (AlignmentSpinTime == 0) {
-        AlignmentSpinTime = HSM_FULL_ROTATION_TIME_MS;
-    }
-
-    printf("Alignment spin started max=%u offset=%lu ms\r\n",
-            MaxBeaconValue, (unsigned long) MaxBeaconOffset);
-
-    PS_TankTurnLeft(ALIGN_TO_FRONT_BORDER_POWER);
-    ES_Timer_InitTimer(HSM_ROTATION_TIMER, AlignmentSpinTime);
+static void StartLockOnTurn(void) {
+    LockOnTurnStarted = TRUE;
+    LockOnRotationMax = 0;
+    ResetBeaconFilter();
+    printf("HOME: LOCK_ON tank turn, right forward / left reverse\r\n");
+    PS_RightMtrSpeed(HSM_LOCK_TURN_POWER);
+    PS_LeftMtrReverseSpeed(HSM_LOCK_TURN_POWER);
+    ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_FULL_ROTATION_TIME_MS);
 }
 
+static void StartNextLockOnRotation(void) {
+    if (LockOnRotationMax > 0) {
+        MaxFilteredBeaconValue = LockOnRotationMax;
+    }
+
+    if (MaxFilteredBeaconValue > HSM_BEACON_LOCK_OFFSET) {
+        BeaconLockThreshold = MaxFilteredBeaconValue - HSM_BEACON_LOCK_OFFSET;
+    } else {
+        BeaconLockThreshold = 0;
+    }
+
+    printf("HOME: LOCK_ON retry max=%u threshold=%u\r\n",
+            MaxFilteredBeaconValue, BeaconLockThreshold);
+
+    LockOnRotationMax = 0;
+    ResetBeaconFilter();
+    ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_FULL_ROTATION_TIME_MS);
+}
+
+static void ResetBeaconFilter(void) {
+    uint8_t i;
+
+    BeaconSampleIndex = 0;
+    BeaconSampleCount = 0;
+    BeaconSampleSum = 0;
+
+    for (i = 0; i < HSM_BEACON_AVG_WINDOW; i++) {
+        BeaconSamples[i] = 0;
+    }
+}
+
+static uint16_t FilterBeaconSample(uint16_t sample) {
+    if (BeaconSampleCount < HSM_BEACON_AVG_WINDOW) {
+        BeaconSampleCount++;
+    } else {
+        BeaconSampleSum -= BeaconSamples[BeaconSampleIndex];
+    }
+
+    BeaconSamples[BeaconSampleIndex] = sample;
+    BeaconSampleSum += sample;
+
+    BeaconSampleIndex++;
+    if (BeaconSampleIndex >= HSM_BEACON_AVG_WINDOW) {
+        BeaconSampleIndex = 0;
+    }
+
+    return (uint16_t) (BeaconSampleSum / BeaconSampleCount);
+}
+
+static uint8_t IsTapeEvent(ES_EventTyp_t eventType) {
+    switch (eventType) {
+        case LEFT_TAPE_DETECTED:
+        case LEFT_TAPE_NOT_DETECTED:
+        case MIDDLE_TAPE_DETECTED:
+        case MIDDLE_TAPE_NOT_DETECTED:
+        case RIGHT_TAPE_DETECTED:
+        case RIGHT_TAPE_NOT_DETECTED:
+        case NO_TAPE_DETECTED:
+            return TRUE;
+
+        default:
+            return FALSE;
+    }
+}
+
+static uint8_t EvaluateLocateTape(void) {
+    unsigned char tapeMask;
+
+    tapeMask = PS_ReadTape();
+    if (tapeMask == TAPE_ALL) {
+        PS_Stop();
+        printf("HOME: LOCATE_TAPE complete\r\n");
+        return TRUE;
+    }
+
+    if (CurrentLocateTapeSubState == LocateTapeForwardSubState) {
+        if ((tapeMask == LEFT_TAPE_MASK) || (tapeMask == TAPE_LEFT_MID)) {
+            return TransitionLocateTapeSubState(LocateTapeFixRightSubState);
+        }
+
+        if (tapeMask == RIGHT_TAPE_MASK) {
+            return TransitionLocateTapeSubState(LocateTapeFixLeftSubState);
+        }
+    }
+
+    return FALSE;
+}
+
+static uint8_t EvaluateTurnToCorner(void) {
+    if (PS_ReadTape() == TAPE_LEFT_MID) {
+        PS_Stop();
+        printf("HOME: TURN_TO_CORNER complete\r\n");
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static uint8_t EvaluateDriveToCorner(void) {
+    unsigned char tapeMask;
+
+    tapeMask = PS_ReadTape();
+    if (tapeMask == TAPE_ALL) {
+        PS_Stop();
+        printf("HOME: DRIVE_TO_CORNER complete\r\n");
+        return TRUE;
+    }
+
+    if (tapeMask == TAPE_LEFT_MID) {
+        if (CurrentDriveToCornerSubState != DriveToCornerForwardSubState) {
+            return TransitionDriveToCornerSubState(DriveToCornerForwardSubState);
+        }
+    } else if (tapeMask == LEFT_TAPE_MASK) {
+        if (CurrentDriveToCornerSubState != DriveToCornerFixRightSubState) {
+            return TransitionDriveToCornerSubState(DriveToCornerFixRightSubState);
+        }
+    } else if (tapeMask == MID_TAPE_MASK) {
+        if (CurrentDriveToCornerSubState != DriveToCornerFixLeftSubState) {
+            return TransitionDriveToCornerSubState(DriveToCornerFixLeftSubState);
+        }
+    } else if (CurrentDriveToCornerSubState != DriveToCornerHoldSubState) {
+        return TransitionDriveToCornerSubState(DriveToCornerHoldSubState);
+    }
+
+    return FALSE;
+}
+
+static uint8_t EvaluateTurnToEdge(void) {
+    if (PS_ReadTape() == TAPE_LEFT_MID) {
+        PS_Stop();
+        printf("HOME: TURN_TO_EDGE complete\r\n");
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static void DriveForward(void) {
+    PS_Forward(HSM_DRIVE_POWER);
+}
+
+static void DriveBackward(void) {
+    PS_Backward(HSM_DRIVE_POWER);
+}
+
+static void DriveLeftOnly(void) {
+    PS_RightMtrSpeed(0);
+    PS_LeftMtrSpeed(HSM_CORRECT_POWER);
+}
+
+static void DriveRightOnly(void) {
+    PS_LeftMtrSpeed(0);
+    PS_RightMtrSpeed(HSM_CORRECT_POWER);
+}
+
+static void TankTurnLeft(void) {
+    PS_TankTurnLeftContinuous(HSM_TAPE_TURN_POWER);
+}
+
+static void ArmLocateTapePoll(void) {
+    ES_Timer_InitTimer(HSM_ROTATION_TIMER, HSM_LOCATE_TAPE_POLL_TIME_MS);
+}

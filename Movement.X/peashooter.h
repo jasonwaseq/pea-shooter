@@ -65,8 +65,14 @@ unsigned char PS_ReadTapeDigitalAll(void);
 // Sets left motor forward speed from 0 to PEASHOOTER_MAX_SPEED.
 char PS_LeftMtrSpeed(unsigned int power);
 
+// Sets left motor reverse speed from 0 to PEASHOOTER_MAX_SPEED.
+char PS_LeftMtrReverseSpeed(unsigned int power);
+
 // Sets right motor forward speed from 0 to PEASHOOTER_MAX_SPEED.
 char PS_RightMtrSpeed(unsigned int power);
+
+// Sets right motor reverse speed from 0 to PEASHOOTER_MAX_SPEED.
+char PS_RightMtrReverseSpeed(unsigned int power);
 
 // Sets both motors using a raw PWM duty cycle from 0 to MAX_PWM.
 char PS_RawMotor(unsigned int power);
@@ -97,6 +103,12 @@ char PS_TankTurnLeftDist(unsigned int power, unsigned int dist);
 
 // Spins right for an approximate distance using a blocking delay.
 char PS_TankTurnRightDist(unsigned int power, unsigned int dist);
+
+// Spins left continuously until another motor command or PS_Stop is issued.
+char PS_TankTurnLeftContinuous(unsigned int power);
+
+// Spins right continuously until another motor command or PS_Stop is issued.
+char PS_TankTurnRightContinuous(unsigned int power);
 
 // Pivots left by stopping the left wheel and driving the right wheel.
 char PS_PivotTurnLeft(unsigned int power);

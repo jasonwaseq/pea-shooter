@@ -196,10 +196,18 @@ char PS_LeftMtrSpeed(unsigned int power) {
     return PS_SetLeftMotor(power, 0);
 }
 
+char PS_LeftMtrReverseSpeed(unsigned int power) {
+    return PS_SetLeftMotor(power, 1);
+}
+
 // Sets the right motor speed and direction, with battery compensation.
 
 char PS_RightMtrSpeed(unsigned int power) {
     return PS_SetRightMotor(power, 0);
+}
+
+char PS_RightMtrReverseSpeed(unsigned int power) {
+    return PS_SetRightMotor(power, 1);
 }
 
 // Sets both drive motors from a raw PWM duty cycle without battery compensation.
@@ -423,6 +431,20 @@ char PS_TankTurnRightDist(unsigned int power, unsigned int dist) {
     PS_Stop();
 
     // Report success after the turn completes.
+    return SUCCESS;
+}
+
+char PS_TankTurnLeftContinuous(unsigned int power) {
+    PS_SetRightMotor(power, 0);
+    PS_SetLeftMotor(power, 1);
+
+    return SUCCESS;
+}
+
+char PS_TankTurnRightContinuous(unsigned int power) {
+    PS_SetRightMotor(power, 1);
+    PS_SetLeftMotor(power, 0);
+
     return SUCCESS;
 }
 
