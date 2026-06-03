@@ -15,7 +15,7 @@ Simple current robot wiring map.
 | Right tape | `W5` | `PORTW05_BIT` |
 | Mid tape | `W6` | `PORTW06_BIT` |
 | HC-SR04 trigger | `X10` | `PORTX`, `PIN10` |
-| HC-SR04 echo | `X12` | `PORTDbits.RD6` |
+| HC-SR04 echo | `Y11` | `PORTEbits.RE5` |
 | Left motor IN1 | `Y6` | `PORTY06_LAT` |
 | Left motor IN2 | `Y5` | `PORTY05_LAT` |
 | Right motor IN1 | `Y8` | `PORTY08_LAT` |
@@ -29,4 +29,4 @@ Simple current robot wiring map.
 
 - `Z6`, `Y12`, `Y10`, `Y4`, and `X11` are the hardware PWM-capable pins used by this codebase.
 - The indexer uses `RC_Servo` on `Z4` so `Z6` is free for the secondary shooter.
-- HC-SR04 `ECHO` must go through a 5 V to 3.3 V divider before reaching `X12`.
+- HC-SR04 `ECHO` must go through a 5 V to 3.3 V divider before reaching `Y11`.

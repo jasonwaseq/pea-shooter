@@ -7,6 +7,7 @@
       <itemPath>ES_Configure.h</itemPath>
       <itemPath>HSMService.h</itemPath>
       <itemPath>BeaconEventChecker.h</itemPath>
+      <itemPath>HSMEventCheckers.h</itemPath>
       <itemPath>../include/AD.h</itemPath>
       <itemPath>../include/BOARD.h</itemPath>
       <itemPath>../include/ES_CheckEvents.h</itemPath>
