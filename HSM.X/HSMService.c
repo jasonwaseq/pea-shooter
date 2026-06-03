@@ -13,6 +13,9 @@
 #include "ES_Timers.h"
 #include "peashooter.h"
 
+#define START_AT_FRONT_BORDER_TEST 1
+
+
 #define HSM_FULL_ROTATION_TIME_MS 5000
 #define HSM_LOCK_ON_START_DELAY_MS 250
 #define HSM_ON_FIELD_BACKUP_TIME_MS 500
@@ -40,9 +43,9 @@
 #define LEFT_TO_OBSTACLE_BACKWARD_POWER 900
 #define LEFT_TO_OBSTACLE_BACKWARD_DIST 2
 #define OBSTACLE_TO_RIGHT_BACKWARD_POWER 900
-#define OBSTACLE_TO_RIGHT_BACKWARD_DIST 2
+#define OBSTACLE_TO_RIGHT_BACKWARD_DIST 3
 #define RIGHT_TO_OBSTACLE_BACKWARD_POWER 900
-#define RIGHT_TO_OBSTACLE_BACKWARD_DIST 2
+#define RIGHT_TO_OBSTACLE_BACKWARD_DIST 2.5
 #define ALIGN_TO_FRONT_BORDER_TANK_POWER 900
 #define ALIGN_TO_FRONT_BORDERRIGHT_TANK_DIST 4
 #define ALIGN_TO_FRONT_BORDERLEFT_TANK_DIST 5
@@ -51,12 +54,15 @@
 #define FRONT_TO_LEFT_BORDER_TANK_POWER 900
 #define FRONT_TO_LEFT_BORDER_TANK_DIST 4
 #define LEFT_TO_OBSTACLE_TANK_POWER 700
-#define LEFT_TO_OBSTACLE_TANK_DIST 7.7
+#define LEFT_TO_OBSTACLE_TANK_DIST 6.5
 #define OBSTACLE_TO_RIGHT_TANK_POWER 900
-#define OBSTACLE_TO_RIGHT_TANK_DIST 4
+#define OBSTACLE_TO_RIGHT_TANK_DIST 4.5
 #define RIGHT_TO_OBSTACLE_TANK_POWER 700
-#define RIGHT_TO_OBSTACLE_TANK_DIST 7.7
-#define ANGLED_FORWARD_POWER 800
+#define RIGHT_TO_OBSTACLE_TANK_DIST 7.2
+#define ANGLED_FORWARD_POWER 600
+
+#define CORRECT_LEFT_POWER 500
+#define CORRECT_LEFT_DIST 2
 
 #define TAPE_NONE 0
 #define TAPE_ALL (LEFT_TAPE_MASK | MID_TAPE_MASK | RIGHT_TAPE_MASK)
@@ -76,12 +82,17 @@ typedef enum {
     SearchForFrontBorderState,
     SearchForSideBorderState,
     RideLeftTapeState,
-    RideRIghtTapeState,
+    RideRightTapeState,
     RideFrontTapeState,
     SearchForRightBorderState,
     SearchForLeftBorderState,
+    AimState,
     STOPPEDState,
 } HomeSubState_t;
+
+typedef enum {
+    InitAimSubState,
+} AimSubState_t;
 
 typedef enum {
     InitFrontBorderSubState,
@@ -147,6 +158,7 @@ static RideFrontTapeSubState_t CurrentRideFrontTapeSubState;
 static SearchForRightBorderSubState_t CurrentFirstObstacleClearedSubState;
 static RideRightTapeSubState_t CurrentRideOtherTapeSubState;
 static SearchForLeftBorderSubState_t CurrentSecondObstacleClearedSubState;
+static AimSubState_t CurrentAimSubState;
 static uint8_t TapeEventsEnabled;
 
 static uint16_t BeaconSamples[HSM_BEACON_AVG_WINDOW];
@@ -173,6 +185,8 @@ static uint8_t InitSearchForRightBorderSubHSM(void);
 static ES_Event SearchForRightBorderSubHSM(ES_Event thisEvent);
 static uint8_t InitSearchForLeftBorderSubHSM(void);
 static ES_Event SearchForLeftBorderSubHSM(ES_Event thisEvent);
+static uint8_t InitAimSubHSM(void);
+static ES_Event RunAimSubHSM(ES_Event thisEvent);
 
 static ES_Event TransitionHomeSubState(HomeSubState_t nextState);
 static ES_Event CompleteHome(void);
@@ -192,7 +206,11 @@ uint8_t InitHSMService(uint8_t priority) {
     MyPriority = priority;
     CurrentState = InitPState;
     CurrentHomeSubState = InitHomeSubState;
+    #ifdef START_AT_FRONT_BORDER_TEST
+    TapeEventsEnabled = TRUE;
+#else
     TapeEventsEnabled = FALSE;
+#endif
     LockOnTurnStarted = FALSE;
     LockOnRotationMax = 0;
     OnFieldStopped = FALSE;
@@ -223,7 +241,7 @@ ES_Event RunHSMService(ES_Event thisEvent) {
             if (thisEvent.EventType == ES_INIT) {
                 printf("RunHSMService: InitPState\r\n");
                 // nextState = BeaconAlignmentState;
-                nextState = SearchForFrontBorderState;
+                nextState = HomeState;
                 // nextState = RideTapeState;
                 makeTransition = TRUE;
                 thisEvent.EventType = ES_NO_EVENT;
@@ -272,11 +290,18 @@ uint8_t HSM_TapeEventsEnabled(void) {
     return TapeEventsEnabled;
 }
 
-static uint8_t InitHomeSubHSM(void) {
+static uint8_t InitHomeSubHSM(void)
+{
     ES_Event returnEvent;
 
+#ifdef START_AT_FRONT_BORDER_TEST
+    CurrentHomeSubState = SearchForFrontBorderState;
+    returnEvent = RunHomeSubHSM(ENTRY_EVENT);
+#else
     CurrentHomeSubState = InitHomeSubState;
     returnEvent = RunHomeSubHSM(INIT_EVENT);
+#endif
+
     return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
 }
 
@@ -458,7 +483,7 @@ static ES_Event RunHomeSubHSM(ES_Event thisEvent) {
             }
             break;
 
-        case RideRIghtTapeState:
+        case RideRightTapeState:
             switch (thisEvent.EventType) {
                 case ES_ENTRY:
                     if (InitRideOtherTapeSubHSM() != TRUE) {
@@ -473,7 +498,7 @@ static ES_Event RunHomeSubHSM(ES_Event thisEvent) {
                     if (thisEvent.EventType == ISZ_BORDER) {
                         thisEvent = TransitionHomeSubState(STOPPEDState);
                     } else if (thisEvent.EventType == BUMPER_TRIPPED) {
-                        thisEvent = TransitionHomeSubState(STOPPEDState);
+                        thisEvent = TransitionHomeSubState(SearchForLeftBorderState);
                     }
                     break;
             }
@@ -493,7 +518,7 @@ static ES_Event RunHomeSubHSM(ES_Event thisEvent) {
                 default:
                     thisEvent = SearchForRightBorderSubHSM(thisEvent);
                     if (thisEvent.EventType == FIRST_BORDER_DONE) {
-                        thisEvent = TransitionHomeSubState(RideRIghtTapeState);
+                        thisEvent = TransitionHomeSubState(RideRightTapeState);
                     }
                     break;
             }
@@ -545,6 +570,15 @@ static uint8_t InitRideTapeSubHSM(void) {
 
     CurrentRideTapeSubState = InitRideTapeSubState;
     returnEvent = RunRideLeftTapeSubHSM(INIT_EVENT);
+    return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
+}
+
+
+static uint8_t InitAimSubHSM(void) {
+    ES_Event returnEvent;
+
+    CurrentAimSubState = InitAimSubState;
+    returnEvent = RunAimSubHSM(INIT_EVENT);
     return (returnEvent.EventType == ES_NO_EVENT) ? TRUE : FALSE;
 }
 
@@ -1154,7 +1188,7 @@ static ES_Event RunRideLeftTapeSubHSM(ES_Event thisEvent) {
             switch (thisEvent.EventType) {
                 case ES_ENTRY:
                     printf("RunRideLeftTapeSubHSM: CorrectLeftSubState: ES_ENTRY\r\n");
-                    PS_TankTurnRightDist(500, 2);
+                    PS_TankTurnRightDist(CORRECT_LEFT_POWER, CORRECT_LEFT_DIST);
                     nextState = AngledForward;
                     makeTransition = TRUE;
                     thisEvent.EventType = ES_NO_EVENT;
@@ -1228,7 +1262,7 @@ static ES_Event RunRideRightTapeSubHSM(ES_Event thisEvent) {
                     printf("RunRideRightTapeSubHSM: AngledOtherForward: Backup done\r\n");
                     PS_TankTurnLeftDist(RIGHT_TO_OBSTACLE_TANK_POWER, RIGHT_TO_OBSTACLE_TANK_DIST);
                     printf("RunRideRightTapeSubHSM: AngledOtherForward: Turn done\r\n");
-                    PS_ForwardDist(SEARCH_FOR_FRONT_BORDER_POWER, 10);
+                    PS_ForwardDist(SEARCH_FOR_FRONT_BORDER_POWER, 12);
                     printf("RunRideRightTapeSubHSM: AngledOtherForward: Forward done\r\n");
                     thisEvent.EventType = BUMPER_TRIPPED;
                     break;
@@ -1281,6 +1315,32 @@ static ES_Event RunRideRightTapeSubHSM(ES_Event thisEvent) {
         RunRideRightTapeSubHSM(EXIT_EVENT);
         CurrentRideOtherTapeSubState = nextState;
         RunRideRightTapeSubHSM(ENTRY_EVENT);
+    }
+
+    return thisEvent;
+}
+
+
+static ES_Event RunAimSubHSM(ES_Event thisEvent) {
+    uint8_t makeTransition = FALSE;
+    AimSubState_t nextState = CurrentAimSubState;
+
+    switch (CurrentAimSubState) {
+        case InitAimSubState:
+            if (thisEvent.EventType == ES_INIT) {
+                PS_Stop();
+                printf("RunRideRightTapeSubHSM: InitRideOtherTapeSubState: ES_INIT\r\n");
+                nextState = AngledOtherForward;
+                makeTransition = TRUE;
+                thisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+    }
+
+    if (makeTransition == TRUE) {
+        RunAimSubHSM(EXIT_EVENT);
+        CurrentAimSubState = nextState;
+        RunAimSubHSM(ENTRY_EVENT);
     }
 
     return thisEvent;
