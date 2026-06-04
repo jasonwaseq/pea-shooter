@@ -27,5 +27,5 @@ Simple current robot wiring map.
 ## Notes
 
 - `Z6`, `Y12`, `Y10`, `Y4`, and `X11` are the hardware PWM-capable pins used by this codebase.
-- The indexer uses hardware PWM on `Z6`; the shooter outputs use `Y4` and `X11`.
+- The shooter firmware also starts the indexer on `Z6`: 100% PWM for 500 ms, then 50% PWM.
 - HC-SR04 `ECHO` must go through a 5 V to 3.3 V divider before reaching `Y11`.

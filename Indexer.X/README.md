@@ -8,8 +8,8 @@ Default output:
 - Hardware PWM pin: `PWM_PORTZ06` (`PortZ-06`)
 - PWM frequency: `PWM_1KHZ`
 - Startup duty: `1000 / 1000`, or 100.0%
-- Startup time: `500 ms`
-- Running duty: `625 / 1000`, or 62.5%
+- Startup time: `100 ms`
+- Running duty: `400 / 1000`, or 40.0%
 
 Beacon detector ADC logic is intentionally kept in `BeaconDetector.X`.
 
@@ -22,6 +22,6 @@ StartIndexerSystem();
 ```
 
 It posts an `INDEXER_START` event to the service. The service drives the
-hardware PWM output at full duty, starts ES timer 0 for 500 ms, and then
-switches to 62.5% duty when that timer expires. `StopIndexerSystem()` posts an
+hardware PWM output at full duty, starts ES timer 0 for 100 ms, and then
+switches to 40.0% duty when that timer expires. `StopIndexerSystem()` posts an
 `INDEXER_STOP` event and sets the PWM duty to zero.

@@ -10,6 +10,25 @@
 #include "pwm.h"
 #include "ShooterService.h"
 
+#define CORE_TIMER_500MS_TICKS 20000000UL
+
+static unsigned int ReadCoreTimer(void)
+{
+    unsigned int count;
+
+    asm volatile("mfc0 %0,$9" : "=r"(count));
+    return count;
+}
+
+static void WaitCoreTimerTicks(unsigned int ticks)
+{
+    unsigned int start = ReadCoreTimer();
+
+    while ((unsigned int) (ReadCoreTimer() - start) < ticks) {
+        ;
+    }
+}
+
 static void InitShooterBoardNoAd(void)
 {
     unsigned int status;
@@ -39,6 +58,8 @@ int main(void)
             UPPER_SHOOTER_PWM_IO_BIT);
     IO_PortsSetPortOutputs(LOWER_SHOOTER_PWM_IO_PORT,
             LOWER_SHOOTER_PWM_IO_BIT);
+    IO_PortsSetPortOutputs(INDEXER_PWM_IO_PORT,
+            INDEXER_PWM_IO_BIT);
 
     IO_PortsSetPortOutputs(SHOOTER_ENABLE_PORT,
             UPPER_SHOOTER_ENABLE_BIT | LOWER_SHOOTER_ENABLE_BIT);
@@ -48,11 +69,19 @@ int main(void)
             LOWER_SHOOTER_ENABLE_BIT);
 
     PWM_AddPins(UPPER_SHOOTER_PWM_PIN
-            | LOWER_SHOOTER_PWM_PIN);
+            | LOWER_SHOOTER_PWM_PIN
+            | INDEXER_PWM_PIN);
     PWM_SetDutyCycle(UPPER_SHOOTER_PWM_PIN,
             UPPER_SHOOTER_DUTY);
     PWM_SetDutyCycle(LOWER_SHOOTER_PWM_PIN,
             LOWER_SHOOTER_DUTY_CYCLE);
+    PWM_SetDutyCycle(INDEXER_PWM_PIN,
+            INDEXER_STARTUP_DUTY);
+
+    WaitCoreTimerTicks(CORE_TIMER_500MS_TICKS);
+
+    PWM_SetDutyCycle(INDEXER_PWM_PIN,
+            INDEXER_RUN_DUTY);
 
     for (;;) {
         ;

@@ -9,6 +9,7 @@
 
 #include "ES_Configure.h"
 #include "ES_Events.h"
+#include "IO_Ports.h"
 #include "pwm.h"
 
 /*
@@ -16,6 +17,14 @@
  */
 #ifndef INDEXER_PWM_PIN
 #define INDEXER_PWM_PIN PWM_PORTZ06
+#endif
+
+#ifndef INDEXER_PWM_IO_PORT
+#define INDEXER_PWM_IO_PORT PORTZ
+#endif
+
+#ifndef INDEXER_PWM_IO_BIT
+#define INDEXER_PWM_IO_BIT PIN6
 #endif
 
 #ifndef INDEXER_OUTPUT_PIN_NAME
@@ -35,11 +44,11 @@
 #endif
 
 #ifndef INDEXER_RUN_DUTY
-#define INDEXER_RUN_DUTY 625
+#define INDEXER_RUN_DUTY 400
 #endif
 
 #ifndef INDEXER_STARTUP_TIME_MS
-#define INDEXER_STARTUP_TIME_MS 500
+#define INDEXER_STARTUP_TIME_MS 100
 #endif
 
 uint8_t InitIndexerService(uint8_t priority);

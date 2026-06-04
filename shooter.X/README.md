@@ -7,9 +7,12 @@ Default firmware behavior:
 
 - Upper shooter motor auto-start: enabled
 - Upper shooter output: drives `RPWM`/`PortY-04` with `R_EN`/`PortX-03`
-- Upper shooter duty cycle: `200 / 1000`, or 20.0%
+- Upper shooter duty cycle: `700 / 1000`, or 70.0%
 - Lower shooter output: drives `LPWM`/`PortX-11` with `L_EN`/`PortX-04`
-- Lower shooter duty cycle: `200 / 1000`, or 20.0%
+- Lower shooter duty cycle: `700 / 1000`, or 70.0%
+- Indexer output: drives `PWM`/`PortZ-06`
+- Indexer startup duty cycle: `1000 / 1000`, or 100.0%, for `500 ms`
+- Indexer running duty cycle: `500 / 1000`, or 50.0%
 - Hardware PWM frequency: `PWM_1KHZ`
 
 ## Wiring
@@ -22,6 +25,7 @@ Uno32 stack control wiring:
 - Upper shooter: Uno32 `PortX-03` -> IBT-2 `R_EN`
 - Lower shooter: Uno32 `PortX-11` -> IBT-2 `LPWM`
 - Lower shooter: Uno32 `PortX-04` -> IBT-2 `L_EN`
+- Indexer: Uno32 `PortZ-06` -> motor driver PWM/control input
 - Uno32 `GND` -> IBT-2 logic `GND`
 - Uno32 `5V` -> IBT-2 logic `VCC`
 
@@ -44,11 +48,12 @@ Important notes:
   `PWM_PORTX11`.
 
 With the default code, the upper and lower shooter outputs start at the fixed
-duty cycle after initialization.
+duty cycle after initialization. The indexer starts at full PWM duty for 500 ms,
+then drops to 50% duty and stays there.
 
 When the upper shooter is started, the service drives `RPWM` and enables
-`R_EN`. The lower shooter uses only `LPWM` and `L_EN`; `PortZ-06` is left for
-the indexer.
+`R_EN`. The lower shooter uses only `LPWM` and `L_EN`. `PortZ-06` drives the
+indexer.
 
 Beacon detector ADC logic is intentionally kept in `BeaconDetector.X`.
 

@@ -42,6 +42,10 @@ static uint8_t ConfigureShooterPins(void)
             LOWER_SHOOTER_PWM_IO_BIT) != SUCCESS) {
         return FALSE;
     }
+    if (IO_PortsSetPortOutputs(INDEXER_PWM_IO_PORT,
+            INDEXER_PWM_IO_BIT) != SUCCESS) {
+        return FALSE;
+    }
     return TRUE;
 }
 
@@ -101,6 +105,14 @@ static uint8_t StopLowerShooterOutput(void)
     return DisableLowerShooterDriver();
 }
 
+static uint8_t SetIndexerDuty(unsigned int duty)
+{
+    if (duty > MAX_PWM) {
+        return FALSE;
+    }
+    return PWM_SetDutyCycle(INDEXER_PWM_PIN, duty) == SUCCESS;
+}
+
 uint8_t InitShooterService(uint8_t priority)
 {
     ES_Event initEvent;
@@ -118,7 +130,8 @@ uint8_t InitShooterService(uint8_t priority)
         return FALSE;
     }
     if (PWM_AddPins(UPPER_SHOOTER_PWM_PIN
-            | LOWER_SHOOTER_PWM_PIN) != SUCCESS) {
+            | LOWER_SHOOTER_PWM_PIN
+            | INDEXER_PWM_PIN) != SUCCESS) {
         return FALSE;
     }
     if (StopUpperShooterOutput() != TRUE) {
@@ -134,6 +147,13 @@ uint8_t InitShooterService(uint8_t priority)
         return FALSE;
     }
     if (StartLowerShooterMotor() != TRUE) {
+        return FALSE;
+    }
+    if (SetIndexerDuty(INDEXER_STARTUP_DUTY) != TRUE) {
+        return FALSE;
+    }
+    if (ES_Timer_InitTimer(INDEXER_STARTUP_TIMER,
+            INDEXER_STARTUP_TIME_MS) != ES_Timer_OK) {
         return FALSE;
     }
     if (InitShooterEventChecker() != TRUE) {
@@ -227,7 +247,17 @@ ES_Event RunShooterService(ES_Event thisEvent)
         CurrentState = SHOOTER_DISABLED;
         break;
 
+    case ES_TIMEOUT:
+        if (thisEvent.EventParam == INDEXER_STARTUP_TIMER) {
+            if (SetIndexerDuty(INDEXER_RUN_DUTY) != TRUE) {
+                returnEvent.EventType = ES_ERROR;
+            }
+        }
+        break;
+
     case ES_EXIT:
+        ES_Timer_StopTimer(INDEXER_STARTUP_TIMER);
+        SetIndexerDuty(MIN_PWM);
         StopLowerShooterOutput();
         StopUpperShooterOutput();
         PWM_End();

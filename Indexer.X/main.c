@@ -6,7 +6,6 @@
  */
 
 #include <BOARD.h>
-#include <stdio.h>
 #include <xc.h>
 
 #include "ES_Configure.h"
@@ -19,27 +18,10 @@ int main(void)
 
     BOARD_Init();
 
-    printf("\r\nStarting Indexer ES Framework project\r\n");
-    printf("Indexer output defaults to %s; edit IndexerService.h if rewired.\r\n",
-            INDEXER_OUTPUT_PIN_NAME);
-    printf("Beacon detector logic lives in BeaconDetector.X.\r\n");
-
     errorType = ES_Initialize();
     if (errorType == Success) {
         StartIndexerSystem();
         errorType = ES_Run();
-    }
-
-    switch (errorType) {
-    case FailedPointer:
-        printf("Failed on NULL pointer\r\n");
-        break;
-    case FailedInit:
-        printf("Failed initialization\r\n");
-        break;
-    default:
-        printf("Other failure: %d\r\n", errorType);
-        break;
     }
 
     for (;;) {

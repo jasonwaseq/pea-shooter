@@ -9,7 +9,7 @@
 #define ES_CONFIGURE_H
 
 //#define USE_KEYBOARD_INPUT
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
 
 /****************************************************************************/

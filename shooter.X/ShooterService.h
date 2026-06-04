@@ -16,6 +16,7 @@
  * Shooter IBT-2/BTS7960 default wiring on the Uno32 I/O protection stack:
  *   Upper shooter: PortY-04 -> RPWM, PortX-03 -> R_EN
  *   Lower shooter: PortX-11 -> LPWM, PortX-04 -> L_EN
+ *   Indexer: PortZ-06 -> PWM
  *
  * PortW is usable as Uno stack digital I/O, but it is not supported by the
  * hardware PWM module in include/pwm.h. Keep RPWM/LPWM on PWM-capable pins.
@@ -77,11 +78,35 @@
 #endif
 
 #ifndef UPPER_SHOOTER_DUTY
-#define UPPER_SHOOTER_DUTY 200
+#define UPPER_SHOOTER_DUTY 700
 #endif
 
 #ifndef LOWER_SHOOTER_DUTY_CYCLE
-#define LOWER_SHOOTER_DUTY_CYCLE 200
+#define LOWER_SHOOTER_DUTY_CYCLE 700
+#endif
+
+#ifndef INDEXER_PWM_PIN
+#define INDEXER_PWM_PIN PWM_PORTZ06
+#endif
+
+#ifndef INDEXER_PWM_IO_PORT
+#define INDEXER_PWM_IO_PORT PORTZ
+#endif
+
+#ifndef INDEXER_PWM_IO_BIT
+#define INDEXER_PWM_IO_BIT PIN6
+#endif
+
+#ifndef INDEXER_STARTUP_DUTY
+#define INDEXER_STARTUP_DUTY MAX_PWM
+#endif
+
+#ifndef INDEXER_RUN_DUTY
+#define INDEXER_RUN_DUTY 500
+#endif
+
+#ifndef INDEXER_STARTUP_TIME_MS
+#define INDEXER_STARTUP_TIME_MS 500
 #endif
 
 uint8_t InitShooterService(uint8_t priority);

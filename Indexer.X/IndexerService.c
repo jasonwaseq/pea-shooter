@@ -6,8 +6,6 @@
 
 #include "IndexerService.h"
 
-#include <stdio.h>
-
 #include "BOARD.h"
 #include "ES_Framework.h"
 #include "ES_Timers.h"
@@ -41,6 +39,10 @@ uint8_t InitIndexerService(uint8_t priority)
         return FALSE;
     }
     if (PWM_SetFrequency(INDEXER_PWM_FREQUENCY) != SUCCESS) {
+        return FALSE;
+    }
+    if (IO_PortsSetPortOutputs(INDEXER_PWM_IO_PORT,
+            INDEXER_PWM_IO_BIT) != SUCCESS) {
         return FALSE;
     }
     if (PWM_AddPins(INDEXER_PWM_PIN) != SUCCESS) {
@@ -90,9 +92,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
 
     switch (thisEvent.EventType) {
     case ES_INIT:
-        printf("Indexer ready on %s using hardware PWM\r\n",
-                INDEXER_OUTPUT_PIN_NAME);
-        printf("PWM frequency: %u Hz\r\n", PWM_GetFrequency());
         break;
 
     case INDEXER_START:
@@ -106,10 +105,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
             break;
         }
         CurrentState = INDEXER_STARTUP;
-        printf("Indexer startup: %u.%u%% duty for %u ms\r\n",
-                INDEXER_STARTUP_DUTY / 10,
-                INDEXER_STARTUP_DUTY % 10,
-                INDEXER_STARTUP_TIME_MS);
         break;
 
     case ES_TIMEOUT:
@@ -120,9 +115,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
                 break;
             }
             CurrentState = INDEXER_RUNNING;
-            printf("Indexer running: %u.%u%% duty\r\n",
-                    INDEXER_RUN_DUTY / 10,
-                    INDEXER_RUN_DUTY % 10);
         }
         break;
 
@@ -132,7 +124,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
         }
         SetIndexerDuty(MIN_PWM);
         CurrentState = INDEXER_OFF;
-        printf("Indexer stopped\r\n");
         break;
 
     case ES_EXIT:
@@ -142,7 +133,6 @@ ES_Event RunIndexerService(ES_Event thisEvent)
         SetIndexerDuty(MIN_PWM);
         PWM_End();
         CurrentState = INDEXER_OFF;
-        printf("Indexer exited\r\n");
         break;
 
     default:
