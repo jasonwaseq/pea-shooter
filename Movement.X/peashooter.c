@@ -468,7 +468,6 @@ char PS_TurnLeft90() {
 }
 
 char PS_AngledRight(unsigned int power) {
-    unsigned int delay;
     // Left motor faster, right motor slower = slight right curve
     PS_LeftMtrSpeed(power);
     PS_RightMtrSpeed(power - 100);
@@ -483,9 +482,8 @@ bool PS_IsMoving(void){
 }
 
 char PS_AngledLeft(unsigned int power) {
-    unsigned int delay;
     // Left motor faster, right motor slower = slight right curve
-    PS_LeftMtrSpeed(power - 100);
+    PS_LeftMtrSpeed(power - 200);
     PS_RightMtrSpeed(power);
 
 

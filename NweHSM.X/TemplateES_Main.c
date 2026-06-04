@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "ES_Configure.h"
 #include "ES_Framework.h"
+#include "peashooter.h"
 
 #ifdef RUN_HSM
 void main(void)
@@ -16,6 +17,8 @@ void main(void)
 
 
     // Your hardware initialization function calls go here
+
+    PS_Init();
 
     // now initialize the Events and Services Framework and start it running
     ErrorType = ES_Initialize();
