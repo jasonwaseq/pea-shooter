@@ -53,7 +53,14 @@
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitTemplateSubHSM(void);
-
+uint8_t InitTemplateSubHSM(void);
+uint8_t InitFollowTapeSubHSM(void);
+uint8_t InitAvoidObstacleSubHSM(void);
+uint8_t InitFindBeaconSubHSM(void);
+uint8_t InitAlignTapeSubHSM(void);
+uint8_t InitLocateCornerSubHSM(void);
+uint8_t InitFollowEdgeSubHSM(void);
+uint8_t InitLauncherSubHSM(void);
 /**
  * @Function RunTemplateSubHSM(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
@@ -70,6 +77,13 @@ uint8_t InitTemplateSubHSM(void);
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunTemplateSubHSM(ES_Event ThisEvent);
-
+ES_Event RunBeaconAlignSubHSM(ES_Event ThisEvent);
+ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent);
+ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent);
+ES_Event RunFindBeaconSubHSM(ES_Event ThisEvent);
+ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent);
+ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent);
+ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent);
+ES_Event RunLauncherSubHSM(ES_Event ThisEvent);
 #endif /* SUB_HSM_Template_H */
 

@@ -33,6 +33,7 @@
 #include "BOARD.h"
 #include "TemplateHSM.h"
 #include "TemplateSubHSM.h" //#include all sub state machines called
+#include "peashooter.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -44,13 +45,17 @@
 
 
 typedef enum {
-    InitPState,
-    FirstState,
+    Init,
+    LocateCorner,
+    FollowEdge,
+    Launcher,
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
-	"InitPState",
-	"FirstState",
+    "Init",
+    "LocateCorner",
+    "FollowEdge",
+    "Launcher",
 };
 
 
@@ -66,7 +71,7 @@ static const char *StateNames[] = {
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
 
-static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
+static TemplateHSMState_t CurrentState = Init; // <- change enum name to match ENUM
 static uint8_t MyPriority;
 
 
@@ -84,11 +89,10 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitTemplateHSM(uint8_t Priority)
-{
+uint8_t InitTemplateHSM(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
-    CurrentState = InitPState;
+    CurrentState = Init;
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
@@ -106,8 +110,7 @@ uint8_t InitTemplateHSM(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostTemplateHSM(ES_Event ThisEvent)
-{
+uint8_t PostTemplateHSM(ES_Event ThisEvent) {
     return ES_PostToService(MyPriority, ThisEvent);
 }
 
@@ -126,43 +129,79 @@ uint8_t PostTemplateHSM(ES_Event ThisEvent)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunTemplateHSM(ES_Event ThisEvent)
-{
+ES_Event RunTemplateHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     TemplateHSMState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPState: // If current state is initial Pseudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-            // Initialize all sub-state machines
-            InitTemplateSubHSM();
-            // now put the machine into the actual initial state
-            nextState = FirstState;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            ;
-        }
-        break;
-
-    case FirstState: // in the first state, replace this with correct names
-        // run sub-state machine for this state
-        //NOTE: the SubState Machine runs and responds to events before anything in the this
-        //state machine does
-        ThisEvent = RunTemplateSubHSM(ThisEvent);
-        switch (ThisEvent.EventType) {
-        case ES_NO_EVENT:
-        default:
+        case Init: // If current state is initial Pseudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
+                // Initialize all sub-state machines
+                uint8_t InitTemplateSubHSM(void);
+                uint8_t InitTemplateSubHSM(void);
+                uint8_t InitFollowTapeSubHSM(void);
+                uint8_t InitAvoidObstacleSubHSM(void);
+                uint8_t InitFindBeaconSubHSM(void);
+                uint8_t InitAlignTapeSubHSM(void);
+                uint8_t InitLocateCornerSubHSM(void);
+                uint8_t InitFollowEdgeSubHSM(void);
+                uint8_t InitLauncherSubHSM(void);
+                // now put the machine into the actual initial state
+                nextState = LocateCorner;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                ;
+            }
             break;
-        }
-        break;
-    default: // all unhandled states fall into here
-        break;
+
+        case LocateCorner:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    ThisEvent = RunAlignTapeSubHSM(ThisEvent);
+                    break;
+                case ALL_TAPE_DETECTED:
+                    nextState = FollowEdge;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        case FollowEdge:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    ThisEvent = RunFollowEdgeSubHSM(ThisEvent);
+                    break;
+                case ALL_TAPE_DETECTED:
+                    nextState = Launcher;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+
+        case Launcher:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    ThisEvent = RunLauncherSubHSM(ThisEvent);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default: // all unhandled states fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY

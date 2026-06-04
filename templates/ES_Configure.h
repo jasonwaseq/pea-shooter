@@ -46,6 +46,34 @@ typedef enum {
     /* User-defined events start here */
     BATTERY_CONNECTED,
     BATTERY_DISCONNECTED,
+            BUMPER_TRIPPED,
+    BUMPER_NOT_TRIPPED,
+    RIGHT_TAPE_DETECTED,
+    RIGHT_TAPE_NOT_DETECTED,
+    MIDDLE_TAPE_DETECTED,
+    MIDDLE_TAPE_NOT_DETECTED,
+    LEFT_TAPE_DETECTED,
+    LEFT_TAPE_NOT_DETECTED,
+    NO_TAPE_DETECTED,
+            ALL_TAPE_DETECTED,
+    BORDER_FOUND,
+    FRONT_BORDER_DONE,
+    SIDE_BORDER_DONE,
+    FRONT_BORDER_ALIGNED,
+    FOUND_OBSTACLE,
+    OBSTACLE_CLEARED,
+    FIRST_BORDER_DONE,
+    SECOND_BORDER_DONE,
+    ISZ_BORDER,
+    HOME_COMPLETE,
+            BEACON_STRENGTH_CHANGED,
+            PING_FAR,
+            PING_CLOSE,
+            
+BEACON_DETECTED,
+BEACON_LOST,
+            BEACON_SAMPLE_READY,
+BEACON_ALIGN_DONE,
 	/* User-defined events end here */
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
@@ -63,6 +91,26 @@ static const char *EventNames[] = {
 	"ES_TIMERSTOPPED",
 	"BATTERY_CONNECTED",
 	"BATTERY_DISCONNECTED",
+    "BUMPER_TRIPPED",
+	"BUMPER_NOT_TRIPPED",
+	"RIGHT_TAPE_DETECTED",
+	"RIGHT_TAPE_NOT_DETECTED",
+	"MIDDLE_TAPE_DETECTED",
+	"MIDDLE_TAPE_NOT_DETECTED",
+	"LEFT_TAPE_DETECTED",
+	"LEFT_TAPE_NOT_DETECTED",
+	"NO_TAPE_DETECTED",
+    "ALL_TAPE_DETECTED",
+	"BORDER_FOUND",
+    "FRONT_BORDER_DONE",
+    "SIDE_BORDER_DONE",
+    "FRONT_BORDER_ALIGNED",
+    "FOUND_OBSTACLE",
+    "OBSTACLE_CLEARED",
+    "FIRST_BORDER_DONE",
+    "SECOND_BORDER_DONE",
+    "ISZ_BORDER",
+    "HOME_COMPLETE",
 	"NUMBEROFEVENTS",
 };
 
@@ -82,11 +130,11 @@ static const char *EventNames[] = {
 // corresponding timer expires. All 16 must be defined. If you are not using
 // a timers, then you can use TIMER_UNUSED
 #define TIMER_UNUSED ((pPostFunc)0)
-#define TIMER0_RESP_FUNC TIMER_UNUSED
-#define TIMER1_RESP_FUNC TIMER_UNUSED
-#define TIMER2_RESP_FUNC TIMER_UNUSED
-#define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define AVOIDOBSTACLE_BACKWARD_TIMER 0
+#define AVOIDOBSTACLE_TURNRIGHT_TIMER 0
+#define PING_CLEARANCE 0
+#define OBSTACLE_SIDE_CLEARANCE 0
+#define HSM_ROTATION_TIMER 0
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -118,7 +166,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 1
+#define NUM_SERVICES 2
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service
@@ -138,11 +186,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public function prototypes
-#define SERV_1_HEADER "TestService.h"
+#define SERV_1_HEADER "TemplateHSM.h"
 // the name of the Init function
-#define SERV_1_INIT TestServiceInit
+#define SERV_1_INIT InitTemplateHSM
 // the name of the run function
-#define SERV_1_RUN TestServiceRun
+#define SERV_1_RUN RunTemplateHSM
 // How big should this services Queue be?
 #define SERV_1_QUEUE_SIZE 3
 #endif

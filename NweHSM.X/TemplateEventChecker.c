@@ -31,6 +31,7 @@
 #include "ES_Events.h"
 #include "serial.h"
 #include "AD.h"
+#include "peashooter.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -100,7 +101,7 @@ uint8_t TemplateCheckBattery(void) {
         returnVal = TRUE;
         lastEvent = curEvent; // update history
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
-        PostGenericService(thisEvent);
+        //        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -129,6 +130,12 @@ uint8_t TemplateCheckBattery(void) {
  * defined in the project, no changes are necessary for your event checkers to work
  * with your other projects.
  */
+
+
+
+
+
+
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 static uint8_t(*EventList[])(void) = {EVENT_CHECK_LIST};
@@ -137,7 +144,9 @@ void PrintEvent(void);
 
 void main(void) {
     BOARD_Init();
+
     /* user initialization code goes here */
+    PS_Init();
 
     // Do not alter anything below this line
     int i;

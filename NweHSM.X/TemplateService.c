@@ -132,7 +132,7 @@ ES_Event RunTemplateService(ES_Event ThisEvent)
             ReturnEvent.EventParam = batVoltage;
             lastEvent = curEvent; // update history
 #ifndef SIMPLESERVICE_TEST           // keep this as is for test harness
-            PostGenericService(ReturnEvent);
+//            PostGenericService(ReturnEvent);
 #else
             PostTemplateService(ReturnEvent);
 #endif   

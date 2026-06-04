@@ -4,6 +4,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 
+#ifdef RUN_HSM
 void main(void)
 {
     ES_Return_t ErrorType;
@@ -41,3 +42,4 @@ void main(void)
 
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/
+#endif
