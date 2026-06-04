@@ -50,9 +50,9 @@
 #define HSM_BEACON_AVG_WINDOW 8
 #define HSM_BEACON_LOCK_OFFSET 10
 
-#define HSM_SWEEP_TURN_POWER 500
-#define HSM_LOCK_TURN_POWER 500
-#define HSM_DRIVE_POWER 700
+#define HSM_SWEEP_TURN_POWER 800
+#define HSM_LOCK_TURN_POWER 800
+#define HSM_DRIVE_POWER 800
 
 
 #define FOLLOWTAPE_ANGLEDLEFT_POWER 800
@@ -291,7 +291,13 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
             }
             break;
         case LocateCorner_FindBeacon:
-            ThisEvent = RunFindBeaconSubHSM(ThisEvent);
+            if (ThisEvent.EventType == ES_ENTRY) {
+                printf("RunLocateCornerSubHSM: LocateCorner_FindBeacon: ES_ENTRY\r\n");
+                InitFindBeaconSubHSM();
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else {
+                ThisEvent = RunFindBeaconSubHSM(ThisEvent);
+            }
 
             switch (ThisEvent.EventType) {
                 case BEACON_LOCKED:
@@ -300,6 +306,7 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+
                 default:
                     break;
             }

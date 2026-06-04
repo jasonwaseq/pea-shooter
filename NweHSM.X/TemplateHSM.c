@@ -47,7 +47,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_INIT) {
                 printf("RunTemplateHSM: Init: ES_INIT\r\n");
 
-                nextState = FollowEdge;
+                nextState = LocateCorner;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
