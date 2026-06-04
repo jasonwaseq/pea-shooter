@@ -6,8 +6,6 @@
 
 #include "IndexerService.h"
 
-#include <stdio.h>
-
 #include "BOARD.h"
 #include "ES_Framework.h"
 #include "ES_Timers.h"
@@ -21,25 +19,13 @@ typedef enum {
 
 static uint8_t MyPriority;
 static IndexerState_t CurrentState;
-static uint8_t IndexerOutputActive;
 
-static uint8_t SetIndexerPulse(unsigned int pulseTime)
+static uint8_t SetIndexerDuty(unsigned int duty)
 {
-    if (pulseTime == 0) {
-        if (IndexerOutputActive == TRUE) {
-            IndexerOutputActive = FALSE;
-            return RC_RemovePins(INDEXER_RC_PIN) == SUCCESS;
-        }
-        return TRUE;
+    if (duty > MAX_PWM) {
+        return FALSE;
     }
-
-    if (IndexerOutputActive == FALSE) {
-        if (RC_AddPins(INDEXER_RC_PIN) != SUCCESS) {
-            return FALSE;
-        }
-        IndexerOutputActive = TRUE;
-    }
-    return RC_SetPulseTime(INDEXER_RC_PIN, pulseTime) == SUCCESS;
+    return PWM_SetDutyCycle(INDEXER_PWM_PIN, duty) == SUCCESS;
 }
 
 uint8_t InitIndexerService(uint8_t priority)
@@ -48,9 +34,21 @@ uint8_t InitIndexerService(uint8_t priority)
 
     MyPriority = priority;
     CurrentState = INDEXER_OFF;
-    IndexerOutputActive = FALSE;
 
-    if (RC_Init() != SUCCESS) {
+    if (PWM_Init() != SUCCESS) {
+        return FALSE;
+    }
+    if (PWM_SetFrequency(INDEXER_PWM_FREQUENCY) != SUCCESS) {
+        return FALSE;
+    }
+    if (IO_PortsSetPortOutputs(INDEXER_PWM_IO_PORT,
+            INDEXER_PWM_IO_BIT) != SUCCESS) {
+        return FALSE;
+    }
+    if (PWM_AddPins(INDEXER_PWM_PIN) != SUCCESS) {
+        return FALSE;
+    }
+    if (SetIndexerDuty(MIN_PWM) != TRUE) {
         return FALSE;
     }
     if (InitIndexerEventChecker() != TRUE) {
@@ -94,12 +92,10 @@ ES_Event RunIndexerService(ES_Event thisEvent)
 
     switch (thisEvent.EventType) {
     case ES_INIT:
-        printf("Indexer ready on %s using RC_Servo output\r\n",
-                INDEXER_OUTPUT_PIN_NAME);
         break;
 
     case INDEXER_START:
-        if (SetIndexerPulse(INDEXER_STARTUP_PULSE_US) != TRUE) {
+        if (SetIndexerDuty(INDEXER_STARTUP_DUTY) != TRUE) {
             returnEvent.EventType = ES_ERROR;
             break;
         }
@@ -109,21 +105,16 @@ ES_Event RunIndexerService(ES_Event thisEvent)
             break;
         }
         CurrentState = INDEXER_STARTUP;
-        printf("Indexer startup: %u us pulse for %u ms\r\n",
-                INDEXER_STARTUP_PULSE_US,
-                INDEXER_STARTUP_TIME_MS);
         break;
 
     case ES_TIMEOUT:
         if ((thisEvent.EventParam == INDEXER_STARTUP_TIMER)
                 && (CurrentState == INDEXER_STARTUP)) {
-            if (SetIndexerPulse(INDEXER_RUN_PULSE_US) != TRUE) {
+            if (SetIndexerDuty(INDEXER_RUN_DUTY) != TRUE) {
                 returnEvent.EventType = ES_ERROR;
                 break;
             }
             CurrentState = INDEXER_RUNNING;
-            printf("Indexer running: %u us pulse\r\n",
-                    INDEXER_RUN_PULSE_US);
         }
         break;
 
@@ -131,19 +122,17 @@ ES_Event RunIndexerService(ES_Event thisEvent)
         if (CurrentState == INDEXER_STARTUP) {
             ES_Timer_StopTimer(INDEXER_STARTUP_TIMER);
         }
-        SetIndexerPulse(0);
+        SetIndexerDuty(MIN_PWM);
         CurrentState = INDEXER_OFF;
-        printf("Indexer stopped\r\n");
         break;
 
     case ES_EXIT:
         if (CurrentState == INDEXER_STARTUP) {
             ES_Timer_StopTimer(INDEXER_STARTUP_TIMER);
         }
-        SetIndexerPulse(0);
-        RC_End();
+        SetIndexerDuty(MIN_PWM);
+        PWM_End();
         CurrentState = INDEXER_OFF;
-        printf("Indexer exited\r\n");
         break;
 
     default:

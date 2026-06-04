@@ -13,134 +13,111 @@
 #include "pwm.h"
 
 /*
- * Primary shooter, IBT-2/BTS7960 default wiring on the Uno32 I/O protection stack:
- *   PortY-04 -> RPWM
- *   PortX-11 -> LPWM
- *   PortX-03 -> R_EN
- *   PortX-04 -> L_EN
- *
- * Secondary shooter:
- *   PortZ-06 -> motor driver hardware PWM/control input
+ * Shooter IBT-2/BTS7960 default wiring on the Uno32 I/O protection stack:
+ *   Upper shooter: PortY-04 -> RPWM, PortX-03 -> R_EN
+ *   Lower shooter: PortX-11 -> LPWM, PortX-04 -> L_EN
+ *   Indexer: PortZ-06 -> PWM
  *
  * PortW is usable as Uno stack digital I/O, but it is not supported by the
  * hardware PWM module in include/pwm.h. Keep RPWM/LPWM on PWM-capable pins.
- *
- * Primary shooter direction command:
- * drive RPWM and hold LPWM low on the IBT-2.
  */
-#ifndef PRIMARY_SHOOTER_RPWM_PIN
-#define PRIMARY_SHOOTER_RPWM_PIN PWM_PORTY04
+#ifndef UPPER_SHOOTER_PWM_PIN
+#define UPPER_SHOOTER_PWM_PIN PWM_PORTY04
 #endif
 
-#ifndef PRIMARY_SHOOTER_RPWM_PIN_NAME
-#define PRIMARY_SHOOTER_RPWM_PIN_NAME "PortY-04"
+#ifndef UPPER_SHOOTER_PWM_PIN_NAME
+#define UPPER_SHOOTER_PWM_PIN_NAME "PortY-04"
 #endif
 
-#ifndef PRIMARY_SHOOTER_RPWM_IO_PORT
-#define PRIMARY_SHOOTER_RPWM_IO_PORT PORTY
+#ifndef UPPER_SHOOTER_PWM_IO_PORT
+#define UPPER_SHOOTER_PWM_IO_PORT PORTY
 #endif
 
-#ifndef PRIMARY_SHOOTER_RPWM_IO_BIT
-#define PRIMARY_SHOOTER_RPWM_IO_BIT PIN4
+#ifndef UPPER_SHOOTER_PWM_IO_BIT
+#define UPPER_SHOOTER_PWM_IO_BIT PIN4
 #endif
 
-#ifndef PRIMARY_SHOOTER_LPWM_PIN
-#define PRIMARY_SHOOTER_LPWM_PIN PWM_PORTX11
+#ifndef LOWER_SHOOTER_PWM_PIN
+#define LOWER_SHOOTER_PWM_PIN PWM_PORTX11
 #endif
 
-#ifndef PRIMARY_SHOOTER_LPWM_PIN_NAME
-#define PRIMARY_SHOOTER_LPWM_PIN_NAME "PortX-11"
+#ifndef LOWER_SHOOTER_PWM_PIN_NAME
+#define LOWER_SHOOTER_PWM_PIN_NAME "PortX-11"
 #endif
 
-#ifndef PRIMARY_SHOOTER_LPWM_IO_PORT
-#define PRIMARY_SHOOTER_LPWM_IO_PORT PORTX
+#ifndef LOWER_SHOOTER_PWM_IO_PORT
+#define LOWER_SHOOTER_PWM_IO_PORT PORTX
 #endif
 
-#ifndef PRIMARY_SHOOTER_LPWM_IO_BIT
-#define PRIMARY_SHOOTER_LPWM_IO_BIT PIN11
+#ifndef LOWER_SHOOTER_PWM_IO_BIT
+#define LOWER_SHOOTER_PWM_IO_BIT PIN11
 #endif
 
-#ifndef PRIMARY_SHOOTER_ENABLE_PORT
-#define PRIMARY_SHOOTER_ENABLE_PORT PORTX
+#ifndef SHOOTER_ENABLE_PORT
+#define SHOOTER_ENABLE_PORT PORTX
 #endif
 
-#ifndef PRIMARY_SHOOTER_REN_ENABLE_BIT
-#define PRIMARY_SHOOTER_REN_ENABLE_BIT PIN3
+#ifndef UPPER_SHOOTER_ENABLE_BIT
+#define UPPER_SHOOTER_ENABLE_BIT PIN3
 #endif
 
-#ifndef PRIMARY_SHOOTER_REN_ENABLE_NAME
-#define PRIMARY_SHOOTER_REN_ENABLE_NAME "PortX-03"
+#ifndef UPPER_SHOOTER_ENABLE_NAME
+#define UPPER_SHOOTER_ENABLE_NAME "PortX-03"
 #endif
 
-#ifndef PRIMARY_SHOOTER_LEN_ENABLE_BIT
-#define PRIMARY_SHOOTER_LEN_ENABLE_BIT PIN4
+#ifndef LOWER_SHOOTER_ENABLE_BIT
+#define LOWER_SHOOTER_ENABLE_BIT PIN4
 #endif
 
-#ifndef PRIMARY_SHOOTER_LEN_ENABLE_NAME
-#define PRIMARY_SHOOTER_LEN_ENABLE_NAME "PortX-04"
+#ifndef LOWER_SHOOTER_ENABLE_NAME
+#define LOWER_SHOOTER_ENABLE_NAME "PortX-04"
 #endif
 
 #ifndef SHOOTER_PWM_FREQUENCY
 #define SHOOTER_PWM_FREQUENCY PWM_1KHZ
 #endif
 
-#ifndef PRIMARY_SHOOTER_DUTY
-#define PRIMARY_SHOOTER_DUTY MAX_PWM
+#ifndef UPPER_SHOOTER_DUTY
+#define UPPER_SHOOTER_DUTY 700
 #endif
 
-#ifndef PRIMARY_SHOOTER_DRIVE_PWM_PIN
-#define PRIMARY_SHOOTER_DRIVE_PWM_PIN PRIMARY_SHOOTER_RPWM_PIN
+#ifndef LOWER_SHOOTER_DUTY_CYCLE
+#define LOWER_SHOOTER_DUTY_CYCLE 700
 #endif
 
-#ifndef PRIMARY_SHOOTER_DRIVE_PWM_PIN_NAME
-#define PRIMARY_SHOOTER_DRIVE_PWM_PIN_NAME PRIMARY_SHOOTER_RPWM_PIN_NAME
+#ifndef INDEXER_PWM_PIN
+#define INDEXER_PWM_PIN PWM_PORTZ06
 #endif
 
-#ifndef PRIMARY_SHOOTER_IDLE_PWM_PIN
-#define PRIMARY_SHOOTER_IDLE_PWM_PIN PRIMARY_SHOOTER_LPWM_PIN
+#ifndef INDEXER_PWM_IO_PORT
+#define INDEXER_PWM_IO_PORT PORTZ
 #endif
 
-#ifndef PRIMARY_SHOOTER_IDLE_PWM_PIN_NAME
-#define PRIMARY_SHOOTER_IDLE_PWM_PIN_NAME PRIMARY_SHOOTER_LPWM_PIN_NAME
+#ifndef INDEXER_PWM_IO_BIT
+#define INDEXER_PWM_IO_BIT PIN6
 #endif
 
-#ifndef SECONDARY_SHOOTER_PWM_PIN
-#define SECONDARY_SHOOTER_PWM_PIN PWM_PORTZ06
+#ifndef INDEXER_STARTUP_DUTY
+#define INDEXER_STARTUP_DUTY MAX_PWM
 #endif
 
-#ifndef SECONDARY_SHOOTER_PWM_PIN_NAME
-#define SECONDARY_SHOOTER_PWM_PIN_NAME "PortZ-06"
+#ifndef INDEXER_RUN_DUTY
+#define INDEXER_RUN_DUTY 500
 #endif
 
-#ifndef SECONDARY_SHOOTER_PWM_IO_PORT
-#define SECONDARY_SHOOTER_PWM_IO_PORT PORTZ
-#endif
-
-#ifndef SECONDARY_SHOOTER_PWM_IO_BIT
-#define SECONDARY_SHOOTER_PWM_IO_BIT PIN6
-#endif
-
-#ifndef SECONDARY_SHOOTER_PWM_IO_TRIS
-#define SECONDARY_SHOOTER_PWM_IO_TRIS PORTZ06_TRIS
-#endif
-
-#ifndef SECONDARY_SHOOTER_DUTY_CYCLE
-#define SECONDARY_SHOOTER_DUTY_CYCLE MAX_PWM
-#endif
-
-#ifndef SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS
-#define SECONDARY_SHOOTER_SOFT_PWM_PERIOD_MS 20
+#ifndef INDEXER_STARTUP_TIME_MS
+#define INDEXER_STARTUP_TIME_MS 500
 #endif
 
 uint8_t InitShooterService(uint8_t priority);
 uint8_t PostShooterService(ES_Event thisEvent);
 ES_Event RunShooterService(ES_Event thisEvent);
 
-uint8_t StartPrimaryShooterMotor(void);
-uint8_t StopPrimaryShooterMotor(void);
+uint8_t StartUpperShooterMotor(void);
+uint8_t StopUpperShooterMotor(void);
+uint8_t StartLowerShooterMotor(void);
+uint8_t StopLowerShooterMotor(void);
 uint8_t StartShooterMotor(void);
 uint8_t StopShooterMotor(void);
-uint8_t StartSecondaryShooterMotor(void);
-uint8_t StopSecondaryShooterMotor(void);
 
 #endif /* SHOOTER_SERVICE_H */

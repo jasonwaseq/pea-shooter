@@ -9,7 +9,7 @@
 #define ES_CONFIGURE_H
 
 //#define USE_KEYBOARD_INPUT
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
 
 /****************************************************************************/
@@ -26,8 +26,8 @@ typedef enum {
     ES_TIMEOUT,
     ES_TIMERACTIVE,
     ES_TIMERSTOPPED,
-    PRIMARY_SHOOTER_START,
-    PRIMARY_SHOOTER_STOP,
+    UPPER_SHOOTER_START,
+    UPPER_SHOOTER_STOP,
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
 
@@ -42,8 +42,8 @@ static const char *EventNames[] = {
     "ES_TIMEOUT",
     "ES_TIMERACTIVE",
     "ES_TIMERSTOPPED",
-    "PRIMARY_SHOOTER_START",
-    "PRIMARY_SHOOTER_STOP",
+    "UPPER_SHOOTER_START",
+    "UPPER_SHOOTER_STOP",
     "NUMBEROFEVENTS",
 };
 
@@ -74,7 +74,8 @@ static const char *EventNames[] = {
 #define TIMER14_RESP_FUNC TIMER_UNUSED
 #define TIMER15_RESP_FUNC TIMER_UNUSED
 
-#define SHOOTER_TIMER 0
+#define INDEXER_STARTUP_TIMER 0
+#define SHOOTER_TIMER INDEXER_STARTUP_TIMER
 
 /****************************************************************************/
 // Services.

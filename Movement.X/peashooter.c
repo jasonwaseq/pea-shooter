@@ -176,8 +176,7 @@ void PS_RightMotorInit(void) {
 // Initializes the indexer motor output.
 
 void PS_IndexerMotorInit(void) {
-    // Indexer moved off hardware PWM Z6. The standalone Indexer.X project
-    // drives it on Z4 through RC_Servo when indexer testing is needed.
+    // The standalone Indexer.X project drives the indexer on Z6 with hardware PWM.
 }
 
 // Spins up both shooter motors, then drops them to idle duty.
