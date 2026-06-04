@@ -32,7 +32,18 @@
 /*******************************************************************************
  * PUBLIC #DEFINES                                                             *
  ******************************************************************************/
+#define NO_TAPE            0
+#define LEFT_TAPE_ONLY     1
+#define MIDDLE_TAPE_ONLY   2
+#define LEFT_AND_MIDDLE    3
+#define RIGHT_TAPE_ONLY    4
+#define LEFT_AND_RIGHT     5
+#define MIDDLE_AND_RIGHT   6
+#define ALL_TAPES          7
 
+#define LEFT_TAPE_MASK     0x01
+#define MID_TAPE_MASK      0x02
+#define RIGHT_TAPE_MASK    0x04
 
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *

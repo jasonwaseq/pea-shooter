@@ -32,7 +32,7 @@
 #include "serial.h"
 #include "AD.h"
 #include "peashooter.h"
-#include "HSMService.h"
+#include "TemplateHSM.h"
 #include "pwm.h"
 
 /*******************************************************************************
@@ -116,9 +116,9 @@ uint8_t TemplateCheckBattery(void) {
         returnVal = TRUE;
         lastEvent = curEvent; // update history
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-    PostHSMService(thisEvent);
+        PostHSMService(thisEvent);
 #else
-   SaveEvent(thisEvent);
+        SaveEvent(thisEvent);
 #endif  
     }
     return (returnVal);
@@ -175,14 +175,16 @@ uint8_t TemplateCheckSwitch(void) {
             returnVal = TRUE;
             lastEvent = curEvent; // update history
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-    PostHSMService(thisEvent);
+            PostHSMService(thisEvent);
 #else
-   SaveEvent(thisEvent);
+            SaveEvent(thisEvent);
 #endif
         }
     }
     return (returnVal);
 }
+
+
 
 uint8_t TemplateCheckTape(void) {
     static unsigned char debouncedLeft = SENSOR_STATE_UNKNOWN;
@@ -198,9 +200,11 @@ uint8_t TemplateCheckTape(void) {
     static unsigned char rightCount = 0;
 
     static uint8_t initialized = FALSE;
+    static uint8_t lastTapeState = 0;
 
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
+    uint8_t tapeState;
 
     unsigned char leftTape = PS_ReadLeftTape();
     unsigned char middleTape = PS_ReadMidTape();
@@ -220,6 +224,11 @@ uint8_t TemplateCheckTape(void) {
         leftCount = 0;
         middleCount = 0;
         rightCount = 0;
+
+        lastTapeState =
+                ((debouncedLeft == TAPE_DETECTED) << 0) |
+                ((debouncedMiddle == TAPE_DETECTED) << 1) |
+                ((debouncedRight == TAPE_DETECTED) << 2);
 
         initialized = TRUE;
         return FALSE;
@@ -254,22 +263,26 @@ uint8_t TemplateCheckTape(void) {
 
     if ((leftCount >= TAPE_DEBOUNCE_COUNT) && (leftTape != debouncedLeft)) {
         debouncedLeft = leftTape;
-        thisEvent.EventType = (debouncedLeft == TAPE_DETECTED)
-                ? LEFT_TAPE_DETECTED : LEFT_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedLeft;
-        returnVal = TRUE;
-    } else if ((middleCount >= TAPE_DEBOUNCE_COUNT) && (middleTape != debouncedMiddle)) {
+    }
+
+    if ((middleCount >= TAPE_DEBOUNCE_COUNT) && (middleTape != debouncedMiddle)) {
         debouncedMiddle = middleTape;
-        thisEvent.EventType = (debouncedMiddle == TAPE_DETECTED)
-                ? MIDDLE_TAPE_DETECTED : MIDDLE_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedMiddle;
-        returnVal = TRUE;
-    } else if ((rightCount >= TAPE_DEBOUNCE_COUNT) && (rightTape != debouncedRight)) {
+    }
+
+    if ((rightCount >= TAPE_DEBOUNCE_COUNT) && (rightTape != debouncedRight)) {
         debouncedRight = rightTape;
-        thisEvent.EventType = (debouncedRight == TAPE_DETECTED)
-                ? RIGHT_TAPE_DETECTED : RIGHT_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedRight;
+    }
+
+    tapeState =
+            ((debouncedLeft == TAPE_DETECTED) << 0) |
+            ((debouncedMiddle == TAPE_DETECTED) << 1) |
+            ((debouncedRight == TAPE_DETECTED) << 2);
+
+    if (tapeState != lastTapeState) {
+        thisEvent.EventType = TAPE_ARRAY_CHANGED;
+        thisEvent.EventParam = tapeState;
         returnVal = TRUE;
+        lastTapeState = tapeState;
     }
 
     if (returnVal == TRUE) {
@@ -319,10 +332,10 @@ void main(void) {
 
     printf("\r\nPeashooter event checking test harness for %s", __FILE__);
     printf("\r\nTesting switch and tape events...\r\n");
-    
+
     while (1) {
         if (IsTransmitEmpty()) {
-            for (i = 0; i < sizeof(EventList) / sizeof(EventList[0]); i++) {
+            for (i = 0; i < sizeof (EventList) / sizeof (EventList[0]); i++) {
                 if (EventList[i]() == TRUE) {
                     PrintEvent();
                     break;
@@ -346,8 +359,7 @@ void PrintEvent(void) {
 #include <stdio.h>
 #define MOVING_TEST_ONE_SECOND 1000000
 
-void main(void)
-{
+void main(void) {
     unsigned int delay;
 
     BOARD_Init();

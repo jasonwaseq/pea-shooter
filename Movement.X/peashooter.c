@@ -55,10 +55,6 @@
 
 
 
-static unsigned char tapeArray[3];
-
-
-
 // Adjusts a requested PWM duty cycle upward as battery voltage drops.
 
 static unsigned int PS_CompensateDutyForBattery(unsigned int dutyCycle) {
@@ -258,6 +254,8 @@ unsigned char PS_ReadTape(void)
            (PS_ReadMidTape()   << 1) |
             PS_ReadRightTape();
 }
+
+
 
 
 

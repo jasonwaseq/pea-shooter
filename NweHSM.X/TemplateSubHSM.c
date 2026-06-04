@@ -36,6 +36,7 @@
 #include "beacon.h"
 #include <stdio.h>
 #include "ES_Timers.h"
+#include "SensorsEventChecker.h"
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -52,6 +53,49 @@
 #define HSM_SWEEP_TURN_POWER 500
 #define HSM_LOCK_TURN_POWER 500
 #define HSM_DRIVE_POWER 700
+
+/*
+ * Tape array EventParam values for TAPE_ARRAY_CHANGED.
+ * Bit 0 = left, Bit 1 = middle, Bit 2 = right.
+ *
+ * NOTE:
+ * I used TAPE_ALL_DETECTED instead of ALL_TAPE_DETECTED here because
+ * ALL_TAPE_DETECTED is already being used as an EventType in your HSM.
+ */
+#ifndef LEFT_TAPE_MASK
+#define LEFT_TAPE_MASK         0x01
+#endif
+#ifndef MIDDLE_TAPE_MASK
+#define MIDDLE_TAPE_MASK       0x02
+#endif
+#ifndef RIGHT_TAPE_MASK
+#define RIGHT_TAPE_MASK        0x04
+#endif
+
+#ifndef NO_TAPE
+#define NO_TAPE                0x00
+#endif
+#ifndef LEFT_TAPE_ONLY
+#define LEFT_TAPE_ONLY         0x01
+#endif
+#ifndef MIDDLE_TAPE_ONLY
+#define MIDDLE_TAPE_ONLY       0x02
+#endif
+#ifndef RIGHT_TAPE_ONLY
+#define RIGHT_TAPE_ONLY        0x04
+#endif
+#ifndef LEFT_AND_MIDDLE
+#define LEFT_AND_MIDDLE        0x03
+#endif
+#ifndef LEFT_AND_RIGHT
+#define LEFT_AND_RIGHT         0x05
+#endif
+#ifndef MIDDLE_AND_RIGHT
+#define MIDDLE_AND_RIGHT       0x06
+#endif
+#ifndef TAPE_ALL_DETECTED
+#define TAPE_ALL_DETECTED      0x07
+#endif
 
 //big ones
 
@@ -311,6 +355,13 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case TAPE_ARRAY_CHANGED:
+                    if (ThisEvent.EventParam == TAPE_ALL_DETECTED) {
+                        nextState = LocateCorner_TurnRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -415,6 +466,13 @@ ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent) {
                     nextState = FollowEdge_TurnRight;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case TAPE_ARRAY_CHANGED:
+                    if (ThisEvent.EventParam == TAPE_ALL_DETECTED) {
+                        nextState = FollowEdge_TurnRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
                 default:
                     break;
@@ -523,6 +581,11 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
         return ThisEvent;
     }
 
+    if ((ThisEvent.EventType == TAPE_ARRAY_CHANGED)
+            && (ThisEvent.EventParam == TAPE_ALL_DETECTED)) {
+        return ThisEvent;
+    }
+
     ES_Tattle(); // trace call stack
 
     switch (AlignTapeSubHSMCurrentState) {
@@ -545,16 +608,34 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     PS_Forward(ALIGNTAPE_FORWARD_POWER);
                     break;
-                case LEFT_TAPE_DETECTED:
-                    nextState = AlignTape_PivotRight;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+                case TAPE_ARRAY_CHANGED:
+                    switch (ThisEvent.EventParam) {
+
+                        case LEFT_TAPE_ONLY:
+                        case LEFT_AND_MIDDLE:
+                            nextState = AlignTape_PivotRight;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
+                        case RIGHT_TAPE_ONLY:
+                        case MIDDLE_AND_RIGHT:
+                            nextState = AlignTape_PivotLeft;
+                            makeTransition = TRUE;
+                            ThisEvent.EventType = ES_NO_EVENT;
+                            break;
+                    }
                     break;
-                case RIGHT_TAPE_DETECTED:
-                    nextState = AlignTape_PivotLeft;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+
+                    //                case LEFT_TAPE_DETECTED:
+                    //                    nextState = AlignTape_PivotRight;
+                    //                    makeTransition = TRUE;
+                    //                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                    break;
+                    //                case RIGHT_TAPE_DETECTED:
+                    //                    nextState = AlignTape_PivotLeft;
+                    //                    makeTransition = TRUE;
+                    //                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                    break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
             }
@@ -564,10 +645,17 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     PS_PivotTurnLeft(ALIGNTAPE_PIVOTLEFT_POWER);
                     break;
-                case RIGHT_TAPE_NOT_DETECTED:
-                    nextState = AlignTape_PivotRight;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                case RIGHT_TAPE_NOT_DETECTED:
+                    //                    nextState = AlignTape_PivotRight;
+                    //                    makeTransition = TRUE;
+                    //                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                    break;
+                case TAPE_ARRAY_CHANGED:
+                    if (!(ThisEvent.EventParam & RIGHT_TAPE_MASK)) {
+                        nextState = AlignTape_PivotRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
@@ -578,10 +666,17 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     PS_PivotTurnRight(ALIGNTAPE_PIVOTRIGHT_POWER);
                     break;
-                case LEFT_TAPE_NOT_DETECTED:
-                    nextState = AlignTape_PivotLeft;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                case LEFT_TAPE_NOT_DETECTED:
+                    //                    nextState = AlignTape_PivotLeft;
+                    //                    makeTransition = TRUE;
+                    //                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                    break;
+                case TAPE_ARRAY_CHANGED:
+                    if (!(ThisEvent.EventParam & LEFT_TAPE_MASK)) {
+                        nextState = AlignTape_PivotLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
@@ -659,6 +754,17 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case TAPE_ARRAY_CHANGED:
+                    if (!(ThisEvent.EventParam & LEFT_TAPE_MASK)) {
+                        nextState = FollowTape_CorrectLeft;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else if (ThisEvent.EventParam & MIDDLE_TAPE_MASK) {
+                        nextState = FollowTape_CorrectRight;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
             }
@@ -673,6 +779,13 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case TAPE_ARRAY_CHANGED:
+                    if (ThisEvent.EventParam & LEFT_TAPE_MASK) {
+                        nextState = FollowTape_Forward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
             }
@@ -686,6 +799,13 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
                     nextState = FollowTape_Forward;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case TAPE_ARRAY_CHANGED:
+                    if (!(ThisEvent.EventParam & MIDDLE_TAPE_MASK)) {
+                        nextState = FollowTape_Forward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
                 default: // all unhandled events pass the event back up to the next level
                     break;
@@ -721,6 +841,9 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
     ES_Tattle(); // trace call stack
 
     if (!(AvoidObstacleSubHSMCurrentState == AvoidObstacle_TurnLeft)) {
+        if (ThisEvent.EventType == TAPE_ARRAY_CHANGED) {
+            ThisEvent.EventType = ES_NO_EVENT;
+        }
         if (ThisEvent.EventType == LEFT_TAPE_DETECTED) {
             ThisEvent.EventType = ES_NO_EVENT;
         }

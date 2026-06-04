@@ -46,7 +46,7 @@ typedef enum {
     /* User-defined events start here */
     BATTERY_CONNECTED,
     BATTERY_DISCONNECTED,
-            BUMPER_TRIPPED,
+    BUMPER_TRIPPED,
     BUMPER_NOT_TRIPPED,
     RIGHT_TAPE_DETECTED,
     RIGHT_TAPE_NOT_DETECTED,
@@ -55,7 +55,7 @@ typedef enum {
     LEFT_TAPE_DETECTED,
     LEFT_TAPE_NOT_DETECTED,
     NO_TAPE_DETECTED,
-            ALL_TAPE_DETECTED,
+    ALL_TAPE_DETECTED,
     BORDER_FOUND,
     FRONT_BORDER_DONE,
     SIDE_BORDER_DONE,
@@ -66,53 +66,78 @@ typedef enum {
     SECOND_BORDER_DONE,
     ISZ_BORDER,
     HOME_COMPLETE,
-            BEACON_STRENGTH_CHANGED,
-            PING_FAR,
-            PING_CLOSE,
-            
-BEACON_DETECTED,
-BEACON_LOST,
-            BEACON_SAMPLE_READY,
-BEACON_ALIGN_DONE,
-            BEACON_LOCKED,
-	/* User-defined events end here */
+    BEACON_STRENGTH_CHANGED,
+    PING_FAR,
+    PING_CLOSE,
+    TAPE_ARRAY_CHANGED,
+
+    BEACON_DETECTED,
+    BEACON_LOST,
+    BEACON_SAMPLE_READY,
+    BEACON_ALIGN_DONE,
+    BEACON_LOCKED,
+    /* User-defined events end here */
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
-	"ES_NO_EVENT",
-	"ES_ERROR",
-	"ES_INIT",
-	"ES_ENTRY",
-	"ES_EXIT",
-	"ES_KEYINPUT",
-	"ES_LISTEVENTS",
-	"ES_TIMEOUT",
-	"ES_TIMERACTIVE",
-	"ES_TIMERSTOPPED",
-	"BATTERY_CONNECTED",
-	"BATTERY_DISCONNECTED",
+    "ES_NO_EVENT",
+    "ES_ERROR",
+    "ES_INIT",
+    "ES_ENTRY",
+    "ES_EXIT",
+    "ES_KEYINPUT",
+    "ES_LISTEVENTS",
+    "ES_TIMEOUT",
+    "ES_TIMERACTIVE",
+    "ES_TIMERSTOPPED",
+
+    "BATTERY_CONNECTED",
+    "BATTERY_DISCONNECTED",
+
     "BUMPER_TRIPPED",
-	"BUMPER_NOT_TRIPPED",
-	"RIGHT_TAPE_DETECTED",
-	"RIGHT_TAPE_NOT_DETECTED",
-	"MIDDLE_TAPE_DETECTED",
-	"MIDDLE_TAPE_NOT_DETECTED",
-	"LEFT_TAPE_DETECTED",
-	"LEFT_TAPE_NOT_DETECTED",
-	"NO_TAPE_DETECTED",
+    "BUMPER_NOT_TRIPPED",
+
+    "RIGHT_TAPE_DETECTED",
+    "RIGHT_TAPE_NOT_DETECTED",
+
+    "MIDDLE_TAPE_DETECTED",
+    "MIDDLE_TAPE_NOT_DETECTED",
+
+    "LEFT_TAPE_DETECTED",
+    "LEFT_TAPE_NOT_DETECTED",
+
+    "NO_TAPE_DETECTED",
     "ALL_TAPE_DETECTED",
-	"BORDER_FOUND",
+
+    "BORDER_FOUND",
     "FRONT_BORDER_DONE",
     "SIDE_BORDER_DONE",
     "FRONT_BORDER_ALIGNED",
+
     "FOUND_OBSTACLE",
     "OBSTACLE_CLEARED",
+
     "FIRST_BORDER_DONE",
     "SECOND_BORDER_DONE",
+
     "ISZ_BORDER",
     "HOME_COMPLETE",
-	"NUMBEROFEVENTS",
+
+    "BEACON_STRENGTH_CHANGED",
+
+    "PING_FAR",
+    "PING_CLOSE",
+
+    "TAPE_ARRAY_CHANGED",
+
+    "BEACON_DETECTED",
+    "BEACON_LOST",
+    "BEACON_SAMPLE_READY",
+    "BEACON_ALIGN_DONE",
+    "BEACON_LOCKED",
+
+    "NUMBEROFEVENTS"
 };
 
 
@@ -120,11 +145,11 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This are the name of the Event checking function header file.
-#define EVENT_CHECK_HEADER "TemplateEventChecker.h"
+#define EVENT_CHECK_HEADER "SensorsEventChecker.h"
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  TemplateCheckBattery
+#define EVENT_CHECK_LIST  TemplateCheckBattery, TemplateCheckSwitch, TemplateCheckTape
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
