@@ -71,7 +71,7 @@
 uint8_t TemplateCheckBattery(void);
 uint8_t TemplateCheckSwitch(void);
 uint8_t TemplateCheckTape(void);
-
+uint8_t TemplateCheckPing(void);
 
 
 #endif	/* SENSORSEVENTCHECKER_H */

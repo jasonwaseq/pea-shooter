@@ -56,63 +56,57 @@ typedef struct {
 static DistanceFilter DistanceAverage;
 static uint32_t ReferenceDistanceMm;
 static uint8_t ReferenceValid;
+static uint32_t LastReadingMm;
+static uint8_t LastReadingValid;
 
-static inline uint32_t CoreTimerNow(void)
-{
+static inline uint32_t CoreTimerNow(void) {
     uint32_t count;
     __asm__ volatile("mfc0 %0,$9" : "=r"(count));
     return count;
 }
 
-static uint32_t CoreTimerTicksPerUs(void)
-{
+static uint32_t CoreTimerTicksPerUs(void) {
     return BOARD_GetPBClock() / 1000000u;
 }
 
-static void DelayUs(uint32_t delayUs)
-{
+static void DelayUs(uint32_t delayUs) {
     const uint32_t targetTicks = delayUs * CoreTimerTicksPerUs();
     const uint32_t start = CoreTimerNow();
 
-    while ((uint32_t)(CoreTimerNow() - start) < targetTicks) {
+    while ((uint32_t) (CoreTimerNow() - start) < targetTicks) {
         ;
     }
 }
 
-static uint8_t EchoIsHigh(void)
-{
+static uint8_t EchoIsHigh(void) {
     return HCSR04_ECHO_PORT != 0;
 }
 
-static void TriggerLow(void)
-{
+static void TriggerLow(void) {
     IO_PortsClearPortBits(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN);
     LATDCLR = HCSR04_TRIG_BIT;
     HCSR04_TRIG_LAT = 0;
 }
 
-static void TriggerHigh(void)
-{
+static void TriggerHigh(void) {
     IO_PortsSetPortBits(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN);
     LATDSET = HCSR04_TRIG_BIT;
     HCSR04_TRIG_LAT = 1;
 }
 
-static uint8_t WaitForEchoState(uint8_t expectedHigh, uint32_t timeoutUs)
-{
+static uint8_t WaitForEchoState(uint8_t expectedHigh, uint32_t timeoutUs) {
     const uint32_t timeoutTicks = timeoutUs * CoreTimerTicksPerUs();
     const uint32_t start = CoreTimerNow();
 
     while (EchoIsHigh() != expectedHigh) {
-        if ((uint32_t)(CoreTimerNow() - start) >= timeoutTicks) {
+        if ((uint32_t) (CoreTimerNow() - start) >= timeoutTicks) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-static void HCSR04_Init(void)
-{
+static void HCSR04_Init(void) {
     TriggerLow();
     IO_PortsSetPortOutputs(HCSR04_TRIG_PORT, HCSR04_TRIG_PIN);
     HCSR04_TRIG_TRIS = 0;
@@ -122,8 +116,7 @@ static void HCSR04_Init(void)
     DelayUs(10000u);
 }
 
-static void HCSR04_PrintPinConfig(void)
-{
+static void HCSR04_PrintPinConfig(void) {
     const uint16_t echoPort = (uint16_t) IO_PortsReadPort(HCSR04_ECHO_IO_PORT);
 
     printf("pin_diag trig_tris=%u trig_lat=%u trig_port=%u echo_tris=%u echo_lat=%u echo_port=%u echo_io=0x%04X y11_high=%u\r\n",
@@ -137,8 +130,7 @@ static void HCSR04_PrintPinConfig(void)
             (echoPort & PIN11) != 0);
 }
 
-static HCSR04_Status HCSR04_ReadEchoUs(uint32_t *echoUs)
-{
+static HCSR04_Status HCSR04_ReadEchoUs(uint32_t *echoUs) {
     uint32_t start;
     uint32_t elapsedTicks;
 
@@ -167,13 +159,11 @@ static HCSR04_Status HCSR04_ReadEchoUs(uint32_t *echoUs)
     return HCSR04_OK;
 }
 
-static uint32_t EchoUsToMillimeters(uint32_t echoUs)
-{
+static uint32_t EchoUsToMillimeters(uint32_t echoUs) {
     return (echoUs * 343u + 1000u) / 2000u;
 }
 
-static void DistanceFilter_Reset(DistanceFilter *filter)
-{
+static void DistanceFilter_Reset(DistanceFilter *filter) {
     uint8_t i;
 
     for (i = 0; i < DISTANCE_FILTER_WINDOW; i++) {
@@ -184,8 +174,7 @@ static void DistanceFilter_Reset(DistanceFilter *filter)
     filter->count = 0;
 }
 
-static void DistanceFilter_Add(DistanceFilter *filter, uint32_t distanceMm)
-{
+static void DistanceFilter_Add(DistanceFilter *filter, uint32_t distanceMm) {
     if (filter->count < DISTANCE_FILTER_WINDOW) {
         filter->samples[filter->index] = distanceMm;
         filter->sum += distanceMm;
@@ -202,8 +191,7 @@ static void DistanceFilter_Add(DistanceFilter *filter, uint32_t distanceMm)
     }
 }
 
-static uint8_t DistanceFilter_GetAverage(const DistanceFilter *filter, uint32_t *averageMm)
-{
+static uint8_t DistanceFilter_GetAverage(const DistanceFilter *filter, uint32_t *averageMm) {
     if (filter->count == 0) {
         return FALSE;
     }
@@ -212,8 +200,7 @@ static uint8_t DistanceFilter_GetAverage(const DistanceFilter *filter, uint32_t 
     return TRUE;
 }
 
-static uint8_t HCSR04_ReadDistanceMm(uint32_t *distanceMm)
-{
+static uint8_t HCSR04_ReadDistanceMm(uint32_t *distanceMm) {
     uint32_t echoUs;
 
     if (HCSR04_ReadEchoUs(&echoUs) != HCSR04_OK) {
@@ -224,24 +211,22 @@ static uint8_t HCSR04_ReadDistanceMm(uint32_t *distanceMm)
     return TRUE;
 }
 
-static const char *HCSR04_StatusName(HCSR04_Status status)
-{
+static const char *HCSR04_StatusName(HCSR04_Status status) {
     switch (status) {
-    case HCSR04_OK:
-        return "ok";
-    case HCSR04_ECHO_STUCK_HIGH_BEFORE_TRIGGER:
-        return "echo_stuck_high_before_trigger";
-    case HCSR04_TIMEOUT_WAITING_FOR_RISE:
-        return "timeout_waiting_for_echo_rise";
-    case HCSR04_TIMEOUT_WAITING_FOR_FALL:
-        return "timeout_waiting_for_echo_fall";
-    default:
-        return "unknown";
+        case HCSR04_OK:
+            return "ok";
+        case HCSR04_ECHO_STUCK_HIGH_BEFORE_TRIGGER:
+            return "echo_stuck_high_before_trigger";
+        case HCSR04_TIMEOUT_WAITING_FOR_RISE:
+            return "timeout_waiting_for_echo_rise";
+        case HCSR04_TIMEOUT_WAITING_FOR_FALL:
+            return "timeout_waiting_for_echo_fall";
+        default:
+            return "unknown";
     }
 }
 
-static uint8_t HCSR04_ZeroReference(uint32_t *referenceMm)
-{
+static uint8_t HCSR04_ZeroReference(uint32_t *referenceMm) {
     uint8_t samples = 0;
     uint8_t attempts = 0;
     DistanceFilter referenceFilter;
@@ -262,21 +247,53 @@ static uint8_t HCSR04_ZeroReference(uint32_t *referenceMm)
     return DistanceFilter_GetAverage(&referenceFilter, referenceMm);
 }
 
-static uint8_t HCSR04_IsReallyClose(uint32_t distanceMm, uint32_t referenceMm)
-{
+static uint8_t HCSR04_IsReallyClose(uint32_t distanceMm, uint32_t referenceMm) {
     if (referenceMm <= REALLY_CLOSE_DELTA_MM) {
         return FALSE;
     }
     return (distanceMm + REALLY_CLOSE_DELTA_MM) <= referenceMm;
 }
 
-static uint8_t HCSR04_IsReallyFar(uint32_t distanceMm, uint32_t referenceMm)
-{
+static uint8_t HCSR04_IsReallyFar(uint32_t distanceMm, uint32_t referenceMm) {
     return distanceMm >= (referenceMm + REALLY_FAR_DELTA_MM);
 }
 
-static const char *HCSR04_ObjectStateName(uint32_t distanceMm, uint32_t referenceMm)
-{
+static uint8_t HCSR04_TakeReading(void) {
+    uint32_t distanceMm;
+    uint32_t averageMm;
+
+    if (HCSR04_ReadDistanceMm(&distanceMm) == FALSE) {
+        LastReadingValid = FALSE;
+        return FALSE;
+    }
+
+    DistanceFilter_Add(&DistanceAverage, distanceMm);
+
+    if (DistanceFilter_GetAverage(&DistanceAverage, &averageMm) == FALSE) {
+        LastReadingValid = FALSE;
+        return FALSE;
+    }
+
+    LastReadingMm = averageMm;
+    LastReadingValid = TRUE;
+    return TRUE;
+}
+
+static uint8_t HCSR04_LastReadingIsReallyClose(void) {
+    if ((LastReadingValid == FALSE) || (ReferenceValid == FALSE)) {
+        return FALSE;
+    }
+    return HCSR04_IsReallyClose(LastReadingMm, ReferenceDistanceMm);
+}
+
+static uint8_t HCSR04_LastReadingIsReallyFar(void) {
+    if ((LastReadingValid == FALSE) || (ReferenceValid == FALSE)) {
+        return FALSE;
+    }
+    return HCSR04_IsReallyFar(LastReadingMm, ReferenceDistanceMm);
+}
+
+static const char *HCSR04_ObjectStateName(uint32_t distanceMm, uint32_t referenceMm) {
     if (HCSR04_IsReallyClose(distanceMm, referenceMm)) {
         return "really_close";
     }
@@ -286,8 +303,7 @@ static const char *HCSR04_ObjectStateName(uint32_t distanceMm, uint32_t referenc
     return "near_reference";
 }
 
-static void PrintDistanceLine(uint32_t rawMm, uint32_t averageMm)
-{
+static void PrintDistanceLine(uint32_t rawMm, uint32_t averageMm) {
     const uint32_t averageInchesTenths = (averageMm * 100u + 127u) / 254u;
 
     if (ReferenceValid) {
@@ -305,8 +321,7 @@ static void PrintDistanceLine(uint32_t rawMm, uint32_t averageMm)
     }
 }
 
-static void TryZeroReference(void)
-{
+static void TryZeroReference(void) {
     uint32_t referenceMm;
 
     printf("zeroing_reference samples=%u\r\n", REFERENCE_SAMPLE_COUNT);
@@ -321,8 +336,9 @@ static void TryZeroReference(void)
     }
 }
 
-int main(void)
-{
+#ifdef PING_TEST
+
+int main(void) {
     DistanceFilter_Reset(&DistanceAverage);
 
     BOARD_Init();
@@ -358,16 +374,20 @@ int main(void)
             }
         } else {
             const uint16_t echoPort = (uint16_t) IO_PortsReadPort(HCSR04_ECHO_IO_PORT);
+            while (1) {
 
-            printf("distance_cm=ERR no_valid_echo reason=%s echo=%u echo_tris=%u echo_lat=%u echo_io=0x%04X y11_high=%u\r\n",
-                    HCSR04_StatusName(echoStatus),
-                    HCSR04_ECHO_PORT,
-                    HCSR04_ECHO_TRIS,
-                    HCSR04_ECHO_LAT,
-                    echoPort,
-                    (echoPort & PIN11) != 0);
+                printf("distance_cm=ERR no_valid_echo reason=%s echo=%u echo_tris=%u echo_lat=%u echo_io=0x%04X y11_high=%u\r\n",
+                        HCSR04_StatusName(echoStatus),
+                        HCSR04_ECHO_PORT,
+                        HCSR04_ECHO_TRIS,
+                        HCSR04_ECHO_LAT,
+                        echoPort,
+                        (echoPort & PIN11) != 0);
+            }
+
+            DelayUs(PING_INTERVAL_US);
         }
-
-        DelayUs(PING_INTERVAL_US);
     }
 }
+
+#endif

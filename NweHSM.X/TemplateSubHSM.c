@@ -59,6 +59,25 @@
 #define FOLLOWTAPE_ANGLEDRIGHT_POWER 800
 #define FOLLOWTAPE_FORWARD_POWER 800
 
+#define LOCATECORNER_TURNRIGHT_POWER 600
+#define LOCATECORNER_TURNRIGHT_TIME 1500
+#define FOLLOWEDGE_TURNRIGHT_POWER 700
+#define FOLLOWEDGE_TURNRIGHT_TIME 1500
+
+
+
+#define AVOIDOBSTACLE_FORWARD_POWER 700
+#define AVOIDOBSTACLE_TURNRIGHT_POWER 700
+#define AVOIDOBSTACLE_TURNLEFT_POWER 700
+#define AVOIDOBSTACLE_FORWARDDIST_POWER 700
+#define AVOIDOBSTACLE_BACKWARDDIST_POWER 700
+#define AVOIDOBSTACLE_PIVOT_POWER 700
+
+#define AVOIDOBSTACLE_BACKWARD_TIME 600
+#define AVOIDOBSTACLE_TURNRIGHT_TIME 1500
+#define PING_CLEARANCE_TIME 700
+#define OBSTACLE_SIDE_CLEARANCE_TIME 800
+
 //big ones
 
 typedef enum {
@@ -276,7 +295,6 @@ uint8_t InitFindBeaconSubHSM(void) {
 
 
 //big ones
-#define LOCATECORNER_TURNRIGHT_POWER 600
 
 ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE;
@@ -329,7 +347,7 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunLocateCornerSubHSM: LocateCorner_TurnRight: ES_ENTRY\r\n");
                     PS_TankTurnRight(LOCATECORNER_TURNRIGHT_POWER);
-                    ES_Timer_InitTimer(LOCATECORNER_TURNRIGHT_TIMER, 500);
+                    ES_Timer_InitTimer(LOCATECORNER_TURNRIGHT_TIMER, LOCATECORNER_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunLocateCornerSubHSM: LocateCorner_TurnRight: ES_TIMEOUT\r\n");
@@ -366,8 +384,6 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
     return ThisEvent;
 }
 
-#define FOLLOWEDGE_TURNRIGHT_POWER 700
-
 ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE;
     FollowEdgeSubHSMState_t nextState = FollowEdgeSubHSMCurrentState;
@@ -385,8 +401,8 @@ ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("RunFollowEdgeSubHSM: FollowEdge_TurnRight: ES_ENTRY\r\n");
-                    PS_TankTurnRight(FOLLOWEDGE_TURNRIGHT_POWER);
-                    ES_Timer_InitTimer(FOLLOWEDGE_TURNRIGHT_TIMER, 1500);
+                    PS_PivotTurnRight(FOLLOWEDGE_TURNRIGHT_POWER);
+                    ES_Timer_InitTimer(FOLLOWEDGE_TURNRIGHT_TIMER, FOLLOWEDGE_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunFollowEdgeSubHSM: FollowEdge_TurnRight: ES_TIMEOUT\r\n");
@@ -461,27 +477,29 @@ ES_Event RunLauncherSubHSM(ES_Event ThisEvent) {
         case LauncherSubHSM_Init:
             if (ThisEvent.EventType == ES_INIT) {
                 printf("RunLauncherSubHSM: LauncherSubHSM_Init: ES_INIT\r\n");
-                nextState = Launcher_PreRev;
+                //prerev
+                nextState = Launcher_FindBeacon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-        case Launcher_PreRev:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunLauncherSubHSM: Launcher_PreRev: ES_ENTRY\r\n");
-
-                    break;
-                default:
-                    break;
-            }
-            break;
         case Launcher_FindBeacon:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunLauncherSubHSM: Launcher_FindBeacon: ES_ENTRY\r\n");
+            if (ThisEvent.EventType == ES_ENTRY) {
+                printf("RunLocateCornerSubHSM: LocateCorner_FindBeacon: ES_ENTRY\r\n");
+                InitFindBeaconSubHSM();
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else {
+                ThisEvent = RunFindBeaconSubHSM(ThisEvent);
+            }
 
+            switch (ThisEvent.EventType) {
+                case BEACON_LOCKED:
+                    printf("RunLocateCornerSubHSM: LocateCorner_FindBeacon: BEACON_LOCKED\r\n");
+                    nextState = Launcher_Launch;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
+
                 default:
                     break;
             }
@@ -736,12 +754,6 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
     return ThisEvent;
 }
 
-#define AVOIDOBSTACLE_FORWARD_POWER 700
-#define AVOIDOBSTACLE_TURNRIGHT_POWER 700
-#define AVOIDOBSTACLE_TURNLEFT_POWER 700
-#define AVOIDOBSTACLE_FORWARDDIST_POWER 700
-#define AVOIDOBSTACLE_BACKWARDDIST_POWER 700
-#define AVOIDOBSTACLE_PIVOT_POWER 700
 
 ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE;
@@ -768,11 +780,6 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
                 printf("RunAvoidObstacleSubHSM: AvoidObstacleSubHSM_Init: ES_INIT\r\n");
-                // this is where you would put any actions associated with the
-                // transition from the initial pseudo-state into the actual
-                // initial state
-
-                // now put the machine into the actual initial state
                 nextState = AvoidObstacle_Backward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -783,7 +790,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_Backward: ES_ENTRY\r\n");
                     PS_Backward(AVOIDOBSTACLE_BACKWARDDIST_POWER);
-                    ES_Timer_InitTimer(AVOIDOBSTACLE_BACKWARD_TIMER, 1500);
+                    ES_Timer_InitTimer(AVOIDOBSTACLE_BACKWARD_TIMER, AVOIDOBSTACLE_BACKWARD_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_Backward: ES_TIMEOUT\r\n");
@@ -803,7 +810,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight: ES_ENTRY\r\n");
                     PS_TankTurnRight(AVOIDOBSTACLE_TURNRIGHT_POWER);
-                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, 500);
+                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, AVOIDOBSTACLE_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight: ES_TIMEOUT\r\n");
@@ -829,7 +836,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassFront: PING_FAR\r\n");
                     PS_Stop();
                     PS_Forward(AVOIDOBSTACLE_FORWARD_POWER);
-                    ES_Timer_InitTimer(PING_CLEARANCE, 2000);
+                    ES_Timer_InitTimer(PING_CLEARANCE, PING_CLEARANCE_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassFront: ES_TIMEOUT\r\n");
@@ -850,7 +857,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight2: ES_ENTRY\r\n");
                     PS_TankTurnRight(AVOIDOBSTACLE_TURNRIGHT_POWER);
-                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, 500);
+                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, AVOIDOBSTACLE_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight2: ES_TIMEOUT\r\n");
@@ -877,7 +884,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassSide: PING_FAR\r\n");
                     PS_Stop();
                     PS_Forward(AVOIDOBSTACLE_FORWARD_POWER);
-                    ES_Timer_InitTimer(OBSTACLE_SIDE_CLEARANCE, 2000);
+                    ES_Timer_InitTimer(OBSTACLE_SIDE_CLEARANCE, OBSTACLE_SIDE_CLEARANCE_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassSide: ES_TIMEOUT\r\n");
@@ -898,7 +905,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnLeft: ES_ENTRY\r\n");
                     PS_TankTurnRight(AVOIDOBSTACLE_TURNRIGHT_POWER);
-                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, 500);
+                    ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, AVOIDOBSTACLE_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnLeft: ES_TIMEOUT\r\n");
@@ -1010,7 +1017,9 @@ ES_Event RunFindBeaconSubHSM(ES_Event ThisEvent) {
                         if (filteredValue >= BeaconLockThreshold) {
                             PS_Stop();
                             TapeEventsEnabled = TRUE;
-                            ThisEvent = TransitionFindBeaconSubState(OnFieldState);
+
+                            ThisEvent.EventType = BEACON_LOCKED;
+                            ThisEvent.EventParam = filteredValue;
                         } else {
                             ThisEvent.EventType = ES_NO_EVENT;
                         }

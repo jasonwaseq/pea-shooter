@@ -75,6 +75,7 @@
       <itemPath>beacon.c</itemPath>
       <itemPath>beacon.h</itemPath>
       <itemPath>../Movement.X/SensorsEventChecker.c</itemPath>
+      <itemPath>../UltrasonicPing.X/ping.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -132,7 +133,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="..\src;..\include;C:\Users\asus\Documents\ece118\pea-shooter\NweHSM.X;..\BeaconDetector.X;..\Movement.X"/>
+                  value="..\src;..\include;C:\Users\asus\Documents\ece118\pea-shooter\NweHSM.X;..\BeaconDetector.X;..\Movement.X;..\UltrasonicPing.X"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

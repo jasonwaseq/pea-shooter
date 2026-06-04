@@ -6,6 +6,7 @@
 #include <AD.h>
 #include <IO_Ports.h>
 #include <stdbool.h>
+#include "ping.c"
 
 
 #define TOP_SHOOTER_PWM PWM_PORTY04
@@ -171,6 +172,12 @@ void PS_RightMotorInit(void) {
 
 // Initializes the indexer motor output.
 
+
+void PS_PingInit(void){
+    HCSR04_Init();
+    TryZeroReference();
+}
+
 void PS_IndexerMotorInit(void) {
     // The standalone Indexer.X project drives the indexer on Z6 with hardware PWM.
 }
@@ -204,6 +211,7 @@ void PS_Init(void) {
     PS_RightMotorInit();
     PS_IndexerMotorInit();
     PS_ShooterInit();
+    PS_PingInit();
 
     // Configure switch and tape sensor pins as digital inputs.
     PORTW03_TRIS = 1;

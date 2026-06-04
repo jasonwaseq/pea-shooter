@@ -10,11 +10,14 @@
 #include "AD.h"
 #include "peashooter.h"
 #include "TemplateHSM.h"
+#include "ping.c"
 #include "pwm.h"
+#include <stdio.h>
 
 #define BATTERY_DISCONNECT_THRESHOLD 175
 #define SENSOR_STATE_UNKNOWN 0xFF
 #define TAPE_DEBOUNCE_COUNT 20
+#define PING_SAMPLE_INTERVAL_US 50000u
 
 //#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
@@ -230,32 +233,32 @@ uint8_t TemplateCheckTape(void) {
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & LEFT_TAPE_MASK) == 0) &&
-                   ((tapeState & LEFT_TAPE_MASK) != 0)) {
+                ((tapeState & LEFT_TAPE_MASK) != 0)) {
             thisEvent.EventType = LEFT_TAPE_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & LEFT_TAPE_MASK) != 0) &&
-                   ((tapeState & LEFT_TAPE_MASK) == 0)) {
+                ((tapeState & LEFT_TAPE_MASK) == 0)) {
             thisEvent.EventType = LEFT_TAPE_NOT_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & MID_TAPE_MASK) == 0) &&
-                   ((tapeState & MID_TAPE_MASK) != 0)) {
+                ((tapeState & MID_TAPE_MASK) != 0)) {
             thisEvent.EventType = MIDDLE_TAPE_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & MID_TAPE_MASK) != 0) &&
-                   ((tapeState & MID_TAPE_MASK) == 0)) {
+                ((tapeState & MID_TAPE_MASK) == 0)) {
             thisEvent.EventType = MIDDLE_TAPE_NOT_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & RIGHT_TAPE_MASK) == 0) &&
-                   ((tapeState & RIGHT_TAPE_MASK) != 0)) {
+                ((tapeState & RIGHT_TAPE_MASK) != 0)) {
             thisEvent.EventType = RIGHT_TAPE_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
         } else if (((lastTapeState & RIGHT_TAPE_MASK) != 0) &&
-                   ((tapeState & RIGHT_TAPE_MASK) == 0)) {
+                ((tapeState & RIGHT_TAPE_MASK) == 0)) {
             thisEvent.EventType = RIGHT_TAPE_NOT_DETECTED;
             thisEvent.EventParam = tapeState;
             returnVal = TRUE;
@@ -275,6 +278,90 @@ uint8_t TemplateCheckTape(void) {
     return returnVal;
 }
 
+uint8_t TemplateCheckPing(void) {
+    static uint8_t ping_close = FALSE;
+    static uint8_t ping_far = FALSE;
+    static uint8_t pingInitialized = FALSE;
+    static uint8_t sampleTimerInitialized = FALSE;
+    static uint32_t lastSampleTicks;
+
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    uint8_t current_ping_close;
+    uint8_t current_ping_far;
+    uint32_t currentTicks;
+    uint32_t sampleIntervalTicks;
+
+    if (pingInitialized == FALSE) {
+        HCSR04_Init();
+        TryZeroReference();
+        pingInitialized = TRUE;
+    }
+
+    currentTicks = CoreTimerNow();
+    sampleIntervalTicks = PING_SAMPLE_INTERVAL_US * CoreTimerTicksPerUs();
+
+    if ((sampleTimerInitialized == TRUE)
+            && ((uint32_t) (currentTicks - lastSampleTicks) < sampleIntervalTicks)) {
+        return FALSE;
+    }
+    lastSampleTicks = currentTicks;
+    sampleTimerInitialized = TRUE;
+
+    if (HCSR04_TakeReading() == FALSE) {
+        return FALSE;
+    }
+
+    current_ping_close = HCSR04_LastReadingIsReallyClose();
+    current_ping_far = HCSR04_LastReadingIsReallyFar();
+
+    if ((current_ping_close == ping_close) && (current_ping_far == ping_far)) {
+        return FALSE;
+    }
+
+    ping_close = current_ping_close;
+    ping_far = current_ping_far;
+
+    if (ping_close == TRUE) {
+        thisEvent.EventType = PING_CLOSE;
+        thisEvent.EventParam = LastReadingMm;
+        returnVal = TRUE;
+    } else if (ping_far == TRUE) {
+        thisEvent.EventType = PING_FAR;
+        thisEvent.EventParam = LastReadingMm;
+        returnVal = TRUE;
+    }
+
+    if (returnVal == TRUE) {
+        printf("TemplateCheckPing: posting %s reading_mm=%lu close=%u far=%u\r\n",
+                EventNames[thisEvent.EventType],
+                (unsigned long) LastReadingMm,
+                ping_close,
+                ping_far);
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+        PostTemplateHSM(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif
+    }
+
+    return returnVal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 static uint8_t(*EventList[])(void) = {EVENT_CHECK_LIST};
@@ -293,7 +380,7 @@ void main(void) {
 
     while (1) {
         if (IsTransmitEmpty()) {
-            for (i = 0; i < sizeof(EventList) / sizeof(EventList[0]); i++) {
+            for (i = 0; i < sizeof (EventList) / sizeof (EventList[0]); i++) {
                 if (EventList[i]() == TRUE) {
                     PrintEvent();
                     break;

@@ -136,10 +136,6 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
 
-                case ES_EXIT:
-                    PS_Stop();
-                    break;
-
                 default:
                     printf("RunTemplateHSM: Launcher\r\n");
                     ThisEvent = RunLauncherSubHSM(ThisEvent);
