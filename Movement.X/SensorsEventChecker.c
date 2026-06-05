@@ -38,7 +38,7 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define BATTERY_DISCONNECT_THRESHOLD 175
+#define BATTERY_DISCONNECT_THRESHOLD 100
 #define SENSOR_STATE_UNKNOWN 0xFF
 
 /* peashooter.h uses SWITCH_TRIPPED / SWITCH_NOT_TRIPPED as raw switch states.
@@ -71,6 +71,14 @@ static ES_Event storedEvent;
 /* Any private module level variable that you might need for keeping track of
    events would be placed here. Private variables should be STATIC so that they
    are limited in scope to this module. */
+
+/* Latest debounced tape state, kept in sync with the events posted by
+   TemplateCheckTape so other modules can query a stable, noise-free reading. */
+static unsigned char DebouncedTapeMask = 0;
+
+unsigned char Sensors_GetDebouncedTapeMask(void) {
+    return DebouncedTapeMask;
+}
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -205,8 +213,23 @@ uint8_t TemplateCheckTape(void) {
     unsigned char leftTape = PS_ReadLeftTape();
     unsigned char middleTape = PS_ReadMidTape();
     unsigned char rightTape = PS_ReadRightTape();
+    unsigned char tapeMask = (leftTape
+            + (middleTape << 1)
+            + (rightTape << 2));
 
 #define TAPE_DEBOUNCE_COUNT 20
+
+    if (HSM_CheckISZImmediate(tapeMask) == TRUE) {
+        return TRUE;
+    }
+
+    if (HSM_CheckDriveImmediate(tapeMask) == TRUE) {
+        return TRUE;
+    }
+
+    if (HSM_CheckTravelTapeImmediate(tapeMask) == TRUE) {
+        return TRUE;
+    }
 
     if (initialized == FALSE) {
         debouncedLeft = leftTape;
@@ -271,6 +294,11 @@ uint8_t TemplateCheckTape(void) {
         thisEvent.EventParam = debouncedRight;
         returnVal = TRUE;
     }
+
+    DebouncedTapeMask = (unsigned char) (
+            ((debouncedLeft == TAPE_DETECTED) ? LEFT_TAPE_MASK : 0)
+            | ((debouncedMiddle == TAPE_DETECTED) ? MID_TAPE_MASK : 0)
+            | ((debouncedRight == TAPE_DETECTED) ? RIGHT_TAPE_MASK : 0));
 
     if (returnVal == TRUE) {
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)

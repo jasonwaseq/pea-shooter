@@ -13,7 +13,7 @@
 #include "ES_Events.h"
 #include "HSMService.h"
 
-static uint16_t SampleDividerCount;
+static uint8_t SampleSequence;
 
 static uint16_t ReadBeaconStrength(void)
 {
@@ -37,8 +37,13 @@ uint8_t InitBeaconEventChecker(void)
         return FALSE;
     }
 
-    SampleDividerCount = 0;
+    SampleSequence = 0;
     return TRUE;
+}
+
+uint8_t BeaconEventChecker_GetSampleSequence(void)
+{
+    return SampleSequence;
 }
 
 uint8_t CheckBeaconDetector(void)
@@ -54,16 +59,28 @@ uint8_t CheckBeaconDetector(void)
     if (currentReading == (uint16_t) ERROR) {
         return FALSE;
     }
+    SampleSequence = (SampleSequence + 1) & BEACON_SAMPLE_SEQ_MASK;
 
-    SampleDividerCount++;
-    if (SampleDividerCount < BEACON_ADC_SAMPLE_DIVIDER) {
+    /* Ignore readings taken while the base motors are running. Only samples
+     * captured during the motors-off hold/pause may complete a beacon lock,
+     * which prevents motor noise from producing a false detection during the
+     * incremental tank turn. */
+    if (HSM_BeaconSampleArmed() != TRUE) {
         return FALSE;
     }
-    SampleDividerCount = 0;
 
-    thisEvent.EventType = BEACON_SAMPLE_READY;
-    thisEvent.EventParam = currentReading;
-    PostHSMService(thisEvent);
+    /* Detection is evaluated on every armed ADC sample, but only a genuine
+     * detection is posted to the HSM. Posting every non-detected reading would
+     * flood the service queue and could drop the rotation-timer timeout that
+     * drives the incremental tank turn, stalling the turn before a beacon is
+     * ever found. */
+    if (HSM_CheckBeaconLockImmediate(currentReading) == TRUE) {
+        thisEvent.EventType = BEACON_SAMPLE_READY;
+        thisEvent.EventParam = BEACON_SAMPLE_EVENT_PARAM(currentReading,
+                SampleSequence);
+        PostHSMService(thisEvent);
+        return TRUE;
+    }
 
-    return TRUE;
+    return FALSE;
 }

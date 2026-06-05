@@ -6,6 +6,12 @@
 #include "SensorsEventChecker.h"
 
 static uint8_t CheckHSMEvents(void) {
+    if (HSM_BeaconAlignFastStopEnabled() == TRUE) {
+        if (CheckBeaconDetector() == TRUE) {
+            return TRUE;
+        }
+    }
+
     if (TemplateCheckBattery() == TRUE) {
         return TRUE;
     }

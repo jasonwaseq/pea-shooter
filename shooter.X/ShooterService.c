@@ -1,117 +1,99 @@
 /*
  * ShooterService.c
  *
- * ES service for commanding the primary IBT-2/BTS7960 shooter motor driver
- * and a fixed-duty secondary shooter PWM output.
+ * ES service for commanding the upper and lower shooter motor outputs.
  */
 
 #include "ShooterService.h"
 
 #include <stdio.h>
-#include <xc.h>
 
 #include "BOARD.h"
 #include "ES_Framework.h"
-#include "ES_Timers.h"
 #include "ShooterEventChecker.h"
 
 typedef enum {
     SHOOTER_DISABLED,
-    PRIMARY_SHOOTER_RUNNING,
+    SHOOTERS_RUNNING,
 } ShooterState_t;
 
 static uint8_t MyPriority;
 static ShooterState_t CurrentState;
 
-static uint8_t ConfigureSecondaryShooterPin(void)
+static uint8_t ConfigureShooterPins(void)
 {
-    if (IO_PortsSetPortOutputs(SECONDARY_SHOOTER_PWM_IO_PORT,
-            SECONDARY_SHOOTER_PWM_IO_BIT) != SUCCESS) {
+    if (IO_PortsSetPortOutputs(UPPER_SHOOTER_RPWM_IO_PORT,
+            UPPER_SHOOTER_RPWM_IO_BIT) != SUCCESS) {
         return FALSE;
     }
-    if (IO_PortsClearPortBits(SECONDARY_SHOOTER_PWM_IO_PORT,
-            SECONDARY_SHOOTER_PWM_IO_BIT) != SUCCESS) {
+    if (IO_PortsSetPortOutputs(LOWER_SHOOTER_LPWM_IO_PORT,
+            LOWER_SHOOTER_LPWM_IO_BIT) != SUCCESS) {
         return FALSE;
     }
-    SECONDARY_SHOOTER_PWM_IO_TRIS = 0;
-    return TRUE;
-}
-
-static uint8_t ConfigurePrimaryShooterPins(void)
-{
-    const uint16_t enablePins = PRIMARY_SHOOTER_REN_ENABLE_BIT
-            | PRIMARY_SHOOTER_LEN_ENABLE_BIT;
-
-    if (IO_PortsSetPortOutputs(PRIMARY_SHOOTER_ENABLE_PORT,
-            enablePins) != SUCCESS) {
+    if (IO_PortsSetPortOutputs(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT) != SUCCESS) {
         return FALSE;
     }
-    if (IO_PortsClearPortBits(PRIMARY_SHOOTER_ENABLE_PORT,
-            enablePins) != SUCCESS) {
+    if (IO_PortsSetPortOutputs(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT) != SUCCESS) {
         return FALSE;
     }
-    if (IO_PortsSetPortOutputs(PRIMARY_SHOOTER_RPWM_IO_PORT,
-            PRIMARY_SHOOTER_RPWM_IO_BIT) != SUCCESS) {
+    if (IO_PortsClearPortBits(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT) != SUCCESS) {
         return FALSE;
     }
-    if (IO_PortsSetPortOutputs(PRIMARY_SHOOTER_LPWM_IO_PORT,
-            PRIMARY_SHOOTER_LPWM_IO_BIT) != SUCCESS) {
+    if (IO_PortsClearPortBits(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT) != SUCCESS) {
         return FALSE;
     }
     return TRUE;
 }
 
-static uint8_t EnableDriver(void)
+static uint8_t EnableShooters(void)
 {
-    const uint16_t enablePins = PRIMARY_SHOOTER_REN_ENABLE_BIT
-            | PRIMARY_SHOOTER_LEN_ENABLE_BIT;
-
-    return IO_PortsSetPortBits(PRIMARY_SHOOTER_ENABLE_PORT,
-            enablePins) == SUCCESS;
+    if (IO_PortsSetPortBits(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT) != SUCCESS) {
+        return FALSE;
+    }
+    return IO_PortsSetPortBits(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT) == SUCCESS;
 }
 
-static uint8_t DisableDriver(void)
+static uint8_t DisableShooters(void)
 {
-    const uint16_t enablePins = PRIMARY_SHOOTER_REN_ENABLE_BIT
-            | PRIMARY_SHOOTER_LEN_ENABLE_BIT;
-
-    return IO_PortsClearPortBits(PRIMARY_SHOOTER_ENABLE_PORT,
-            enablePins) == SUCCESS;
+    if (IO_PortsClearPortBits(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT) != SUCCESS) {
+        return FALSE;
+    }
+    return IO_PortsClearPortBits(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT) == SUCCESS;
 }
 
-static uint8_t SetPrimaryShooterDuty(unsigned int duty)
+static uint8_t SetUpperShooterDuty(unsigned int duty)
 {
     if (duty > MAX_PWM) {
         return FALSE;
     }
-    if (PWM_SetDutyCycle(PRIMARY_SHOOTER_IDLE_PWM_PIN, MIN_PWM) != SUCCESS) {
-        return FALSE;
-    }
-    return PWM_SetDutyCycle(PRIMARY_SHOOTER_DRIVE_PWM_PIN, duty) == SUCCESS;
+    return PWM_SetDutyCycle(UPPER_SHOOTER_RPWM_PIN, duty) == SUCCESS;
 }
 
-static uint8_t StopMotorOutput(void)
-{
-    if (PWM_SetDutyCycle(PRIMARY_SHOOTER_RPWM_PIN, MIN_PWM) != SUCCESS) {
-        return FALSE;
-    }
-    if (PWM_SetDutyCycle(PRIMARY_SHOOTER_LPWM_PIN, MIN_PWM) != SUCCESS) {
-        return FALSE;
-    }
-    return DisableDriver();
-}
-
-static uint8_t SetSecondaryShooterDuty(unsigned int duty)
+static uint8_t SetLowerShooterDuty(unsigned int duty)
 {
     if (duty > MAX_PWM) {
         return FALSE;
     }
-    return PWM_SetDutyCycle(SECONDARY_SHOOTER_PWM_PIN, duty) == SUCCESS;
+    return PWM_SetDutyCycle(LOWER_SHOOTER_LPWM_PIN, duty) == SUCCESS;
 }
 
-static uint8_t StopSecondaryShooterOutput(void)
+static uint8_t StopShooterOutputs(void)
 {
-    return SetSecondaryShooterDuty(MIN_PWM);
+    if (SetUpperShooterDuty(MIN_PWM) != TRUE) {
+        return FALSE;
+    }
+    if (SetLowerShooterDuty(MIN_PWM) != TRUE) {
+        return FALSE;
+    }
+    return DisableShooters();
 }
 
 uint8_t InitShooterService(uint8_t priority)
@@ -127,21 +109,14 @@ uint8_t InitShooterService(uint8_t priority)
     if (PWM_SetFrequency(SHOOTER_PWM_FREQUENCY) != SUCCESS) {
         return FALSE;
     }
-    if (ConfigurePrimaryShooterPins() != TRUE) {
+    if (ConfigureShooterPins() != TRUE) {
         return FALSE;
     }
-    if (ConfigureSecondaryShooterPin() != TRUE) {
+    if (PWM_AddPins(UPPER_SHOOTER_RPWM_PIN
+            | LOWER_SHOOTER_LPWM_PIN) != SUCCESS) {
         return FALSE;
     }
-    if (PWM_AddPins(PRIMARY_SHOOTER_RPWM_PIN
-            | PRIMARY_SHOOTER_LPWM_PIN
-            | SECONDARY_SHOOTER_PWM_PIN) != SUCCESS) {
-        return FALSE;
-    }
-    if (StopMotorOutput() != TRUE) {
-        return FALSE;
-    }
-    if (StartSecondaryShooterMotor() != TRUE) {
+    if (StopShooterOutputs() != TRUE) {
         return FALSE;
     }
     if (InitShooterEventChecker() != TRUE) {
@@ -158,42 +133,65 @@ uint8_t PostShooterService(ES_Event thisEvent)
     return ES_PostToService(MyPriority, thisEvent);
 }
 
-uint8_t StartPrimaryShooterMotor(void)
+uint8_t StartUpperShooterMotor(void)
 {
     ES_Event startEvent;
 
-    startEvent.EventType = PRIMARY_SHOOTER_START;
-    startEvent.EventParam = PRIMARY_SHOOTER_DUTY;
+    startEvent.EventType = UPPER_SHOOTER_START;
+    startEvent.EventParam = UPPER_SHOOTER_DUTY;
     return PostShooterService(startEvent);
 }
 
-uint8_t StopPrimaryShooterMotor(void)
+uint8_t StopUpperShooterMotor(void)
 {
     ES_Event stopEvent;
 
-    stopEvent.EventType = PRIMARY_SHOOTER_STOP;
+    stopEvent.EventType = UPPER_SHOOTER_STOP;
     stopEvent.EventParam = 0;
     return PostShooterService(stopEvent);
 }
 
+uint8_t StartLowerShooterMotor(void)
+{
+    if (EnableShooters() != TRUE) {
+        return FALSE;
+    }
+    return SetLowerShooterDuty(LOWER_SHOOTER_DUTY);
+}
+
+uint8_t StopLowerShooterMotor(void)
+{
+    return SetLowerShooterDuty(MIN_PWM);
+}
+
 uint8_t StartShooterMotor(void)
 {
-    return StartPrimaryShooterMotor();
+    return StartUpperShooterMotor();
 }
 
 uint8_t StopShooterMotor(void)
 {
-    return StopPrimaryShooterMotor();
+    return StopUpperShooterMotor();
+}
+
+uint8_t StartPrimaryShooterMotor(void)
+{
+    return StartUpperShooterMotor();
+}
+
+uint8_t StopPrimaryShooterMotor(void)
+{
+    return StopUpperShooterMotor();
 }
 
 uint8_t StartSecondaryShooterMotor(void)
 {
-    return SetSecondaryShooterDuty(SECONDARY_SHOOTER_DUTY_CYCLE);
+    return StartLowerShooterMotor();
 }
 
 uint8_t StopSecondaryShooterMotor(void)
 {
-    return StopSecondaryShooterOutput();
+    return StopLowerShooterMotor();
 }
 
 ES_Event RunShooterService(ES_Event thisEvent)
@@ -205,49 +203,49 @@ ES_Event RunShooterService(ES_Event thisEvent)
 
     switch (thisEvent.EventType) {
     case ES_INIT:
-        printf("Primary shooter ready: RPWM=%s, LPWM=%s, R_EN=%s, L_EN=%s\r\n",
-                PRIMARY_SHOOTER_RPWM_PIN_NAME,
-                PRIMARY_SHOOTER_LPWM_PIN_NAME,
-                PRIMARY_SHOOTER_REN_ENABLE_NAME,
-                PRIMARY_SHOOTER_LEN_ENABLE_NAME);
-        printf("Primary shooter direction: drive %s, hold %s low\r\n",
-                PRIMARY_SHOOTER_DRIVE_PWM_PIN_NAME,
-                PRIMARY_SHOOTER_IDLE_PWM_PIN_NAME);
-        printf("Secondary shooter ready: PWM=%s at %u.%u%% duty\r\n",
-                SECONDARY_SHOOTER_PWM_PIN_NAME,
-                SECONDARY_SHOOTER_DUTY_CYCLE / 10,
-                SECONDARY_SHOOTER_DUTY_CYCLE % 10);
+        printf("Upper shooter ready: RPWM=%s, R_EN=%s, duty=%u.%u%%\r\n",
+                UPPER_SHOOTER_RPWM_PIN_NAME,
+                UPPER_SHOOTER_REN_ENABLE_NAME,
+                UPPER_SHOOTER_DUTY / 10,
+                UPPER_SHOOTER_DUTY % 10);
+        printf("Lower shooter ready: LPWM=%s, L_EN=%s, duty=%u.%u%%\r\n",
+                LOWER_SHOOTER_LPWM_PIN_NAME,
+                LOWER_SHOOTER_LEN_ENABLE_NAME,
+                LOWER_SHOOTER_DUTY / 10,
+                LOWER_SHOOTER_DUTY % 10);
         printf("PWM frequency: %u Hz\r\n", PWM_GetFrequency());
         break;
 
-    case PRIMARY_SHOOTER_START:
-        if (EnableDriver() != TRUE) {
+    case UPPER_SHOOTER_START:
+        if (EnableShooters() != TRUE) {
             returnEvent.EventType = ES_ERROR;
             break;
         }
-        if (SetPrimaryShooterDuty(thisEvent.EventParam) != TRUE) {
-            StopMotorOutput();
+        if ((SetUpperShooterDuty(thisEvent.EventParam) != TRUE)
+                || (SetLowerShooterDuty(LOWER_SHOOTER_DUTY) != TRUE)) {
+            StopShooterOutputs();
             returnEvent.EventType = ES_ERROR;
             break;
         }
-        CurrentState = PRIMARY_SHOOTER_RUNNING;
-        printf("Primary shooter running opposite secondary at %u.%u%% duty\r\n",
+        CurrentState = SHOOTERS_RUNNING;
+        printf("Shooters running: upper=%u.%u%% lower=%u.%u%%\r\n",
                 thisEvent.EventParam / 10,
-                thisEvent.EventParam % 10);
+                thisEvent.EventParam % 10,
+                LOWER_SHOOTER_DUTY / 10,
+                LOWER_SHOOTER_DUTY % 10);
         break;
 
-    case PRIMARY_SHOOTER_STOP:
-        if (StopMotorOutput() != TRUE) {
+    case UPPER_SHOOTER_STOP:
+        if (StopShooterOutputs() != TRUE) {
             returnEvent.EventType = ES_ERROR;
             break;
         }
         CurrentState = SHOOTER_DISABLED;
-        printf("Primary shooter stopped\r\n");
+        printf("Shooters stopped\r\n");
         break;
 
     case ES_EXIT:
-        StopSecondaryShooterOutput();
-        StopMotorOutput();
+        StopShooterOutputs();
         PWM_End();
         CurrentState = SHOOTER_DISABLED;
         printf("Shooter exited\r\n");

@@ -1,7 +1,7 @@
 /*
  * Shooter.X
  *
- * ES Framework application entry point for the shooter motor outputs.
+ * Direct hardware smoke test for the upper and lower shooter outputs.
  */
 
 #include <BOARD.h>
@@ -36,76 +36,66 @@ int main(void)
 {
     char pwmInitResult;
     char pwmFrequencyResult;
-    char primaryRpwmOutputResult;
-    char primaryLpwmOutputResult;
-    char primaryEnableOutputResult;
-    char primaryEnableSetResult;
-    char secondaryOutputResult;
+    char upperOutputResult;
+    char lowerOutputResult;
+    char upperEnableOutputResult;
+    char lowerEnableOutputResult;
+    char upperEnableSetResult;
+    char lowerEnableSetResult;
     char addPinsResult;
-    char primaryIdleDutyResult;
-    char primaryDriveDutyResult;
-    char secondaryDutyResult;
+    char upperDutyResult;
+    char lowerDutyResult;
 
     InitShooterBoardNoAd();
 
-    printf("\r\nStarting primary and secondary shooter motors directly\r\n");
+    printf("\r\nStarting upper and lower shooter motors directly\r\n");
 
     pwmInitResult = PWM_Init();
     pwmFrequencyResult = PWM_SetFrequency(SHOOTER_PWM_FREQUENCY);
 
-    primaryRpwmOutputResult = IO_PortsSetPortOutputs(PRIMARY_SHOOTER_RPWM_IO_PORT,
-            PRIMARY_SHOOTER_RPWM_IO_BIT);
-    primaryLpwmOutputResult = IO_PortsSetPortOutputs(PRIMARY_SHOOTER_LPWM_IO_PORT,
-            PRIMARY_SHOOTER_LPWM_IO_BIT);
+    upperOutputResult = IO_PortsSetPortOutputs(UPPER_SHOOTER_RPWM_IO_PORT,
+            UPPER_SHOOTER_RPWM_IO_BIT);
+    lowerOutputResult = IO_PortsSetPortOutputs(LOWER_SHOOTER_LPWM_IO_PORT,
+            LOWER_SHOOTER_LPWM_IO_BIT);
 
-    primaryEnableOutputResult = IO_PortsSetPortOutputs(PRIMARY_SHOOTER_ENABLE_PORT,
-            PRIMARY_SHOOTER_REN_ENABLE_BIT | PRIMARY_SHOOTER_LEN_ENABLE_BIT);
-    primaryEnableSetResult = IO_PortsSetPortBits(PRIMARY_SHOOTER_ENABLE_PORT,
-            PRIMARY_SHOOTER_REN_ENABLE_BIT | PRIMARY_SHOOTER_LEN_ENABLE_BIT);
+    upperEnableOutputResult = IO_PortsSetPortOutputs(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT);
+    lowerEnableOutputResult = IO_PortsSetPortOutputs(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT);
+    upperEnableSetResult = IO_PortsSetPortBits(UPPER_SHOOTER_ENABLE_PORT,
+            UPPER_SHOOTER_REN_ENABLE_BIT);
+    lowerEnableSetResult = IO_PortsSetPortBits(LOWER_SHOOTER_ENABLE_PORT,
+            LOWER_SHOOTER_LEN_ENABLE_BIT);
 
-    secondaryOutputResult = IO_PortsSetPortOutputs(SECONDARY_SHOOTER_PWM_IO_PORT,
-            SECONDARY_SHOOTER_PWM_IO_BIT);
-    SECONDARY_SHOOTER_PWM_IO_TRIS = 0;
+    addPinsResult = PWM_AddPins(UPPER_SHOOTER_RPWM_PIN
+            | LOWER_SHOOTER_LPWM_PIN);
+    upperDutyResult = PWM_SetDutyCycle(UPPER_SHOOTER_RPWM_PIN,
+            UPPER_SHOOTER_DUTY);
+    lowerDutyResult = PWM_SetDutyCycle(LOWER_SHOOTER_LPWM_PIN,
+            LOWER_SHOOTER_DUTY);
 
-    addPinsResult = PWM_AddPins(PRIMARY_SHOOTER_RPWM_PIN
-            | PRIMARY_SHOOTER_LPWM_PIN
-            | SECONDARY_SHOOTER_PWM_PIN);
-    primaryIdleDutyResult = PWM_SetDutyCycle(PRIMARY_SHOOTER_IDLE_PWM_PIN, MIN_PWM);
-    primaryDriveDutyResult = PWM_SetDutyCycle(PRIMARY_SHOOTER_DRIVE_PWM_PIN,
-            PRIMARY_SHOOTER_DUTY);
-    secondaryDutyResult = PWM_SetDutyCycle(SECONDARY_SHOOTER_PWM_PIN,
-            SECONDARY_SHOOTER_DUTY_CYCLE);
-
-    printf("Primary shooter: drive %s at %u.%u%% duty, hold %s low\r\n",
-            PRIMARY_SHOOTER_DRIVE_PWM_PIN_NAME,
-            PRIMARY_SHOOTER_DUTY / 10,
-            PRIMARY_SHOOTER_DUTY % 10,
-            PRIMARY_SHOOTER_IDLE_PWM_PIN_NAME);
-    printf("Secondary shooter: hardware PWM %s at %u.%u%% duty\r\n",
-            SECONDARY_SHOOTER_PWM_PIN_NAME,
-            SECONDARY_SHOOTER_DUTY_CYCLE / 10,
-            SECONDARY_SHOOTER_DUTY_CYCLE % 10);
+    printf("Upper shooter: RPWM %s at %u.%u%% duty, R_EN %s\r\n",
+            UPPER_SHOOTER_RPWM_PIN_NAME,
+            UPPER_SHOOTER_DUTY / 10,
+            UPPER_SHOOTER_DUTY % 10,
+            UPPER_SHOOTER_REN_ENABLE_NAME);
+    printf("Lower shooter: LPWM %s at %u.%u%% duty, L_EN %s\r\n",
+            LOWER_SHOOTER_LPWM_PIN_NAME,
+            LOWER_SHOOTER_DUTY / 10,
+            LOWER_SHOOTER_DUTY % 10,
+            LOWER_SHOOTER_LEN_ENABLE_NAME);
     printf("Init results: PWM_Init=%d PWM_SetFrequency=%d AddPins=%d\r\n",
             pwmInitResult, pwmFrequencyResult, addPinsResult);
-    printf("Output results: RPWM=%d LPWM=%d EnablesOut=%d EnablesSet=%d SecondaryOut=%d\r\n",
-            primaryRpwmOutputResult, primaryLpwmOutputResult,
-            primaryEnableOutputResult, primaryEnableSetResult,
-            secondaryOutputResult);
-    printf("Duty results: PrimaryIdle=%d PrimaryDrive=%d Secondary=%d\r\n",
-            primaryIdleDutyResult, primaryDriveDutyResult,
-            secondaryDutyResult);
-    printf("PWM active pins=0x%03X primary duty readback=%u secondary duty readback=%u\r\n",
+    printf("Output results: UpperPWM=%d LowerPWM=%d UpperEnOut=%d LowerEnOut=%d UpperEnSet=%d LowerEnSet=%d\r\n",
+            upperOutputResult, lowerOutputResult,
+            upperEnableOutputResult, lowerEnableOutputResult,
+            upperEnableSetResult, lowerEnableSetResult);
+    printf("Duty results: Upper=%d Lower=%d\r\n",
+            upperDutyResult, lowerDutyResult);
+    printf("PWM active pins=0x%03X upper duty readback=%u lower duty readback=%u\r\n",
             PWM_ListPins(),
-            PWM_GetDutyCycle(PRIMARY_SHOOTER_DRIVE_PWM_PIN),
-            PWM_GetDutyCycle(SECONDARY_SHOOTER_PWM_PIN));
-    printf("Z6/OC1 registers: TRISD0=%u LATD0=%u OC1CON=0x%08lX OC1R=%lu OC1RS=%lu PR2=%lu T2CON=0x%08lX\r\n",
-            (unsigned int) PORTZ06_TRIS,
-            (unsigned int) PORTZ06_LAT,
-            (unsigned long) OC1CON,
-            (unsigned long) OC1R,
-            (unsigned long) OC1RS,
-            (unsigned long) PR2,
-            (unsigned long) T2CON);
+            PWM_GetDutyCycle(UPPER_SHOOTER_RPWM_PIN),
+            PWM_GetDutyCycle(LOWER_SHOOTER_LPWM_PIN));
 
     for (;;) {
         ;

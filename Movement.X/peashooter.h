@@ -86,6 +86,9 @@ char PS_Backward(unsigned int power);
 // Stops both drive motors.
 char PS_Stop(void);
 
+// Actively brakes both drive motors (dynamic brake) for a fast, holding stop.
+char PS_Brake(void);
+
 // Drives forward for an approximate distance using a blocking delay.
 char PS_ForwardDist(unsigned int power, char dist);
 

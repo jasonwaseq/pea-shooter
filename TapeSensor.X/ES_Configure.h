@@ -2,14 +2,15 @@
  Module
      ES_Configure.h
  Description
-     Project-specific ES Framework configuration for shooter.
+     Project-specific ES Framework configuration for the tape sensor event
+     monitor.
  *****************************************************************************/
 
 #ifndef ES_CONFIGURE_H
 #define ES_CONFIGURE_H
 
 //#define USE_KEYBOARD_INPUT
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
 
 /****************************************************************************/
@@ -26,8 +27,13 @@ typedef enum {
     ES_TIMEOUT,
     ES_TIMERACTIVE,
     ES_TIMERSTOPPED,
-    UPPER_SHOOTER_START,
-    UPPER_SHOOTER_STOP,
+    RIGHT_TAPE_DETECTED,
+    RIGHT_TAPE_NOT_DETECTED,
+    MIDDLE_TAPE_DETECTED,
+    MIDDLE_TAPE_NOT_DETECTED,
+    LEFT_TAPE_DETECTED,
+    LEFT_TAPE_NOT_DETECTED,
+    NO_TAPE_DETECTED,
     NUMBEROFEVENTS,
 } ES_EventTyp_t;
 
@@ -42,22 +48,28 @@ static const char *EventNames[] = {
     "ES_TIMEOUT",
     "ES_TIMERACTIVE",
     "ES_TIMERSTOPPED",
-    "UPPER_SHOOTER_START",
-    "UPPER_SHOOTER_STOP",
+    "RIGHT_TAPE_DETECTED",
+    "RIGHT_TAPE_NOT_DETECTED",
+    "MIDDLE_TAPE_DETECTED",
+    "MIDDLE_TAPE_NOT_DETECTED",
+    "LEFT_TAPE_DETECTED",
+    "LEFT_TAPE_NOT_DETECTED",
+    "NO_TAPE_DETECTED",
     "NUMBEROFEVENTS",
 };
 
 /****************************************************************************/
-// User event checker list. This starter project is driven by posted events.
+// User event checker list.
 
-#define EVENT_CHECK_HEADER "ShooterEventChecker.h"
-#define EVENT_CHECK_LIST CheckShooterEvents
+#define EVENT_CHECK_HEADER "TapeSensorEventChecker.h"
+#define EVENT_CHECK_LIST CheckTapeSensor
 
 /****************************************************************************/
-// Timer routing. The PWM driver owns Timer2; ES timers use Timer1.
+// Timer routing.
 
 #define TIMER_UNUSED ((pPostFunc)0)
-#define TIMER0_RESP_FUNC PostShooterService
+
+#define TIMER0_RESP_FUNC TIMER_UNUSED
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
@@ -74,18 +86,16 @@ static const char *EventNames[] = {
 #define TIMER14_RESP_FUNC TIMER_UNUSED
 #define TIMER15_RESP_FUNC TIMER_UNUSED
 
-#define SHOOTER_TIMER 0
-
 /****************************************************************************/
 // Services.
 
 #define MAX_NUM_SERVICES 8
 #define NUM_SERVICES 1
 
-#define SERV_0_HEADER "ShooterService.h"
-#define SERV_0_INIT InitShooterService
-#define SERV_0_RUN RunShooterService
-#define SERV_0_QUEUE_SIZE 6
+#define SERV_0_HEADER "TapeSensorService.h"
+#define SERV_0_INIT InitTapeSensorService
+#define SERV_0_RUN RunTapeSensorService
+#define SERV_0_QUEUE_SIZE 8
 
 #define POST_KEY_FUNC ES_PostAll
 

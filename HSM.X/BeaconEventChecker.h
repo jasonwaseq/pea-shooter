@@ -30,7 +30,21 @@
 #define BEACON_ADC_SAMPLE_DIVIDER 1
 #endif
 
+#define BEACON_SAMPLE_ADC_MASK 0x03ffu
+#define BEACON_SAMPLE_SEQ_MASK 0x003fu
+#define BEACON_SAMPLE_SEQ_SHIFT 10
+#define BEACON_SAMPLE_EVENT_PARAM(adc, seq) \
+        ((uint16_t) ((((uint16_t) (adc)) & BEACON_SAMPLE_ADC_MASK) \
+        | ((((uint16_t) (seq)) & BEACON_SAMPLE_SEQ_MASK) \
+        << BEACON_SAMPLE_SEQ_SHIFT)))
+#define BEACON_SAMPLE_EVENT_ADC(param) \
+        ((uint16_t) (((uint16_t) (param)) & BEACON_SAMPLE_ADC_MASK))
+#define BEACON_SAMPLE_EVENT_SEQ(param) \
+        ((uint8_t) ((((uint16_t) (param)) >> BEACON_SAMPLE_SEQ_SHIFT) \
+        & BEACON_SAMPLE_SEQ_MASK))
+
 uint8_t InitBeaconEventChecker(void);
 uint8_t CheckBeaconDetector(void);
+uint8_t BeaconEventChecker_GetSampleSequence(void);
 
 #endif /* BEACON_EVENT_CHECKER_H */

@@ -61,6 +61,15 @@ uint8_t TemplateCheckBattery(void);
 uint8_t TemplateCheckSwitch(void);
 uint8_t TemplateCheckTape(void);
 
+/**
+ * @Function Sensors_GetDebouncedTapeMask(void)
+ * @return Bit mask of the debounced tape sensor states (bit0 left, bit1 mid,
+ *         bit2 right). This reflects the same debounced state used to post the
+ *         tape events, so consumers can test for "all three on at once" without
+ *         relying on a raw, noisy PS_ReadTape() reading.
+ */
+unsigned char Sensors_GetDebouncedTapeMask(void);
+
 
 
 #endif	/* SENSORSEVENTCHECKER_H */

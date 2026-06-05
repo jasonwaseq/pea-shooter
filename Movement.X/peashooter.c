@@ -158,8 +158,8 @@ void PS_RightMotorInit(void) {
 // Initializes the indexer motor output.
 
 void PS_IndexerMotorInit(void) {
-    // Indexer moved off hardware PWM Z6. The standalone Indexer.X project
-    // drives it on Z4 through RC_Servo when indexer testing is needed.
+    // Indexer uses hardware PWM Z6. The standalone Indexer.X project
+    // owns the indexer test behavior.
 }
 
 // Initializes all peashooter hardware used by motors and sensors.
@@ -311,6 +311,23 @@ char PS_Stop(void) {
     PS_LeftMtrSpeed(0);
 
     // Report success after issuing the stop commands.
+    return SUCCESS;
+}
+
+// Actively brakes both drive motors by shorting the motor windings: both
+// H-bridge inputs are driven high, which puts the TB6612-style driver in its
+// short-brake state. This halts the base far faster than the coast produced by
+// PS_Stop(), and holds position until the next motor command is issued.
+
+char PS_Brake(void) {
+    LEFT_IN1 = 1;
+    LEFT_IN2 = 1;
+    RIGHT_IN1 = 1;
+    RIGHT_IN2 = 1;
+
+    PWM_SetDutyCycle(LEFT_PWM, MAX_PWM);
+    PWM_SetDutyCycle(RIGHT_PWM, MAX_PWM);
+
     return SUCCESS;
 }
 
