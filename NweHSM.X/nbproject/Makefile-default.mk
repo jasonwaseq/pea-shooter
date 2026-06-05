@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../src/AD.c ../src/BOARD.c ../src/ES_CheckEvents.c ../src/ES_Framework.c ../src/ES_KeyboardInput.c ../src/ES_PostList.c ../src/ES_Queue.c ../src/ES_TattleTale.c ../src/ES_Timers.c ../src/IO_Ports.c ../src/LED.c ../src/RC_Servo.c ../src/pwm.c ../src/roach.c ../src/serial.c ../src/timers.c TemplateES_Main.c TemplateFSM.c TemplateHSM.c TemplateService.c TemplateSubHSM.c ../Movement.X/peashooter.c ../BeaconDetector.X/BeaconDetectorService.c ../BeaconDetector.X/BeaconEventChecker.c beacon.c ../Movement.X/SensorsEventChecker.c ../UltrasonicPing.X/ping.c
+SOURCEFILES_QUOTED_IF_SPACED=../src/AD.c ../src/BOARD.c ../src/ES_CheckEvents.c ../src/ES_Framework.c ../src/ES_KeyboardInput.c ../src/ES_PostList.c ../src/ES_Queue.c ../src/ES_TattleTale.c ../src/ES_Timers.c ../src/IO_Ports.c ../src/LED.c ../src/RC_Servo.c ../src/pwm.c ../src/roach.c ../src/serial.c ../src/timers.c TemplateES_Main.c TemplateService.c ../Movement.X/peashooter.c ../BeaconDetector.X/BeaconDetectorService.c ../BeaconDetector.X/BeaconEventChecker.c beacon.c ../Movement.X/SensorsEventChecker.c ../UltrasonicPing.X/ping.c TemplateHSM.c TemplateSubHSM.c AlignTapeSubHSM.c AvoidObstacleSubHSM.c FindBeaconSubHSM.c FollowEdgeSubHSM.c FollowTapeSubHSM.c LauncherSubHSM.c LocateCornerSubHSM.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1360937237/AD.o ${OBJECTDIR}/_ext/1360937237/BOARD.o ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o ${OBJECTDIR}/_ext/1360937237/ES_Framework.o ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1360937237/ES_PostList.o ${OBJECTDIR}/_ext/1360937237/ES_Queue.o ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o ${OBJECTDIR}/_ext/1360937237/ES_Timers.o ${OBJECTDIR}/_ext/1360937237/IO_Ports.o ${OBJECTDIR}/_ext/1360937237/LED.o ${OBJECTDIR}/_ext/1360937237/RC_Servo.o ${OBJECTDIR}/_ext/1360937237/pwm.o ${OBJECTDIR}/_ext/1360937237/roach.o ${OBJECTDIR}/_ext/1360937237/serial.o ${OBJECTDIR}/_ext/1360937237/timers.o ${OBJECTDIR}/TemplateES_Main.o ${OBJECTDIR}/TemplateFSM.o ${OBJECTDIR}/TemplateHSM.o ${OBJECTDIR}/TemplateService.o ${OBJECTDIR}/TemplateSubHSM.o ${OBJECTDIR}/_ext/677763416/peashooter.o ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o ${OBJECTDIR}/beacon.o ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o ${OBJECTDIR}/_ext/2146788981/ping.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1360937237/AD.o.d ${OBJECTDIR}/_ext/1360937237/BOARD.o.d ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o.d ${OBJECTDIR}/_ext/1360937237/ES_Framework.o.d ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o.d ${OBJECTDIR}/_ext/1360937237/ES_PostList.o.d ${OBJECTDIR}/_ext/1360937237/ES_Queue.o.d ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o.d ${OBJECTDIR}/_ext/1360937237/ES_Timers.o.d ${OBJECTDIR}/_ext/1360937237/IO_Ports.o.d ${OBJECTDIR}/_ext/1360937237/LED.o.d ${OBJECTDIR}/_ext/1360937237/RC_Servo.o.d ${OBJECTDIR}/_ext/1360937237/pwm.o.d ${OBJECTDIR}/_ext/1360937237/roach.o.d ${OBJECTDIR}/_ext/1360937237/serial.o.d ${OBJECTDIR}/_ext/1360937237/timers.o.d ${OBJECTDIR}/TemplateES_Main.o.d ${OBJECTDIR}/TemplateFSM.o.d ${OBJECTDIR}/TemplateHSM.o.d ${OBJECTDIR}/TemplateService.o.d ${OBJECTDIR}/TemplateSubHSM.o.d ${OBJECTDIR}/_ext/677763416/peashooter.o.d ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o.d ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o.d ${OBJECTDIR}/beacon.o.d ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o.d ${OBJECTDIR}/_ext/2146788981/ping.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1360937237/AD.o ${OBJECTDIR}/_ext/1360937237/BOARD.o ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o ${OBJECTDIR}/_ext/1360937237/ES_Framework.o ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1360937237/ES_PostList.o ${OBJECTDIR}/_ext/1360937237/ES_Queue.o ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o ${OBJECTDIR}/_ext/1360937237/ES_Timers.o ${OBJECTDIR}/_ext/1360937237/IO_Ports.o ${OBJECTDIR}/_ext/1360937237/LED.o ${OBJECTDIR}/_ext/1360937237/RC_Servo.o ${OBJECTDIR}/_ext/1360937237/pwm.o ${OBJECTDIR}/_ext/1360937237/roach.o ${OBJECTDIR}/_ext/1360937237/serial.o ${OBJECTDIR}/_ext/1360937237/timers.o ${OBJECTDIR}/TemplateES_Main.o ${OBJECTDIR}/TemplateService.o ${OBJECTDIR}/_ext/677763416/peashooter.o ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o ${OBJECTDIR}/beacon.o ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o ${OBJECTDIR}/_ext/2146788981/ping.o ${OBJECTDIR}/TemplateHSM.o ${OBJECTDIR}/TemplateSubHSM.o ${OBJECTDIR}/AlignTapeSubHSM.o ${OBJECTDIR}/AvoidObstacleSubHSM.o ${OBJECTDIR}/FindBeaconSubHSM.o ${OBJECTDIR}/FollowEdgeSubHSM.o ${OBJECTDIR}/FollowTapeSubHSM.o ${OBJECTDIR}/LauncherSubHSM.o ${OBJECTDIR}/LocateCornerSubHSM.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1360937237/AD.o.d ${OBJECTDIR}/_ext/1360937237/BOARD.o.d ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o.d ${OBJECTDIR}/_ext/1360937237/ES_Framework.o.d ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o.d ${OBJECTDIR}/_ext/1360937237/ES_PostList.o.d ${OBJECTDIR}/_ext/1360937237/ES_Queue.o.d ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o.d ${OBJECTDIR}/_ext/1360937237/ES_Timers.o.d ${OBJECTDIR}/_ext/1360937237/IO_Ports.o.d ${OBJECTDIR}/_ext/1360937237/LED.o.d ${OBJECTDIR}/_ext/1360937237/RC_Servo.o.d ${OBJECTDIR}/_ext/1360937237/pwm.o.d ${OBJECTDIR}/_ext/1360937237/roach.o.d ${OBJECTDIR}/_ext/1360937237/serial.o.d ${OBJECTDIR}/_ext/1360937237/timers.o.d ${OBJECTDIR}/TemplateES_Main.o.d ${OBJECTDIR}/TemplateService.o.d ${OBJECTDIR}/_ext/677763416/peashooter.o.d ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o.d ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o.d ${OBJECTDIR}/beacon.o.d ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o.d ${OBJECTDIR}/_ext/2146788981/ping.o.d ${OBJECTDIR}/TemplateHSM.o.d ${OBJECTDIR}/TemplateSubHSM.o.d ${OBJECTDIR}/AlignTapeSubHSM.o.d ${OBJECTDIR}/AvoidObstacleSubHSM.o.d ${OBJECTDIR}/FindBeaconSubHSM.o.d ${OBJECTDIR}/FollowEdgeSubHSM.o.d ${OBJECTDIR}/FollowTapeSubHSM.o.d ${OBJECTDIR}/LauncherSubHSM.o.d ${OBJECTDIR}/LocateCornerSubHSM.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1360937237/AD.o ${OBJECTDIR}/_ext/1360937237/BOARD.o ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o ${OBJECTDIR}/_ext/1360937237/ES_Framework.o ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1360937237/ES_PostList.o ${OBJECTDIR}/_ext/1360937237/ES_Queue.o ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o ${OBJECTDIR}/_ext/1360937237/ES_Timers.o ${OBJECTDIR}/_ext/1360937237/IO_Ports.o ${OBJECTDIR}/_ext/1360937237/LED.o ${OBJECTDIR}/_ext/1360937237/RC_Servo.o ${OBJECTDIR}/_ext/1360937237/pwm.o ${OBJECTDIR}/_ext/1360937237/roach.o ${OBJECTDIR}/_ext/1360937237/serial.o ${OBJECTDIR}/_ext/1360937237/timers.o ${OBJECTDIR}/TemplateES_Main.o ${OBJECTDIR}/TemplateFSM.o ${OBJECTDIR}/TemplateHSM.o ${OBJECTDIR}/TemplateService.o ${OBJECTDIR}/TemplateSubHSM.o ${OBJECTDIR}/_ext/677763416/peashooter.o ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o ${OBJECTDIR}/beacon.o ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o ${OBJECTDIR}/_ext/2146788981/ping.o
+OBJECTFILES=${OBJECTDIR}/_ext/1360937237/AD.o ${OBJECTDIR}/_ext/1360937237/BOARD.o ${OBJECTDIR}/_ext/1360937237/ES_CheckEvents.o ${OBJECTDIR}/_ext/1360937237/ES_Framework.o ${OBJECTDIR}/_ext/1360937237/ES_KeyboardInput.o ${OBJECTDIR}/_ext/1360937237/ES_PostList.o ${OBJECTDIR}/_ext/1360937237/ES_Queue.o ${OBJECTDIR}/_ext/1360937237/ES_TattleTale.o ${OBJECTDIR}/_ext/1360937237/ES_Timers.o ${OBJECTDIR}/_ext/1360937237/IO_Ports.o ${OBJECTDIR}/_ext/1360937237/LED.o ${OBJECTDIR}/_ext/1360937237/RC_Servo.o ${OBJECTDIR}/_ext/1360937237/pwm.o ${OBJECTDIR}/_ext/1360937237/roach.o ${OBJECTDIR}/_ext/1360937237/serial.o ${OBJECTDIR}/_ext/1360937237/timers.o ${OBJECTDIR}/TemplateES_Main.o ${OBJECTDIR}/TemplateService.o ${OBJECTDIR}/_ext/677763416/peashooter.o ${OBJECTDIR}/_ext/703160285/BeaconDetectorService.o ${OBJECTDIR}/_ext/703160285/BeaconEventChecker.o ${OBJECTDIR}/beacon.o ${OBJECTDIR}/_ext/677763416/SensorsEventChecker.o ${OBJECTDIR}/_ext/2146788981/ping.o ${OBJECTDIR}/TemplateHSM.o ${OBJECTDIR}/TemplateSubHSM.o ${OBJECTDIR}/AlignTapeSubHSM.o ${OBJECTDIR}/AvoidObstacleSubHSM.o ${OBJECTDIR}/FindBeaconSubHSM.o ${OBJECTDIR}/FollowEdgeSubHSM.o ${OBJECTDIR}/FollowTapeSubHSM.o ${OBJECTDIR}/LauncherSubHSM.o ${OBJECTDIR}/LocateCornerSubHSM.o
 
 # Source Files
-SOURCEFILES=../src/AD.c ../src/BOARD.c ../src/ES_CheckEvents.c ../src/ES_Framework.c ../src/ES_KeyboardInput.c ../src/ES_PostList.c ../src/ES_Queue.c ../src/ES_TattleTale.c ../src/ES_Timers.c ../src/IO_Ports.c ../src/LED.c ../src/RC_Servo.c ../src/pwm.c ../src/roach.c ../src/serial.c ../src/timers.c TemplateES_Main.c TemplateFSM.c TemplateHSM.c TemplateService.c TemplateSubHSM.c ../Movement.X/peashooter.c ../BeaconDetector.X/BeaconDetectorService.c ../BeaconDetector.X/BeaconEventChecker.c beacon.c ../Movement.X/SensorsEventChecker.c ../UltrasonicPing.X/ping.c
+SOURCEFILES=../src/AD.c ../src/BOARD.c ../src/ES_CheckEvents.c ../src/ES_Framework.c ../src/ES_KeyboardInput.c ../src/ES_PostList.c ../src/ES_Queue.c ../src/ES_TattleTale.c ../src/ES_Timers.c ../src/IO_Ports.c ../src/LED.c ../src/RC_Servo.c ../src/pwm.c ../src/roach.c ../src/serial.c ../src/timers.c TemplateES_Main.c TemplateService.c ../Movement.X/peashooter.c ../BeaconDetector.X/BeaconDetectorService.c ../BeaconDetector.X/BeaconEventChecker.c beacon.c ../Movement.X/SensorsEventChecker.c ../UltrasonicPing.X/ping.c TemplateHSM.c TemplateSubHSM.c AlignTapeSubHSM.c AvoidObstacleSubHSM.c FindBeaconSubHSM.c FollowEdgeSubHSM.c FollowTapeSubHSM.c LauncherSubHSM.c LocateCornerSubHSM.c
 
 
 
@@ -203,29 +203,11 @@ ${OBJECTDIR}/TemplateES_Main.o: TemplateES_Main.c  .generated_files/flags/defaul
 	@${RM} ${OBJECTDIR}/TemplateES_Main.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateES_Main.o.d" -o ${OBJECTDIR}/TemplateES_Main.o TemplateES_Main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/TemplateFSM.o: TemplateFSM.c  .generated_files/flags/default/7128a1c75ef65eb6a6cdd43a3a80c156c770be9c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateFSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateFSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateFSM.o.d" -o ${OBJECTDIR}/TemplateFSM.o TemplateFSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
-${OBJECTDIR}/TemplateHSM.o: TemplateHSM.c  .generated_files/flags/default/ba4b5d1579b1f2ac338fb92caaa2814d402af2a7 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateHSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateHSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateHSM.o.d" -o ${OBJECTDIR}/TemplateHSM.o TemplateHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
 ${OBJECTDIR}/TemplateService.o: TemplateService.c  .generated_files/flags/default/e18fec4974b8606d787af304185dfc9f57ce7642 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/TemplateService.o.d 
 	@${RM} ${OBJECTDIR}/TemplateService.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateService.o.d" -o ${OBJECTDIR}/TemplateService.o TemplateService.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
-${OBJECTDIR}/TemplateSubHSM.o: TemplateSubHSM.c  .generated_files/flags/default/edb4d502c88bfd7de3a4822575d954fb9851f771 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateSubHSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateSubHSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateSubHSM.o.d" -o ${OBJECTDIR}/TemplateSubHSM.o TemplateSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/_ext/677763416/peashooter.o: ../Movement.X/peashooter.c  .generated_files/flags/default/d248664d2998c7d9dd05e0843f7ab4d599e29633 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/677763416" 
@@ -262,6 +244,60 @@ ${OBJECTDIR}/_ext/2146788981/ping.o: ../UltrasonicPing.X/ping.c  .generated_file
 	@${RM} ${OBJECTDIR}/_ext/2146788981/ping.o.d 
 	@${RM} ${OBJECTDIR}/_ext/2146788981/ping.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/_ext/2146788981/ping.o.d" -o ${OBJECTDIR}/_ext/2146788981/ping.o ../UltrasonicPing.X/ping.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/TemplateHSM.o: TemplateHSM.c  .generated_files/flags/default/ba4b5d1579b1f2ac338fb92caaa2814d402af2a7 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/TemplateHSM.o.d 
+	@${RM} ${OBJECTDIR}/TemplateHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateHSM.o.d" -o ${OBJECTDIR}/TemplateHSM.o TemplateHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/TemplateSubHSM.o: TemplateSubHSM.c  .generated_files/flags/default/edb4d502c88bfd7de3a4822575d954fb9851f771 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/TemplateSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/TemplateSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateSubHSM.o.d" -o ${OBJECTDIR}/TemplateSubHSM.o TemplateSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/AlignTapeSubHSM.o: AlignTapeSubHSM.c  .generated_files/flags/default/64583ec1f284358e47ed60ff21d7b74cac3a3611 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/AlignTapeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/AlignTapeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/AlignTapeSubHSM.o.d" -o ${OBJECTDIR}/AlignTapeSubHSM.o AlignTapeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/AvoidObstacleSubHSM.o: AvoidObstacleSubHSM.c  .generated_files/flags/default/e47e3341b8b24404416e564bf43cabd33fc0eb12 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/AvoidObstacleSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/AvoidObstacleSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/AvoidObstacleSubHSM.o.d" -o ${OBJECTDIR}/AvoidObstacleSubHSM.o AvoidObstacleSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FindBeaconSubHSM.o: FindBeaconSubHSM.c  .generated_files/flags/default/26ff874734f1569d8987a510cbe0caa87d56fd6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FindBeaconSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FindBeaconSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FindBeaconSubHSM.o.d" -o ${OBJECTDIR}/FindBeaconSubHSM.o FindBeaconSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FollowEdgeSubHSM.o: FollowEdgeSubHSM.c  .generated_files/flags/default/c8b7784a18e7324e8c29f2863f14b95b5c25e68a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FollowEdgeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FollowEdgeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FollowEdgeSubHSM.o.d" -o ${OBJECTDIR}/FollowEdgeSubHSM.o FollowEdgeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FollowTapeSubHSM.o: FollowTapeSubHSM.c  .generated_files/flags/default/180330918cb96fdfd67d66407e79ff1cb45e5627 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FollowTapeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FollowTapeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FollowTapeSubHSM.o.d" -o ${OBJECTDIR}/FollowTapeSubHSM.o FollowTapeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/LauncherSubHSM.o: LauncherSubHSM.c  .generated_files/flags/default/8d293e3213d9aa51a64bfcac2ae25992d41b968b .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LauncherSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/LauncherSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/LauncherSubHSM.o.d" -o ${OBJECTDIR}/LauncherSubHSM.o LauncherSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/LocateCornerSubHSM.o: LocateCornerSubHSM.c  .generated_files/flags/default/3acf712d577056ee04b30eb2d8b6f8d71e3b7abe .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LocateCornerSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/LocateCornerSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/LocateCornerSubHSM.o.d" -o ${OBJECTDIR}/LocateCornerSubHSM.o LocateCornerSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 else
 ${OBJECTDIR}/_ext/1360937237/AD.o: ../src/AD.c  .generated_files/flags/default/90d9e6585c21a555c5fb6f9e33c965067c0622dc .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
@@ -366,29 +402,11 @@ ${OBJECTDIR}/TemplateES_Main.o: TemplateES_Main.c  .generated_files/flags/defaul
 	@${RM} ${OBJECTDIR}/TemplateES_Main.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateES_Main.o.d" -o ${OBJECTDIR}/TemplateES_Main.o TemplateES_Main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/TemplateFSM.o: TemplateFSM.c  .generated_files/flags/default/5ecab29a38e3da9f76ced133a1f9ec0216c15ee0 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateFSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateFSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateFSM.o.d" -o ${OBJECTDIR}/TemplateFSM.o TemplateFSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
-${OBJECTDIR}/TemplateHSM.o: TemplateHSM.c  .generated_files/flags/default/a31cd3aab8bc778eedcdecad2a2b0c39d99d7b9d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateHSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateHSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateHSM.o.d" -o ${OBJECTDIR}/TemplateHSM.o TemplateHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
 ${OBJECTDIR}/TemplateService.o: TemplateService.c  .generated_files/flags/default/95f45763c43c97e0a315107486ddef4a42889b07 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/TemplateService.o.d 
 	@${RM} ${OBJECTDIR}/TemplateService.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateService.o.d" -o ${OBJECTDIR}/TemplateService.o TemplateService.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
-	
-${OBJECTDIR}/TemplateSubHSM.o: TemplateSubHSM.c  .generated_files/flags/default/b4a6f3551d8b915507b4db0cc97d957ccc39237c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/TemplateSubHSM.o.d 
-	@${RM} ${OBJECTDIR}/TemplateSubHSM.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateSubHSM.o.d" -o ${OBJECTDIR}/TemplateSubHSM.o TemplateSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 ${OBJECTDIR}/_ext/677763416/peashooter.o: ../Movement.X/peashooter.c  .generated_files/flags/default/8a1add04692d4e2d5f31f695cf978f9758dc32ad .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/677763416" 
@@ -425,6 +443,60 @@ ${OBJECTDIR}/_ext/2146788981/ping.o: ../UltrasonicPing.X/ping.c  .generated_file
 	@${RM} ${OBJECTDIR}/_ext/2146788981/ping.o.d 
 	@${RM} ${OBJECTDIR}/_ext/2146788981/ping.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/_ext/2146788981/ping.o.d" -o ${OBJECTDIR}/_ext/2146788981/ping.o ../UltrasonicPing.X/ping.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/TemplateHSM.o: TemplateHSM.c  .generated_files/flags/default/a31cd3aab8bc778eedcdecad2a2b0c39d99d7b9d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/TemplateHSM.o.d 
+	@${RM} ${OBJECTDIR}/TemplateHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateHSM.o.d" -o ${OBJECTDIR}/TemplateHSM.o TemplateHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/TemplateSubHSM.o: TemplateSubHSM.c  .generated_files/flags/default/b4a6f3551d8b915507b4db0cc97d957ccc39237c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/TemplateSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/TemplateSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/TemplateSubHSM.o.d" -o ${OBJECTDIR}/TemplateSubHSM.o TemplateSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/AlignTapeSubHSM.o: AlignTapeSubHSM.c  .generated_files/flags/default/2d176ba31493ab2c23f6e5e8ea45d7d6e48d58e0 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/AlignTapeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/AlignTapeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/AlignTapeSubHSM.o.d" -o ${OBJECTDIR}/AlignTapeSubHSM.o AlignTapeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/AvoidObstacleSubHSM.o: AvoidObstacleSubHSM.c  .generated_files/flags/default/e14cb543c7d0a024927199895d39785f1901ac85 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/AvoidObstacleSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/AvoidObstacleSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/AvoidObstacleSubHSM.o.d" -o ${OBJECTDIR}/AvoidObstacleSubHSM.o AvoidObstacleSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FindBeaconSubHSM.o: FindBeaconSubHSM.c  .generated_files/flags/default/e759647afa3e21c9c315aadacd509d3c6f971bfb .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FindBeaconSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FindBeaconSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FindBeaconSubHSM.o.d" -o ${OBJECTDIR}/FindBeaconSubHSM.o FindBeaconSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FollowEdgeSubHSM.o: FollowEdgeSubHSM.c  .generated_files/flags/default/e037f5a7a71ee33820a965a1a4f4900f4bf23446 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FollowEdgeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FollowEdgeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FollowEdgeSubHSM.o.d" -o ${OBJECTDIR}/FollowEdgeSubHSM.o FollowEdgeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/FollowTapeSubHSM.o: FollowTapeSubHSM.c  .generated_files/flags/default/e5195c4609b738cc50336b240d673f5ad6ce1016 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/FollowTapeSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/FollowTapeSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/FollowTapeSubHSM.o.d" -o ${OBJECTDIR}/FollowTapeSubHSM.o FollowTapeSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/LauncherSubHSM.o: LauncherSubHSM.c  .generated_files/flags/default/84044f62b456c0614035f5ffe18d91432ea0e829 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LauncherSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/LauncherSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/LauncherSubHSM.o.d" -o ${OBJECTDIR}/LauncherSubHSM.o LauncherSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/LocateCornerSubHSM.o: LocateCornerSubHSM.c  .generated_files/flags/default/5c977ab7e67c925703609c5da90935e2b75011a6 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LocateCornerSubHSM.o.d 
+	@${RM} ${OBJECTDIR}/LocateCornerSubHSM.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../src" -I"../include" -I"C:/Users/asus/Documents/ece118/pea-shooter/NweHSM.X" -I"../BeaconDetector.X" -I"../Movement.X" -I"../UltrasonicPing.X" -MP -MMD -MF "${OBJECTDIR}/LocateCornerSubHSM.o.d" -o ${OBJECTDIR}/LocateCornerSubHSM.o LocateCornerSubHSM.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 endif
 
