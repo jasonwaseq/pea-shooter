@@ -16,7 +16,7 @@
  * Created on 23/Oct/2011
  * Updated on 16/Sep/2013
  */
-
+#ifdef OLD_PROJ
 #ifndef SUB_TEMPLATE_HSM_H  // <- This should be changed to your own guard on both
 #define SUB_TEMPLATE_HSM_H  //    of these lines
 
@@ -89,3 +89,4 @@ ES_Event RunLauncherSubHSM(ES_Event ThisEvent);
 ES_Event RunSTOPSTATESubHSM(ES_Event ThisEvent);
 #endif /* SUB_HSM_Template_H */
 
+#endif

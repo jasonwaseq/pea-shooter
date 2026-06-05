@@ -212,11 +212,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public function prototypes
-#define SERV_1_HEADER "TemplateHSM.h"
+#define SERV_1_HEADER "MainHSM.h"
 // the name of the Init function
-#define SERV_1_INIT InitTemplateHSM
+#define SERV_1_INIT InitMainHSM
 // the name of the run function
-#define SERV_1_RUN RunTemplateHSM
+#define SERV_1_RUN RunMainHSM
 // How big should this services Queue be?
 #define SERV_1_QUEUE_SIZE 16
 #endif

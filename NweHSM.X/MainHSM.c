@@ -1,11 +1,11 @@
 /*
- * File: TemplateHSM.c
+ * File: MainHSM.c
  */
 
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
-#include "TemplateHSM.h"
+#include "MainHSM.h"
 #include "LocateCornerSubHSM.h"
 #include "FollowEdgeSubHSM.h"
 #include "LauncherSubHSM.h"
@@ -19,7 +19,7 @@ typedef enum {
     FollowEdge,
     Launcher,
     STOP
-} TemplateHSMState_t;
+} MainHSMState_t;
 
 static const char *StateNames[] = {
     "Init",
@@ -29,10 +29,10 @@ static const char *StateNames[] = {
     "STOP"
 };
 
-static TemplateHSMState_t CurrentState = Init;
+static MainHSMState_t CurrentState = Init;
 static uint8_t MyPriority;
 
-uint8_t InitTemplateHSM(uint8_t Priority) {
+uint8_t InitMainHSM(uint8_t Priority) {
     MyPriority = Priority;
     CurrentState = Init;
 
@@ -45,18 +45,18 @@ uint8_t InitTemplateHSM(uint8_t Priority) {
     }
 }
 
-uint8_t PostTemplateHSM(ES_Event ThisEvent) {
+uint8_t PostMainHSM(ES_Event ThisEvent) {
     return ES_PostToService(MyPriority, ThisEvent);
 }
 
-ES_Event RunTemplateHSM(ES_Event ThisEvent) {
+ES_Event RunMainHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE;
-    TemplateHSMState_t nextState = CurrentState;
+    MainHSMState_t nextState = CurrentState;
 
     switch (CurrentState) {
         case Init:
             if (ThisEvent.EventType == ES_INIT) {
-                printf("RunTemplateHSM: Init: ES_INIT\r\n");
+                printf("RunMainHSM: Init: ES_INIT\r\n");
 
                 /* Change this back to LocateCorner when you want the full path. */
                 nextState = FollowEdge;
@@ -68,7 +68,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
         case LocateCorner:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    printf("RunTemplateHSM: LocateCorner: ES_ENTRY\r\n");
+                    printf("RunMainHSM: LocateCorner: ES_ENTRY\r\n");
                     InitLocateCornerSubHSM();
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -105,7 +105,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
         case FollowEdge:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    printf("RunTemplateHSM: FollowEdge: ES_ENTRY\r\n");
+                    printf("RunMainHSM: FollowEdge: ES_ENTRY\r\n");
                     InitFollowEdgeSubHSM();
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -115,7 +115,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
                     break;
 
                 default:
-                    printf("RunTemplateHSM: FollowEdge\r\n");
+                    printf("RunMainHSM: FollowEdge\r\n");
                     ThisEvent = RunFollowEdgeSubHSM(ThisEvent);
 
                     switch (ThisEvent.EventType) {
@@ -143,7 +143,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
         case Launcher:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    printf("RunTemplateHSM: Launcher: ES_ENTRY\r\n");
+                    printf("RunMainHSM: Launcher: ES_ENTRY\r\n");
                     InitLauncherSubHSM();
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -153,7 +153,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
                     break;
 
                 default:
-                    printf("RunTemplateHSM: Launcher\r\n");
+                    printf("RunMainHSM: Launcher\r\n");
                     ThisEvent = RunLauncherSubHSM(ThisEvent);
                     break;
             }
@@ -162,7 +162,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
         case STOP:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    printf("RunTemplateHSM: STOP: ES_ENTRY\r\n");
+                    printf("RunMainHSM: STOP: ES_ENTRY\r\n");
                     PS_Stop();
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -178,11 +178,11 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
     }
 
     if (makeTransition == TRUE) {
-        printf("RunTemplateHSM: transition %s -> %s\r\n",
+        printf("RunMainHSM: transition %s -> %s\r\n",
                StateNames[CurrentState], StateNames[nextState]);
-        RunTemplateHSM(EXIT_EVENT);
+        RunMainHSM(EXIT_EVENT);
         CurrentState = nextState;
-        RunTemplateHSM(ENTRY_EVENT);
+        RunMainHSM(ENTRY_EVENT);
     }
 
     return ThisEvent;

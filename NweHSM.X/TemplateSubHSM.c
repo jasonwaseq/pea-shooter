@@ -22,6 +22,7 @@
  * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
  */
 
+#ifdef OLD_PROJ
 
 /*******************************************************************************
  * MODULE #INCLUDE                                                             *
@@ -30,7 +31,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
-#include "TemplateHSM.h"
+#include "MainHSM.h"
 #include "TemplateSubHSM.h"
 #include "peashooter.h"
 #include "beacon.h"
@@ -1213,3 +1214,6 @@ static uint16_t FilterBeaconSample(uint16_t sample) {
 
     return (uint16_t) (BeaconSampleSum / BeaconSampleCount);
 }
+
+
+#endif

@@ -10,7 +10,7 @@
 #include "ES_Timers.h"
 #include "SensorsEventChecker.h"
 #include <stdio.h>
-#include "TemplateHSM.h"
+#include "MainHSM.h"
 #include "AvoidObstacleSubHSM.h"
 
 /*******************************************************************************

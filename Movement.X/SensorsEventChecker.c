@@ -10,7 +10,7 @@
 #include "AD.h"
 #include "BeaconEventChecker.h"
 #include "peashooter.h"
-#include "TemplateHSM.h"
+#include "MainHSM.h"
 #include "ping.c"
 #include "pwm.h"
 #include <stdio.h>
@@ -56,7 +56,7 @@ uint8_t TemplateCheckBattery(void) {
         lastEvent = curEvent;
 
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-        PostTemplateHSM(thisEvent);
+        PostMainHSM(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif
@@ -123,7 +123,7 @@ uint8_t TemplateCheckSwitch(void) {
             lastEvent = curEvent;
 
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-            PostTemplateHSM(thisEvent);
+            PostMainHSM(thisEvent);
 #else
             SaveEvent(thisEvent);
 #endif
@@ -269,7 +269,7 @@ uint8_t TemplateCheckTape(void) {
 
         if (returnVal == TRUE) {
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-            PostTemplateHSM(thisEvent);
+            PostMainHSM(thisEvent);
 #else
             SaveEvent(thisEvent);
 #endif
@@ -304,7 +304,7 @@ uint8_t TemplateCheckBeacon(void) {
     thisEvent.EventParam = beaconReading;
 
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-    PostTemplateHSM(thisEvent);
+    PostMainHSM(thisEvent);
 #else
     SaveEvent(thisEvent);
 #endif
@@ -373,7 +373,7 @@ uint8_t TemplateCheckPing(void) {
                 ping_close,
                 ping_far);
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-        PostTemplateHSM(thisEvent);
+        PostMainHSM(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif
