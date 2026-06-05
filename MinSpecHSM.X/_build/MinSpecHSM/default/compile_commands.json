@@ -1,0 +1,50 @@
+[
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o"
+},
+{
+  "directory": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default",
+  "command": "/Applications/microchip/xc32/v4.35/bin/xc32-gcc -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -I\"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..\" -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259 -o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o -c \"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c\"",
+  "file": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c",
+  "output": "/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o"
+}
+]

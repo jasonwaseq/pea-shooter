@@ -1,0 +1,5 @@
+/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_image_mUN63ejm.dir
+/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/MinSpecHSM_default_Bin2Hex.dir
+/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/edit_cache.dir
+/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/_build/MinSpecHSM/default/CMakeFiles/rebuild_cache.dir
