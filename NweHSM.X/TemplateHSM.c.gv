@@ -1,0 +1,86 @@
+
+digraph fsm {
+
+    // header
+    // rankdir=LR;
+Init[shape = "point", color = "black",style="filled",width=.1,forcelabels=false];
+
+    // states
+    node [shape=plaintext]
+
+    LocateCorner [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">LocateCorner</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    printf("RunTemplateHSM: LocateCorner: ES_ENTRY\r\n");</TD></TR>
+        <TR><TD ALIGN="LEFT">                    InitLocateCornerSubHSM();</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ThisEvent.EventType = ES_NO_EVENT;</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    PS_Stop();</TD></TR>
+</TABLE>>];
+
+
+    FollowEdge [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">FollowEdge</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    printf("RunTemplateHSM: FollowEdge: ES_ENTRY\r\n");</TD></TR>
+        <TR><TD ALIGN="LEFT">                    InitFollowEdgeSubHSM();</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ThisEvent.EventType = ES_NO_EVENT;</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+<TR><TD ALIGN="LEFT">                    PS_Stop();</TD></TR>
+</TABLE>>];
+
+
+    Launcher [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">Launcher</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR><TD ALIGN="LEFT">                    printf("RunTemplateHSM: Launcher: ES_ENTRY\r\n");</TD></TR>
+        <TR><TD ALIGN="LEFT">                    InitLauncherSubHSM();</TD></TR>
+        <TR><TD ALIGN="LEFT">                    ThisEvent.EventType = ES_NO_EVENT;</TD></TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    // guards
+
+    // transitions
+Init -> FollowEdge[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunTemplateHSM: Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+LocateCorner -> FollowEdge[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ALL_TAPE_DETECTED</TD></TR>
+        </TABLE>>];
+
+LocateCorner -> FollowEdge[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(TAPE_ARRAY_CHANGED)(ALL_TAPES)</TD></TR>
+        </TABLE>>];
+
+FollowEdge -> Launcher[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ALL_TAPE_DETECTED</TD></TR>
+        </TABLE>>];
+
+FollowEdge -> STOP[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(TAPE_ARRAY_CHANGED)(ALL_TAPES)</TD></TR>
+        </TABLE>>];
+
+
+}

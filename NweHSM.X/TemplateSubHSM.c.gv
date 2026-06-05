@@ -1,0 +1,176 @@
+
+digraph fsm {
+
+    // header
+    // rankdir=LR;
+InitPSubState[shape = "point", color = "black",style="filled",width=.1,forcelabels=false];
+
+    // states
+    node [shape=plaintext]
+
+    SubFirstState [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" style="rounded">
+        <TR>
+            <TD BORDER="1" SIDES="B">SubFirstState</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Entry: </B></TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><B>/Exit: </B></TD>
+        </TR>
+</TABLE>>];
+
+
+    // guards
+
+    // transitions
+ -> LocateCorner_FindBeacon[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunLocateCornerSubHSM: LocateCornerSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> LocateCorner_AlignTape[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">BEACON_LOCKED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunLocateCornerSubHSM: LocateCorner_FindBeacon: BEACON_LOCKED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> LocateCorner_TurnRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ALL_TAPE_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunLocateCornerSubHSM: LocateCorner_AlignTape: ALL_TAPE_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> LocateCorner_FollowTape[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(LOCATECORNER_TURNRIGHT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> FollowEdge_FollowTape[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunFollowEdgeSubHSM: FollowEdgeSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> FollowEdge_FollowTape[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(FOLLOWEDGE_TURNRIGHT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> FollowEdge_AvoidObstacle[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">BUMPER_TRIPPED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunFollowEdgeSubHSM: FollowEdge_FollowTape: BUMPER_TRIPPED\r\n");</TD></TR>
+            <TR><TD ALIGN="LEFT">                    PS_Stop();</TD></TR>
+            <TR><TD ALIGN="LEFT">                    while(1){}</TD></TR>
+        </TABLE>>];
+
+ -> FollowEdge_TurnRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ALL_TAPE_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunFollowEdgeSubHSM: FollowEdge_AvoidObstacle: ALL_TAPE_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> Launcher_FindBeacon[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunLauncherSubHSM: LauncherSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> Launcher_Launch[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">BEACON_LOCKED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunLocateCornerSubHSM: LocateCorner_FindBeacon: BEACON_LOCKED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AlignTape_Forward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunAlignTapeSubHSM: AlignTapeSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AlignTape_PivotRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunAlignTapeSubHSM: AlignTape_Forward: LEFT_TAPE_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AlignTape_PivotLeft[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunAlignTapeSubHSM: AlignTape_Forward: RIGHT_TAPE_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AlignTape_PivotRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">RIGHT_TAPE_NOT_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunAlignTapeSubHSM: AlignTape_PivotLeft: RIGHT_TAPE_NOT_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AlignTape_PivotLeft[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">LEFT_TAPE_NOT_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunAlignTapeSubHSM: AlignTape_PivotRight: LEFT_TAPE_NOT_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> FollowTape_Forward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunFollowTapeSubHSM: FollowTapeSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> FollowTape_CorrectLeft[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">NO_TAPES_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunFollowTapeSubHSM: FollowTape_Forward: NO_TAPES_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> FollowTape_CorrectRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">MIDDLE_TAPE_DETECTED</TD></TR>
+            <TR><TD ALIGN="LEFT">                    printf("RunFollowTapeSubHSM: FollowTape_Forward: MIDDLE_TAPE_DETECTED\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> FollowTape_Forward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(CORRECT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> FollowTape_Forward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(CORRECT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_Backward[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunAvoidObstacleSubHSM: AvoidObstacleSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_TurnRight[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(AVOIDOBSTACLE_BACKWARD_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_PassFront[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(AVOIDOBSTACLE_TURNRIGHT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+            <TR><TD ALIGN="LEFT">                        TemplateResetPingReference();</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_TurnRight2[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(PING_CLEARANCE)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_PassSide[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(AVOIDOBSTACLE_TURNRIGHT_TIMER)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+            <TR><TD ALIGN="LEFT">                        while (1) {</TD></TR>
+            <TR><TD ALIGN="LEFT">                        };</TD></TR>
+        </TABLE>>];
+
+ -> AvoidObstacle_TurnLeft[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">(ES_TIMEOUT)(OBSTACLE_SIDE_CLEARANCE)</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+            <TR><TD ALIGN="LEFT">                        PS_Stop();</TD></TR>
+            <TR><TD ALIGN="LEFT">                        while (1) {</TD></TR>
+            <TR><TD ALIGN="LEFT">                        };</TD></TR>
+        </TABLE>>];
+
+ -> SweepDataState[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunFindBeaconSubHSM: FindBeaconSubHSM_Init: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+InitPSubState -> SubFirstState[label=<<TABLE BORDER="0" CELLBORDER="0">
+        <TR><TD BORDER="1" SIDES="B">ES_INIT</TD></TR>
+            <TR><TD ALIGN="LEFT">                printf("RunTemplateSubHSM: InitPSubState: ES_INIT\r\n");</TD></TR>
+        </TABLE>>];
+
+
+}
