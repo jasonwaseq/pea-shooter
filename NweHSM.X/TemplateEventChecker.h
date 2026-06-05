@@ -1,5 +1,5 @@
 /* 
- * File:   SensorsEventChecker.h
+ * File:   TemplateEventChecker.h
  * Author: Gabriel Hugh Elkaim
  *
  * Template file to set up typical EventCheckers for the  Events and Services
@@ -19,8 +19,8 @@
  * Modified on September 12, 2016, 7:59 PM
  */
 
-#ifndef SENSORSEVENTCHECKER_H
-#define	SENSORSEVENTCHECKER_H
+#ifndef TEMPLATEEVENTCHECKER_H
+#define	TEMPLATEEVENTCHECKER_H
 
 /*******************************************************************************
  * PUBLIC #INCLUDES                                                            *
@@ -32,18 +32,7 @@
 /*******************************************************************************
  * PUBLIC #DEFINES                                                             *
  ******************************************************************************/
-#define NO_TAPE            0
-#define LEFT_TAPE_ONLY     1
-#define MIDDLE_TAPE_ONLY   2
-#define LEFT_AND_MIDDLE    3
-#define RIGHT_TAPE_ONLY    4
-#define LEFT_AND_RIGHT     5
-#define MIDDLE_AND_RIGHT   6
-#define ALL_TAPES          7
 
-#define LEFT_TAPE_MASK     0x01
-#define MID_TAPE_MASK      0x02
-#define RIGHT_TAPE_MASK    0x04
 
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *
@@ -69,10 +58,8 @@
  * @author Gabriel H Elkaim, 2013.09.27 09:18
  * @modified Gabriel H Elkaim/Max Dunne, 2016.09.12 20:08 */
 uint8_t TemplateCheckBattery(void);
-uint8_t TemplateCheckSwitch(void);
-uint8_t TemplateCheckTape(void);
-uint8_t TemplateCheckPing(void);
 
 
-#endif	/* SENSORSEVENTCHECKER_H */
+
+#endif	/* TEMPLATEEVENTCHECKER_H */
 

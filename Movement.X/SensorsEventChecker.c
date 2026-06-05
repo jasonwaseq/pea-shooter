@@ -1,30 +1,7 @@
 /*
  * File:   SensorsEventChecker.c
  * Author: Gabriel Hugh Elkaim
- *
- * Template file to set up typical EventCheckers for the  Events and Services
- * Framework (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that
- * this file will need to be modified to fit your exact needs, and most of the
- * names will have to be changed to match your code.
- *
- * This EventCheckers file will work with both FSM's and HSM's.
- *
- * Remember that EventCheckers should only return TRUE when an event has occured,
- * and that the event is a TRANSITION between two detectable differences. They
- * should also be atomic and run as fast as possible for good results.
- *
- * This file includes a test harness that will run the event detectors listed in the
- * ES_Configure file in the project, and will conditionally compile main if the macro
- * EVENTCHECKER_TEST is defined (either in the project or in the file). This will allow
- * you to check you event detectors in their own project, and then leave them untouched
- * for your project unless you need to alter their post functions.
- *
- * Created on September 27, 2013, 8:37 AM
  */
-
-/*******************************************************************************
- * MODULE #INCLUDE                                                             *
- ******************************************************************************/
 
 #include "ES_Configure.h"
 #include "SensorsEventChecker.h"
@@ -32,22 +9,15 @@
 #include "serial.h"
 #include "AD.h"
 #include "peashooter.h"
-#include "HSMService.h"
+#include "TemplateHSM.h"
+#include "ping.c"
 #include "pwm.h"
+#include <stdio.h>
 
-/*******************************************************************************
- * MODULE #DEFINES                                                             *
- ******************************************************************************/
 #define BATTERY_DISCONNECT_THRESHOLD 175
 #define SENSOR_STATE_UNKNOWN 0xFF
-
-/* peashooter.h uses SWITCH_TRIPPED / SWITCH_NOT_TRIPPED as raw switch states.
- * ES_Configure.h also uses those names as event types, so keep the raw values
- * under local names and then restore access to the event enum identifiers. */
-
-/*******************************************************************************
- * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
- ******************************************************************************/
+#define TAPE_DEBOUNCE_COUNT 20
+#define PING_SAMPLE_INTERVAL_US 50000u
 
 //#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
@@ -58,47 +28,15 @@ static const char *eventName;
 static ES_Event storedEvent;
 #endif
 
-/*******************************************************************************
- * PRIVATE FUNCTION PROTOTYPES                                                 *
- ******************************************************************************/
-/* Prototypes for private functions for this EventChecker. They should be functions
-   relevant to the behavior of this particular event checker */
-
-/*******************************************************************************
- * PRIVATE MODULE VARIABLES                                                    *
- ******************************************************************************/
-
-/* Any private module level variable that you might need for keeping track of
-   events would be placed here. Private variables should be STATIC so that they
-   are limited in scope to this module. */
-
-/*******************************************************************************
- * PUBLIC FUNCTIONS                                                            *
- ******************************************************************************/
-
-/**
- * @Function TemplateCheckBattery(void)
- * @param none
- * @return TRUE or FALSE
- * @brief This function is a prototype event checker that checks the battery voltage
- *        against a fixed threshold (#defined in the .c file). Note that you need to
- *        keep track of previous history, and that the actual battery voltage is checked
- *        only once at the beginning of the function. The function will post an event
- *        of either BATTERY_CONNECTED or BATTERY_DISCONNECTED if the power switch is turned
- *        on or off with the USB cord plugged into the Uno32. Returns TRUE if there was an 
- *        event, FALSE otherwise.
- * @note Use this code as a template for your other event checkers, and modify as necessary.
- * @author Gabriel H Elkaim, 2013.09.27 09:18
- * @modified Gabriel H Elkaim/Max Dunne, 2016.09.12 20:08 */
 uint8_t TemplateCheckBattery(void) {
     static ES_EventTyp_t lastEvent = BATTERY_DISCONNECTED;
     static uint8_t initialized = FALSE;
     ES_EventTyp_t curEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
-    uint16_t batVoltage = AD_ReadADPin(BAT_VOLTAGE); // read the battery voltage
+    uint16_t batVoltage = AD_ReadADPin(BAT_VOLTAGE);
 
-    if (batVoltage > BATTERY_DISCONNECT_THRESHOLD) { // is battery connected?
+    if (batVoltage > BATTERY_DISCONNECT_THRESHOLD) {
         curEvent = BATTERY_CONNECTED;
     } else {
         curEvent = BATTERY_DISCONNECTED;
@@ -110,18 +48,20 @@ uint8_t TemplateCheckBattery(void) {
         return returnVal;
     }
 
-    if (curEvent != lastEvent) { // check for change from last time
+    if (curEvent != lastEvent) {
         thisEvent.EventType = curEvent;
         thisEvent.EventParam = batVoltage;
         returnVal = TRUE;
-        lastEvent = curEvent; // update history
+        lastEvent = curEvent;
+
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-    PostHSMService(thisEvent);
+        PostTemplateHSM(thisEvent);
 #else
-   SaveEvent(thisEvent);
-#endif  
+        SaveEvent(thisEvent);
+#endif
     }
-    return (returnVal);
+
+    return returnVal;
 }
 
 uint8_t TemplateCheckSwitch(void) {
@@ -130,6 +70,7 @@ uint8_t TemplateCheckSwitch(void) {
     static unsigned char lastSample = SWITCH_NOT_TRIPPED;
     static unsigned char sameSampleCount = 0;
     static uint8_t initialized = FALSE;
+
     ES_EventTyp_t curEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
@@ -143,8 +84,13 @@ uint8_t TemplateCheckSwitch(void) {
         debouncedState = switchState;
         lastSample = switchState;
         sameSampleCount = 0;
-        lastEvent = (switchState == SWITCH_TRIPPED)
-                ? BUMPER_TRIPPED : BUMPER_NOT_TRIPPED;
+
+        if (switchState == SWITCH_TRIPPED) {
+            lastEvent = BUMPER_TRIPPED;
+        } else {
+            lastEvent = BUMPER_NOT_TRIPPED;
+        }
+
         initialized = TRUE;
         return returnVal;
     }
@@ -169,19 +115,21 @@ uint8_t TemplateCheckSwitch(void) {
             curEvent = BUMPER_NOT_TRIPPED;
         }
 
-        if (curEvent != lastEvent) { // check for change from last time
+        if (curEvent != lastEvent) {
             thisEvent.EventType = curEvent;
             thisEvent.EventParam = debouncedState;
             returnVal = TRUE;
-            lastEvent = curEvent; // update history
+            lastEvent = curEvent;
+
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-    PostHSMService(thisEvent);
+            PostTemplateHSM(thisEvent);
 #else
-   SaveEvent(thisEvent);
+            SaveEvent(thisEvent);
 #endif
         }
     }
-    return (returnVal);
+
+    return returnVal;
 }
 
 uint8_t TemplateCheckTape(void) {
@@ -198,15 +146,15 @@ uint8_t TemplateCheckTape(void) {
     static unsigned char rightCount = 0;
 
     static uint8_t initialized = FALSE;
+    static uint8_t lastTapeState = 0;
 
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
+    uint8_t tapeState;
 
     unsigned char leftTape = PS_ReadLeftTape();
     unsigned char middleTape = PS_ReadMidTape();
     unsigned char rightTape = PS_ReadRightTape();
-
-#define TAPE_DEBOUNCE_COUNT 20
 
     if (initialized == FALSE) {
         debouncedLeft = leftTape;
@@ -220,6 +168,11 @@ uint8_t TemplateCheckTape(void) {
         leftCount = 0;
         middleCount = 0;
         rightCount = 0;
+
+        lastTapeState =
+                ((debouncedLeft == TAPE_DETECTED) << 0) |
+                ((debouncedMiddle == TAPE_DETECTED) << 1) |
+                ((debouncedRight == TAPE_DETECTED) << 2);
 
         initialized = TRUE;
         return FALSE;
@@ -254,27 +207,139 @@ uint8_t TemplateCheckTape(void) {
 
     if ((leftCount >= TAPE_DEBOUNCE_COUNT) && (leftTape != debouncedLeft)) {
         debouncedLeft = leftTape;
-        thisEvent.EventType = (debouncedLeft == TAPE_DETECTED)
-                ? LEFT_TAPE_DETECTED : LEFT_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedLeft;
-        returnVal = TRUE;
-    } else if ((middleCount >= TAPE_DEBOUNCE_COUNT) && (middleTape != debouncedMiddle)) {
+    }
+
+    if ((middleCount >= TAPE_DEBOUNCE_COUNT) && (middleTape != debouncedMiddle)) {
         debouncedMiddle = middleTape;
-        thisEvent.EventType = (debouncedMiddle == TAPE_DETECTED)
-                ? MIDDLE_TAPE_DETECTED : MIDDLE_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedMiddle;
-        returnVal = TRUE;
-    } else if ((rightCount >= TAPE_DEBOUNCE_COUNT) && (rightTape != debouncedRight)) {
+    }
+
+    if ((rightCount >= TAPE_DEBOUNCE_COUNT) && (rightTape != debouncedRight)) {
         debouncedRight = rightTape;
-        thisEvent.EventType = (debouncedRight == TAPE_DETECTED)
-                ? RIGHT_TAPE_DETECTED : RIGHT_TAPE_NOT_DETECTED;
-        thisEvent.EventParam = debouncedRight;
+    }
+
+    tapeState =
+            ((debouncedLeft == TAPE_DETECTED) << 0) |
+            ((debouncedMiddle == TAPE_DETECTED) << 1) |
+            ((debouncedRight == TAPE_DETECTED) << 2);
+
+    if (tapeState != lastTapeState) {
+
+        if (tapeState == NO_TAPE) {
+            thisEvent.EventType = NO_TAPES_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (tapeState == ALL_TAPES) {
+            thisEvent.EventType = ALL_TAPE_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & LEFT_TAPE_MASK) == 0) &&
+                ((tapeState & LEFT_TAPE_MASK) != 0)) {
+            thisEvent.EventType = LEFT_TAPE_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & LEFT_TAPE_MASK) != 0) &&
+                ((tapeState & LEFT_TAPE_MASK) == 0)) {
+            thisEvent.EventType = LEFT_TAPE_NOT_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & MID_TAPE_MASK) == 0) &&
+                ((tapeState & MID_TAPE_MASK) != 0)) {
+            thisEvent.EventType = MIDDLE_TAPE_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & MID_TAPE_MASK) != 0) &&
+                ((tapeState & MID_TAPE_MASK) == 0)) {
+            thisEvent.EventType = MIDDLE_TAPE_NOT_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & RIGHT_TAPE_MASK) == 0) &&
+                ((tapeState & RIGHT_TAPE_MASK) != 0)) {
+            thisEvent.EventType = RIGHT_TAPE_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        } else if (((lastTapeState & RIGHT_TAPE_MASK) != 0) &&
+                ((tapeState & RIGHT_TAPE_MASK) == 0)) {
+            thisEvent.EventType = RIGHT_TAPE_NOT_DETECTED;
+            thisEvent.EventParam = tapeState;
+            returnVal = TRUE;
+        }
+
+        lastTapeState = tapeState;
+
+        if (returnVal == TRUE) {
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+            PostTemplateHSM(thisEvent);
+#else
+            SaveEvent(thisEvent);
+#endif
+        }
+    }
+
+    return returnVal;
+}
+
+uint8_t TemplateCheckPing(void) {
+    static uint8_t ping_close = FALSE;
+    static uint8_t ping_far = FALSE;
+    static uint8_t pingInitialized = FALSE;
+    static uint8_t sampleTimerInitialized = FALSE;
+    static uint32_t lastSampleTicks;
+
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    uint8_t current_ping_close;
+    uint8_t current_ping_far;
+    uint32_t currentTicks;
+    uint32_t sampleIntervalTicks;
+
+    if (pingInitialized == FALSE) {
+        HCSR04_Init();
+        TryZeroReference();
+        pingInitialized = TRUE;
+    }
+
+    currentTicks = CoreTimerNow();
+    sampleIntervalTicks = PING_SAMPLE_INTERVAL_US * CoreTimerTicksPerUs();
+
+    if ((sampleTimerInitialized == TRUE)
+            && ((uint32_t) (currentTicks - lastSampleTicks) < sampleIntervalTicks)) {
+        return FALSE;
+    }
+    lastSampleTicks = currentTicks;
+    sampleTimerInitialized = TRUE;
+
+    if (HCSR04_TakeReading() == FALSE) {
+        return FALSE;
+    }
+
+    current_ping_close = HCSR04_LastReadingIsReallyClose();
+    current_ping_far = HCSR04_LastReadingIsReallyFar();
+
+    if ((current_ping_close == ping_close) && (current_ping_far == ping_far)) {
+        return FALSE;
+    }
+
+    ping_close = current_ping_close;
+    ping_far = current_ping_far;
+
+    if (ping_close == TRUE) {
+        thisEvent.EventType = PING_CLOSE;
+        thisEvent.EventParam = LastReadingMm;
+        returnVal = TRUE;
+    } else if (ping_far == TRUE) {
+        thisEvent.EventType = PING_FAR;
+        thisEvent.EventParam = LastReadingMm;
         returnVal = TRUE;
     }
 
     if (returnVal == TRUE) {
+        printf("TemplateCheckPing: posting %s reading_mm=%lu close=%u far=%u\r\n",
+                EventNames[thisEvent.EventType],
+                (unsigned long) LastReadingMm,
+                ping_close,
+                ping_far);
 #if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
-        PostHSMService(thisEvent);
+        PostTemplateHSM(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif
@@ -283,27 +348,20 @@ uint8_t TemplateCheckTape(void) {
     return returnVal;
 }
 
-/* 
- * The Test Harness for the event checkers is conditionally compiled using
- * the EVENTCHECKER_TEST macro (defined either in the file or at the project level).
- * No other main() can exist within the project.
- * 
- * It requires a valid ES_Configure.h file in the project with the correct events in 
- * the enum, and the correct list of event checkers in the EVENT_CHECK_LIST.
- * 
- * The test harness will run each of your event detectors identically to the way the
- * ES_Framework will call them, and if an event is detected it will print out the function
- * name, event, and event parameter. Use this to test your event checking code and
- * ensure that it is fully functional.
- * 
- * If you are locking up the output, most likely you are generating too many events.
- * Remember that events are detectable changes, not a state in itself.
- * 
- * Once you have fully tested your event checking code, you can leave it in its own
- * project and point to it from your other projects. If the EVENTCHECKER_TEST marco is
- * defined in the project, no changes are necessary for your event checkers to work
- * with your other projects.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 static uint8_t(*EventList[])(void) = {EVENT_CHECK_LIST};
@@ -319,10 +377,10 @@ void main(void) {
 
     printf("\r\nPeashooter event checking test harness for %s", __FILE__);
     printf("\r\nTesting switch and tape events...\r\n");
-    
+
     while (1) {
         if (IsTransmitEmpty()) {
-            for (i = 0; i < sizeof(EventList) / sizeof(EventList[0]); i++) {
+            for (i = 0; i < sizeof (EventList) / sizeof (EventList[0]); i++) {
                 if (EventList[i]() == TRUE) {
                     PrintEvent();
                     break;
@@ -333,8 +391,11 @@ void main(void) {
 }
 
 void PrintEvent(void) {
-    printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X\r\n", eventName,
-            EventNames[storedEvent.EventType], storedEvent.EventParam);
+    printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X\r\n",
+            eventName,
+            EventNames[storedEvent.EventType],
+            storedEvent.EventParam);
+
     while (!IsTransmitEmpty()) {
         ;
     }
@@ -346,8 +407,7 @@ void PrintEvent(void) {
 #include <stdio.h>
 #define MOVING_TEST_ONE_SECOND 1000000
 
-void main(void)
-{
+void main(void) {
     unsigned int delay;
 
     BOARD_Init();
@@ -357,11 +417,7 @@ void main(void)
     printf("Testing Moving Functions\n");
 
     while (1) {
-        PS_TurnRight90();
-        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
-
-        PS_TurnLeft90();
-        DELAY_COUNTS(MOVING_TEST_ONE_SECOND);
+        PS_AngledLeft(700);
     }
 }
 

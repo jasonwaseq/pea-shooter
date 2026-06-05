@@ -75,13 +75,13 @@ static unsigned int TMR_TimerArray[NUM_TIMERS];
 static unsigned int TMR_ActiveFlags;
 static uint32_t FreeRunningTimer; /* this is used by the default RTI routine */
 
-static pPostFunc const Timer2PostFunc[NUM_TIMERS] = {TIMER0_RESP_FUNC,
-    TIMER1_RESP_FUNC,
-    TIMER2_RESP_FUNC,
-    TIMER3_RESP_FUNC,
-    TIMER4_RESP_FUNC,
-    TIMER5_RESP_FUNC,
-    TIMER6_RESP_FUNC,
+static pPostFunc const Timer2PostFunc[NUM_TIMERS] = {PostTemplateHSM,
+    PostTemplateHSM,
+    PostTemplateHSM,
+    PostTemplateHSM,
+    PostTemplateHSM,
+    PostTemplateHSM,
+    PostTemplateHSM,
     TIMER7_RESP_FUNC,
     TIMER8_RESP_FUNC,
     TIMER9_RESP_FUNC,

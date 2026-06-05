@@ -5,6 +5,12 @@
 #include <serial.h>
 #include <AD.h>
 #include <IO_Ports.h>
+#include <stdbool.h>
+#include "ping.c"
+
+
+#define TOP_SHOOTER_PWM PWM_PORTY04
+#define BOT_SHOOTER_PWM PWM_PORTX11
 
 // PWM channels used to control speed for each motor.
 #define LEFT_PWM PWM_PORTY10
@@ -35,10 +41,20 @@
 // Battery readings used to scale motor PWM duty cycle as the battery voltage changes.
 #define PS_NOMINAL_BATTERY_VOLTAGE 310
 #define PS_MIN_BATTERY_COMP_VOLTAGE 263
+#define PS_SHOOTER_START_DUTY 800
+#define PS_SHOOTER_IDLE_DUTY 100
+#define PS_SHOOTER_STARTUP_DELAY_COUNTS 1000000
 
 // Wheel offsets
 #define LEFT_MTR_OFFSET 1
 #define RIGHT_MTR_OFFSET 1.11 //105% aka 5% higher
+
+
+#define LEFT_TAPE_BIT   0b100
+#define MID_TAPE_BIT    0b010
+#define RIGHT_TAPE_BIT  0b001
+
+
 
 // Adjusts a requested PWM duty cycle upward as battery voltage drops.
 
@@ -65,56 +81,55 @@ static unsigned int PS_CompensateDutyForBattery(unsigned int dutyCycle) {
     return (unsigned int) compensatedDuty;
 }
 
-static char PS_SetLeftMotor(unsigned int speed, unsigned char reverse) {
+char PS_LeftMtrSpeed(int power) {
     unsigned int dutyCycle;
-    speed *= LEFT_MTR_OFFSET;
-
-    if (speed > PEASHOOTER_MAX_SPEED) {
+    power *= LEFT_MTR_OFFSET;
+    if (power > MAX_PWM || power < -MAX_PWM) {
         return ERROR;
     }
 
-    if (speed == 0) {
+    if (power == 0) {
         LEFT_IN1 = 0;
         LEFT_IN2 = 0;
         return PWM_SetDutyCycle(LEFT_PWM, 0);
     }
 
-    if (reverse) {
-        LEFT_IN1 = 1;
-        LEFT_IN2 = 0;
-    } else {
+    if (power > 0) {
         LEFT_IN1 = 0;
         LEFT_IN2 = 1;
+    } else {
+        LEFT_IN1 = 1;
+        LEFT_IN2 = 0;
+        power = -power;
     }
 
-    dutyCycle = speed * (MAX_PWM / PEASHOOTER_MAX_SPEED);
+    dutyCycle = power * (MAX_PWM / PEASHOOTER_MAX_SPEED);
     dutyCycle = PS_CompensateDutyForBattery(dutyCycle);
     return PWM_SetDutyCycle(LEFT_PWM, dutyCycle);
 }
 
-static char PS_SetRightMotor(unsigned int speed, unsigned char reverse) {
-    speed *= RIGHT_MTR_OFFSET;
+char PS_RightMtrSpeed(int power) {
     unsigned int dutyCycle;
-
-    if (speed > PEASHOOTER_MAX_SPEED) {
+    if (power > MAX_PWM || power < -MAX_PWM) {
         return ERROR;
     }
 
-    if (speed == 0) {
+    if (power == 0) {
         RIGHT_IN1 = 0;
         RIGHT_IN2 = 0;
         return PWM_SetDutyCycle(RIGHT_PWM, 0);
     }
 
-    if (reverse) {
-        RIGHT_IN1 = 1;
-        RIGHT_IN2 = 0;
-    } else {
+    if (power > 0) {
         RIGHT_IN1 = 0;
         RIGHT_IN2 = 1;
+    } else {
+        RIGHT_IN1 = 1;
+        RIGHT_IN2 = 0;
+        power = -power;
     }
 
-    dutyCycle = speed * (MAX_PWM / PEASHOOTER_MAX_SPEED);
+    dutyCycle = power * (MAX_PWM / PEASHOOTER_MAX_SPEED);
     dutyCycle = PS_CompensateDutyForBattery(dutyCycle);
     return PWM_SetDutyCycle(RIGHT_PWM, dutyCycle);
 }
@@ -157,8 +172,29 @@ void PS_RightMotorInit(void) {
 
 // Initializes the indexer motor output.
 
+
+void PS_PingInit(void){
+    HCSR04_Init();
+    TryZeroReference();
+}
+
 void PS_IndexerMotorInit(void) {
     // The standalone Indexer.X project drives the indexer on Z6 with hardware PWM.
+}
+
+// Spins up both shooter motors, then drops them to idle duty.
+
+void PS_ShooterInit(void) {
+    unsigned int delay;
+
+    PWM_AddPins(TOP_SHOOTER_PWM | BOT_SHOOTER_PWM);
+    PWM_SetDutyCycle(TOP_SHOOTER_PWM, PS_SHOOTER_START_DUTY);
+    PWM_SetDutyCycle(BOT_SHOOTER_PWM, PS_SHOOTER_START_DUTY);
+
+    DELAY_COUNTS(PS_SHOOTER_STARTUP_DELAY_COUNTS);
+
+    PWM_SetDutyCycle(TOP_SHOOTER_PWM, PS_SHOOTER_IDLE_DUTY);
+    PWM_SetDutyCycle(BOT_SHOOTER_PWM, PS_SHOOTER_IDLE_DUTY);
 }
 
 // Initializes all peashooter hardware used by motors and sensors.
@@ -174,6 +210,8 @@ void PS_Init(void) {
     PS_LeftMotorInit();
     PS_RightMotorInit();
     PS_IndexerMotorInit();
+    PS_ShooterInit();
+    PS_PingInit();
 
     // Configure switch and tape sensor pins as digital inputs.
     PORTW03_TRIS = 1;
@@ -189,68 +227,16 @@ unsigned int PS_BatteryVoltage(void) {
     return AD_ReadADPin(BAT_VOLTAGE);
 }
 
-// Sets the left motor speed and direction, with battery compensation.
-
-char PS_LeftMtrSpeed(unsigned int power) {
-    return PS_SetLeftMotor(power, 0);
-}
-
-char PS_LeftMtrReverseSpeed(unsigned int power) {
-    return PS_SetLeftMotor(power, 1);
-}
-
-// Sets the right motor speed and direction, with battery compensation.
-
-char PS_RightMtrSpeed(unsigned int power) {
-    return PS_SetRightMotor(power, 0);
-}
-
-char PS_RightMtrReverseSpeed(unsigned int power) {
-    return PS_SetRightMotor(power, 1);
-}
-
-// Sets both drive motors from a raw PWM duty cycle without battery compensation.
-
-char PS_RawMotor(unsigned int power) {
-    char leftResult;
-    char rightResult;
-
-    // Reject duty cycles beyond what the PWM driver supports.
-    if (power > MAX_PWM) {
-        return ERROR;
-    }
-
-    if (power == 0) {
-        LEFT_IN1 = 0;
-        LEFT_IN2 = 0;
-        RIGHT_IN1 = 0;
-        RIGHT_IN2 = 0;
-
-        leftResult = PWM_SetDutyCycle(LEFT_PWM, 0);
-        rightResult = PWM_SetDutyCycle(RIGHT_PWM, 0);
-        return ((leftResult == ERROR) || (rightResult == ERROR)) ? ERROR : SUCCESS;
-    }
-
-    // Raw motor mode drives both motors forward at the requested duty cycle.
-    LEFT_IN1 = 1;
-    LEFT_IN2 = 0;
-    RIGHT_IN1 = 1;
-    RIGHT_IN2 = 0;
-
-    // Use the raw command directly as PWM duty cycle.
-    leftResult = PWM_SetDutyCycle(LEFT_PWM, power);
-    rightResult = PWM_SetDutyCycle(RIGHT_PWM, power);
-    return ((leftResult == ERROR) || (rightResult == ERROR)) ? ERROR : SUCCESS;
-}
-
-// Reads the switch sensor and converts the analog value into a switch state.
-
 unsigned char PS_ReadSwitch(void) {
     return SWITCH_SENSOR ? SWITCH_NOT_TRIPPED : SWITCH_TRIPPED;
 }
 
 
-// Reads the left tape sensor with hysteresis to avoid noisy state changes.
+bool PS_IsTape(unsigned char tape)
+{
+    return (PS_ReadTape() & tape) != 0;
+}
+
 
 unsigned char PS_ReadLeftTape(void) {
     return LEFT_TAPE ? TAPE_DETECTED : TAPE_NOT_DETECTED;
@@ -270,12 +256,13 @@ unsigned char PS_ReadRightTape(void) {
 
 // Combines the three analog tape sensor states into one bit mask.
 
-unsigned char PS_ReadTape(void) {
-    // Pack left, middle, and right tape detections into bits 0, 1, and 2.
-    return (PS_ReadLeftTape()
-            + (PS_ReadMidTape() << 1)
-            + (PS_ReadRightTape() << 2));
+unsigned char PS_ReadTape(void)
+{
+    return (PS_ReadLeftTape()  << 2) |
+           (PS_ReadMidTape()   << 1) |
+            PS_ReadRightTape();
 }
+
 
 
 
@@ -295,8 +282,8 @@ char PS_Forward(unsigned int power) {
 
 char PS_Backward(unsigned int power) {
     // Command both sides with the same reverse speed.
-    PS_SetRightMotor(power, 1);
-    PS_SetLeftMotor(power, 1);
+    PS_RightMtrSpeed(power * -1);
+    PS_LeftMtrSpeed(power * -1);
 
     // Report success after issuing the motor commands.
     return SUCCESS;
@@ -308,7 +295,6 @@ char PS_Stop(void) {
     // Zero duty cycle on both motors stops the drive base.
     PS_RightMtrSpeed(0);
     PS_LeftMtrSpeed(0);
-
     // Report success after issuing the stop commands.
     return SUCCESS;
 }
@@ -359,14 +345,8 @@ char PS_TankTurnLeft(unsigned int power) {
     unsigned int delay;
 
     // Right motor forward and left motor reverse creates a left turn.
-    PS_SetRightMotor(power, 0);
-    PS_SetLeftMotor(power, 1);
-
-    // Hold the turn for the calibrated left-turn delay.
-    DELAY_COUNTS(TURN_LEFT_TIME);
-
-    // Stop both drive motors after the turn delay.
-    PS_Stop();
+    PS_RightMtrSpeed(power);
+    PS_LeftMtrSpeed(power * -1);
 
     // Report success after the turn completes.
     return SUCCESS;
@@ -377,15 +357,9 @@ char PS_TankTurnLeft(unsigned int power) {
 char PS_TankTurnRight(unsigned int power) {
     unsigned int delay;
 
-    // Right motor reverse and left motor forward creates a right turn.
-    PS_SetRightMotor(power, 1);
-    PS_SetLeftMotor(power, 0);
-
-    // Hold the turn for the calibrated right-turn delay.
-    DELAY_COUNTS(TURN_RIGHT_TIME);
-
-    // Stop both drive motors after the turn delay.
-    PS_Stop();
+    // Right motor forward and left motor reverse creates a left turn.
+    PS_RightMtrSpeed(power * -1);
+    PS_LeftMtrSpeed(power);
 
     // Report success after the turn completes.
     return SUCCESS;
@@ -397,8 +371,8 @@ char PS_TankTurnLeftDist(unsigned int power, unsigned int dist) {
     unsigned int delay;
 
     // Right motor forward and left motor reverse creates a left turn.
-    PS_SetRightMotor(power, 0);
-    PS_SetLeftMotor(power, 1);
+    PS_RightMtrSpeed(power);
+    PS_LeftMtrSpeed(power * -1);
 
     // Wait for a distance-scaled amount of time.
     for (delay = 0; delay < dist * MOVE_TIME_PER_DIST; delay++) {
@@ -418,8 +392,8 @@ char PS_TankTurnRightDist(unsigned int power, unsigned int dist) {
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
-    PS_SetRightMotor(power, 1);
-    PS_SetLeftMotor(power, 0);
+    PS_RightMtrSpeed(power * -1);
+    PS_LeftMtrSpeed(power);
 
     // Wait for a distance-scaled amount of time.
     for (delay = 0; delay < dist * MOVE_TIME_PER_DIST; delay++) {
@@ -433,42 +407,46 @@ char PS_TankTurnRightDist(unsigned int power, unsigned int dist) {
     return SUCCESS;
 }
 
+//zero is forward
+
 char PS_TankTurnLeftContinuous(unsigned int power) {
-    PS_SetRightMotor(power, 0);
-    PS_SetLeftMotor(power, 1);
+    PS_RightMtrSpeed(power);
+    PS_LeftMtrSpeed(power * -1);
 
     return SUCCESS;
 }
 
 char PS_TankTurnRightContinuous(unsigned int power) {
-    PS_SetRightMotor(power, 1);
-    PS_SetLeftMotor(power, 0);
+    PS_RightMtrSpeed(power * -1);
+    PS_LeftMtrSpeed(power);
 
     return SUCCESS;
 }
 
 // Pivots left by stopping the left wheel and driving the right wheel forward.
+
 char PS_PivotTurnLeft(unsigned int power) {
-    PS_LeftMtrSpeed(power/4);
+    PS_LeftMtrSpeed(power / 4);
     PS_RightMtrSpeed(power);
 
     return SUCCESS;
 }
 
 // Pivots right by stopping the right wheel and driving the left wheel forward.
+
 char PS_PivotTurnRight(unsigned int power) {
-    PS_RightMtrSpeed(power/4);
+    PS_RightMtrSpeed(power / 4);
     PS_LeftMtrSpeed(power);
 
     return SUCCESS;
 }
 
-char PS_TurnRight90(){
+char PS_TurnRight90() {
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
-    PS_SetRightMotor(700, 1);
-    PS_SetLeftMotor(700, 0);
+    PS_RightMtrSpeed(-700);
+    PS_LeftMtrSpeed(700);
 
     // Hold the turn for the calibrated right-turn delay.
     DELAY_COUNTS(TURN_90_TIME);
@@ -480,12 +458,12 @@ char PS_TurnRight90(){
     return SUCCESS;
 }
 
-char PS_TurnLeft90(){
+char PS_TurnLeft90() {
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
-    PS_SetRightMotor(700, 0);
-    PS_SetLeftMotor(700, 1);
+    PS_RightMtrSpeed(700);
+    PS_LeftMtrSpeed(-700);
 
     // Hold the turn for the calibrated right-turn delay.
     DELAY_COUNTS(TURN_90_TIME);
@@ -497,23 +475,26 @@ char PS_TurnLeft90(){
     return SUCCESS;
 }
 
-char PS_AngledForward(unsigned int power) {
-    unsigned int delay;
+char PS_AngledRight(unsigned int power) {
     // Left motor faster, right motor slower = slight right curve
     PS_LeftMtrSpeed(power);
-    PS_RightMtrSpeed(power-100);
-    
+    PS_RightMtrSpeed(power - 100);
+
 
     return SUCCESS;
 }
 
+bool PS_IsMoving(void){
+    return PWM_GetDutyCycle(LEFT_PWM) != 0 || PWM_GetDutyCycle(RIGHT_PWM) != 0;
 
-char PS_AngledForward2(unsigned int power) {
-    unsigned int delay;
+}
+
+char PS_AngledLeft(unsigned int power) {
     // Left motor faster, right motor slower = slight right curve
-    PS_LeftMtrSpeed(power - 100);
+    PS_LeftMtrSpeed(power - 200);
     PS_RightMtrSpeed(power);
-    
+
 
     return SUCCESS;
 }
+
