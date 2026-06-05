@@ -46,8 +46,8 @@
 #define PS_SHOOTER_STARTUP_DELAY_COUNTS 1000000
 
 // Wheel offsets
-#define LEFT_MTR_OFFSET 1
-#define RIGHT_MTR_OFFSET 1.11 //105% aka 5% higher
+#define LEFT_MTR_OFFSET 200
+#define RIGHT_MTR_OFFSET 0 //105% aka 5% higher
 
 
 #define LEFT_TAPE_BIT   0b100
@@ -83,7 +83,7 @@ static unsigned int PS_CompensateDutyForBattery(unsigned int dutyCycle) {
 
 char PS_LeftMtrSpeed(int power) {
     unsigned int dutyCycle;
-    power *= LEFT_MTR_OFFSET;
+    power -= LEFT_MTR_OFFSET;
     if (power > MAX_PWM || power < -MAX_PWM) {
         return ERROR;
     }
@@ -110,6 +110,7 @@ char PS_LeftMtrSpeed(int power) {
 
 char PS_RightMtrSpeed(int power) {
     unsigned int dutyCycle;
+    power -= RIGHT_MTR_OFFSET;
     if (power > MAX_PWM || power < -MAX_PWM) {
         return ERROR;
     }
@@ -269,7 +270,7 @@ unsigned char PS_ReadTape(void)
 
 // Drives both motors forward at the requested power.
 
-char PS_Forward(unsigned int power) {
+char PS_Forward(int power) {
     // Command both sides with the same positive speed.
     PS_RightMtrSpeed(power);
     PS_LeftMtrSpeed(power);
@@ -280,7 +281,7 @@ char PS_Forward(unsigned int power) {
 
 // Drives both motors backward at the requested power.
 
-char PS_Backward(unsigned int power) {
+char PS_Backward(int power) {
     // Command both sides with the same reverse speed.
     PS_RightMtrSpeed(power * -1);
     PS_LeftMtrSpeed(power * -1);
@@ -441,7 +442,7 @@ char PS_PivotTurnRight(unsigned int power) {
     return SUCCESS;
 }
 
-char PS_TurnRight90() {
+char PS_TurnRight90(void) {
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
@@ -458,7 +459,7 @@ char PS_TurnRight90() {
     return SUCCESS;
 }
 
-char PS_TurnLeft90() {
+char PS_TurnLeft90(void) {
     unsigned int delay;
 
     // Right motor reverse and left motor forward creates a right turn.
@@ -491,7 +492,7 @@ bool PS_IsMoving(void){
 
 char PS_AngledLeft(unsigned int power) {
     // Left motor faster, right motor slower = slight right curve
-    PS_LeftMtrSpeed(power - 200);
+    PS_LeftMtrSpeed(power - 100);
     PS_RightMtrSpeed(power);
 
 

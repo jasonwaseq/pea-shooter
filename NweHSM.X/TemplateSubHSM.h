@@ -61,6 +61,7 @@ uint8_t InitAlignTapeSubHSM(void);
 uint8_t InitLocateCornerSubHSM(void);
 uint8_t InitFollowEdgeSubHSM(void);
 uint8_t InitLauncherSubHSM(void);
+uint8_t InitSTOPSTATEubHSM(void);
 /**
  * @Function RunTemplateSubHSM(ES_Event ThisEvent)
  * @param ThisEvent - the event (type and param) to be responded.
@@ -85,5 +86,6 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent);
 ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent);
 ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent);
 ES_Event RunLauncherSubHSM(ES_Event ThisEvent);
+ES_Event RunSTOPSTATESubHSM(ES_Event ThisEvent);
 #endif /* SUB_HSM_Template_H */
 

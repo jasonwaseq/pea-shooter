@@ -149,7 +149,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  TemplateCheckBattery, TemplateCheckSwitch, TemplateCheckTape, TemplateCheckPing
+#define EVENT_CHECK_LIST  TemplateCheckBattery, TemplateCheckSwitch, TemplateCheckTape, TemplateCheckPing//, TemplateCheckBeacon
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -163,7 +163,7 @@ static const char *EventNames[] = {
 #define HSM_ROTATION_TIMER 0
 #define LOCATECORNER_TURNRIGHT_TIMER 0
 #define FOLLOWEDGE_TURNRIGHT_TIMER 0
-#define TIMER7_RESP_FUNC TIMER_UNUSED
+#define CORRECT_TIMER 0
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
@@ -218,7 +218,7 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_1_RUN RunTemplateHSM
 // How big should this services Queue be?
-#define SERV_1_QUEUE_SIZE 3
+#define SERV_1_QUEUE_SIZE 16
 #endif
 
 // These are the definitions for Service 2

@@ -45,8 +45,6 @@
 
 #define HSM_FULL_ROTATION_TIME_MS 5000
 #define HSM_LOCK_ON_START_DELAY_MS 250
-#define HSM_ON_FIELD_BACKUP_TIME_MS 500
-#define HSM_ON_FIELD_STOP_DELAY_MS 250
 #define HSM_BEACON_AVG_WINDOW 8
 #define HSM_BEACON_LOCK_OFFSET 10
 
@@ -58,6 +56,7 @@
 #define FOLLOWTAPE_ANGLEDLEFT_POWER 800
 #define FOLLOWTAPE_ANGLEDRIGHT_POWER 800
 #define FOLLOWTAPE_FORWARD_POWER 800
+#define FOLLOWTAPE_CORRECT_TIME 500
 
 #define LOCATECORNER_TURNRIGHT_POWER 600
 #define LOCATECORNER_TURNRIGHT_TIME 1500
@@ -73,10 +72,10 @@
 #define AVOIDOBSTACLE_BACKWARDDIST_POWER 700
 #define AVOIDOBSTACLE_PIVOT_POWER 700
 
-#define AVOIDOBSTACLE_BACKWARD_TIME 600
-#define AVOIDOBSTACLE_TURNRIGHT_TIME 1500
-#define PING_CLEARANCE_TIME 700
-#define OBSTACLE_SIDE_CLEARANCE_TIME 800
+#define AVOIDOBSTACLE_BACKWARD_TIME 250
+#define AVOIDOBSTACLE_TURNRIGHT_TIME 1150
+#define PING_CLEARANCE_TIME 300
+#define OBSTACLE_SIDE_CLEARANCE_TIME 1000
 
 //big ones
 
@@ -126,7 +125,6 @@ typedef enum {
     FindBeaconSubHSM_Init,
     SweepDataState,
     LockOnState,
-    OnFieldState,
 } FindBeaconSubHSMState_t;
 
 typedef enum {
@@ -154,7 +152,6 @@ static void StartLockOnTurn(void);
 static void StartNextLockOnRotation(void);
 static void ResetBeaconFilter(void);
 static uint16_t FilterBeaconSample(uint16_t sample);
-static void DriveBackward(void);
 
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
@@ -169,7 +166,6 @@ static uint16_t MaxFilteredBeaconValue;
 static uint16_t BeaconLockThreshold;
 static uint8_t LockOnTurnStarted;
 static uint16_t LockOnRotationMax;
-static uint8_t OnFieldStopped;
 static uint8_t TapeEventsEnabled;
 
 /* You will need MyPriority and the state variable; you may need others as well.
@@ -330,7 +326,13 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
             }
             break;
         case LocateCorner_AlignTape:
-            ThisEvent = RunAlignTapeSubHSM(ThisEvent);
+            if (ThisEvent.EventType == ES_ENTRY) {
+                printf("RunLocateCornerSubHSM: LocateCorner_AlignTape: ES_ENTRY\r\n");
+                InitAlignTapeSubHSM();
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else {
+                ThisEvent = RunAlignTapeSubHSM(ThisEvent);
+            }
             switch (ThisEvent.EventType) {
                 case ALL_TAPE_DETECTED:
                     printf("RunLocateCornerSubHSM: LocateCorner_AlignTape: ALL_TAPE_DETECTED\r\n");
@@ -363,7 +365,13 @@ ES_Event RunLocateCornerSubHSM(ES_Event ThisEvent) {
             }
             break;
         case LocateCorner_FollowTape:
-            ThisEvent = RunFollowTapeSubHSM(ThisEvent);
+            if (ThisEvent.EventType == ES_ENTRY) {
+                printf("RunLocateCornerSubHSM: LocateCorner_FollowTape: ES_ENTRY\r\n");
+                InitFollowTapeSubHSM();
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else {
+                ThisEvent = RunFollowTapeSubHSM(ThisEvent);
+            }
             switch (ThisEvent.EventType) {
                 default:
                     break;
@@ -392,7 +400,8 @@ ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent) {
         case FollowEdgeSubHSM_Init:
             if (ThisEvent.EventType == ES_INIT) {
                 printf("RunFollowEdgeSubHSM: FollowEdgeSubHSM_Init: ES_INIT\r\n");
-                nextState = FollowEdge_TurnRight;
+                //    nextState = FollowEdge_TurnRight;
+                nextState = FollowEdge_FollowTape;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -429,6 +438,8 @@ ES_Event RunFollowEdgeSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case BUMPER_TRIPPED:
                     printf("RunFollowEdgeSubHSM: FollowEdge_FollowTape: BUMPER_TRIPPED\r\n");
+                    PS_Stop();
+                    while(1){}
                     nextState = FollowEdge_AvoidObstacle;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -548,7 +559,7 @@ ES_Event RunLauncherSubHSM(ES_Event ThisEvent) {
 
 
 
-#define ALIGNTAPE_FORWARD_POWER 600
+#define ALIGNTAPE_FORWARD_POWER 700
 #define ALIGNTAPE_PIVOTRIGHT_POWER 600
 #define ALIGNTAPE_PIVOTLEFT_POWER 600
 
@@ -572,6 +583,7 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
 
         case AlignTape_Forward:
             switch (ThisEvent.EventType) {
+
                 case ES_ENTRY:
                     printf("RunAlignTapeSubHSM: AlignTape_Forward: ES_ENTRY\r\n");
                     PS_Forward(ALIGNTAPE_FORWARD_POWER);
@@ -663,7 +675,6 @@ ES_Event RunAlignTapeSubHSM(ES_Event ThisEvent) {
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 
-
 ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE;
     FollowTapeSubHSMState_t nextState = FollowTapeSubHSMCurrentState;
@@ -685,15 +696,15 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
                     PS_Forward(FOLLOWTAPE_FORWARD_POWER);
                     break;
 
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunFollowTapeSubHSM: FollowTape_Forward: MIDDLE_TAPE_DETECTED\r\n");
+                case NO_TAPES_DETECTED:
+                    printf("RunFollowTapeSubHSM: FollowTape_Forward: NO_TAPES_DETECTED\r\n");
                     nextState = FollowTape_CorrectLeft;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
 
-                case NO_TAPES_DETECTED:
-                    printf("RunFollowTapeSubHSM: FollowTape_Forward: NO_TAPES_DETECTED\r\n");
+                case MIDDLE_TAPE_DETECTED:
+                    printf("RunFollowTapeSubHSM: FollowTape_Forward: MIDDLE_TAPE_DETECTED\r\n");
                     nextState = FollowTape_CorrectRight;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -708,13 +719,18 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("RunFollowTapeSubHSM: FollowTape_CorrectLeft: ES_ENTRY\r\n");
-                    PS_AngledLeft(FOLLOWTAPE_ANGLEDLEFT_POWER);
+                    PS_PivotTurnLeft(FOLLOWTAPE_ANGLEDLEFT_POWER);
+                    ES_Timer_InitTimer(CORRECT_TIMER, FOLLOWTAPE_CORRECT_TIME);
                     break;
-                case NO_TAPES_DETECTED:
-                    printf("RunFollowTapeSubHSM: FollowTape_CorrectLeft: tape lost, returning forward\r\n");
-                    nextState = FollowTape_CorrectRight;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+
+                case ES_TIMEOUT:
+                    printf("RunFollowTapeSubHSM: FollowTape_CorrectLeft: ES_TIMEOUT\r\n");
+                    if (ThisEvent.EventParam == CORRECT_TIMER) {
+                        PS_Stop();
+                        nextState = FollowTape_Forward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
 
                 default:
@@ -726,14 +742,18 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("RunFollowTapeSubHSM: FollowTape_CorrectRight: ES_ENTRY\r\n");
-                    PS_AngledRight(FOLLOWTAPE_ANGLEDRIGHT_POWER);
+                    PS_PivotTurnRight(FOLLOWTAPE_ANGLEDRIGHT_POWER);
+                    ES_Timer_InitTimer(CORRECT_TIMER, FOLLOWTAPE_CORRECT_TIME);
                     break;
 
-                case MIDDLE_TAPE_DETECTED:
-                    printf("RunFollowTapeSubHSM: FollowTape_CorrectRight: MIDDLE_TAPE_DETECTED\r\n");
-                    nextState = FollowTape_CorrectLeft;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+                case ES_TIMEOUT:
+                    printf("RunFollowTapeSubHSM: FollowTape_CorrectRight: ES_TIMEOUT\r\n");
+                    if (ThisEvent.EventParam == CORRECT_TIMER) {
+                        PS_Stop();
+                        nextState = FollowTape_Forward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                     break;
 
                 default:
@@ -753,6 +773,10 @@ ES_Event RunFollowTapeSubHSM(ES_Event ThisEvent) {
 
     return ThisEvent;
 }
+
+
+
+
 
 
 ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
@@ -796,6 +820,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_Backward: ES_TIMEOUT\r\n");
                     if (ThisEvent.EventParam == AVOIDOBSTACLE_BACKWARD_TIMER) {
                         PS_Stop();
+
                         nextState = AvoidObstacle_TurnRight;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -816,7 +841,9 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight: ES_TIMEOUT\r\n");
                     if (ThisEvent.EventParam == AVOIDOBSTACLE_TURNRIGHT_TIMER) {
                         PS_Stop();
-                        //zero
+                        TemplateResetPingReference();
+                        //zero here
+
                         nextState = AvoidObstacle_PassFront;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -835,6 +862,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case PING_FAR:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassFront: PING_FAR\r\n");
                     PS_Stop();
+
                     PS_Forward(AVOIDOBSTACLE_FORWARD_POWER);
                     ES_Timer_InitTimer(PING_CLEARANCE, PING_CLEARANCE_TIME);
                     break;
@@ -843,6 +871,7 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     if (ThisEvent.EventParam == PING_CLEARANCE) {
                         PS_Stop();
                         //zero
+
                         nextState = AvoidObstacle_TurnRight2;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -856,14 +885,17 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight2: ES_ENTRY\r\n");
-                    PS_TankTurnRight(AVOIDOBSTACLE_TURNRIGHT_POWER);
+                    PS_TankTurnLeft(AVOIDOBSTACLE_TURNRIGHT_POWER);
                     ES_Timer_InitTimer(AVOIDOBSTACLE_TURNRIGHT_TIMER, AVOIDOBSTACLE_TURNRIGHT_TIME);
                     break;
                 case ES_TIMEOUT:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_TurnRight2: ES_TIMEOUT\r\n");
                     if (ThisEvent.EventParam == AVOIDOBSTACLE_TURNRIGHT_TIMER) {
                         PS_Stop();
+                        while (1) {
+                        };
                         //zero
+
                         nextState = AvoidObstacle_PassSide;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -879,11 +911,6 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassSide: ES_ENTRY\r\n");
                     PS_Forward(AVOIDOBSTACLE_FORWARD_POWER);
-                    break;
-                case PING_FAR:
-                    printf("RunAvoidObstacleSubHSM: AvoidObstacle_PassSide: PING_FAR\r\n");
-                    PS_Stop();
-                    PS_Forward(AVOIDOBSTACLE_FORWARD_POWER);
                     ES_Timer_InitTimer(OBSTACLE_SIDE_CLEARANCE, OBSTACLE_SIDE_CLEARANCE_TIME);
                     break;
                 case ES_TIMEOUT:
@@ -891,6 +918,9 @@ ES_Event RunAvoidObstacleSubHSM(ES_Event ThisEvent) {
                     if (ThisEvent.EventParam == OBSTACLE_SIDE_CLEARANCE) {
                         PS_Stop();
                         //zero
+                        PS_Stop();
+                        while (1) {
+                        };
                         nextState = AvoidObstacle_TurnLeft;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -1016,41 +1046,12 @@ ES_Event RunFindBeaconSubHSM(ES_Event ThisEvent) {
 
                         if (filteredValue >= BeaconLockThreshold) {
                             PS_Stop();
+                            printf("RunFindBeaconSubHSM: LockOnState: locked adc=%u threshold=%u\r\n",
+                                    filteredValue,
+                                    BeaconLockThreshold);
                             TapeEventsEnabled = TRUE;
-
                             ThisEvent.EventType = BEACON_LOCKED;
                             ThisEvent.EventParam = filteredValue;
-                        } else {
-                            ThisEvent.EventType = ES_NO_EVENT;
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-
-        case OnFieldState:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    printf("RunFindBeaconSubHSM: OnFieldState: ES_ENTRY\r\n");
-                    OnFieldStopped = FALSE;
-                    DriveBackward();
-                    ES_Timer_InitTimer(HSM_ROTATION_TIMER,
-                            HSM_ON_FIELD_BACKUP_TIME_MS);
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-
-                case ES_TIMEOUT:
-                    printf("RunFindBeaconSubHSM: OnFieldState: ES_TIMEOUT\r\n");
-                    if (ThisEvent.EventParam == HSM_ROTATION_TIMER) {
-                        if (OnFieldStopped == FALSE) {
-                            PS_Stop();
-                            OnFieldStopped = TRUE;
-                            ES_Timer_InitTimer(HSM_ROTATION_TIMER,
-                                    HSM_ON_FIELD_STOP_DELAY_MS);
-                            ThisEvent.EventType = ES_NO_EVENT;
                         } else {
                             ThisEvent.EventType = ES_NO_EVENT;
                         }
@@ -1211,8 +1212,4 @@ static uint16_t FilterBeaconSample(uint16_t sample) {
     }
 
     return (uint16_t) (BeaconSampleSum / BeaconSampleCount);
-}
-
-static void DriveBackward(void) {
-    PS_Backward(HSM_DRIVE_POWER);
 }

@@ -55,8 +55,8 @@ char PS_LeftMtrSpeed(int power);
 char PS_RightMtrSpeed(int power);
 
 // Movement.
-char PS_Forward(unsigned int power);
-char PS_Backward(unsigned int power);
+char PS_Forward(int power);
+char PS_Backward(int power);
 char PS_Stop(void);
 
 char PS_ForwardDist(unsigned int power, char dist);

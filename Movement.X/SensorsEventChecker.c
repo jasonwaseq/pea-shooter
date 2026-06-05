@@ -8,6 +8,7 @@
 #include "ES_Events.h"
 #include "serial.h"
 #include "AD.h"
+#include "BeaconEventChecker.h"
 #include "peashooter.h"
 #include "TemplateHSM.h"
 #include "ping.c"
@@ -278,6 +279,39 @@ uint8_t TemplateCheckTape(void) {
     return returnVal;
 }
 
+uint8_t TemplateCheckBeacon(void) {
+    static uint8_t initialized = FALSE;
+    ES_Event thisEvent;
+    uint16_t beaconReading;
+
+    if (initialized == FALSE) {
+        if (InitBeaconEventChecker() != TRUE) {
+            return FALSE;
+        }
+        initialized = TRUE;
+    }
+
+    if (AD_IsNewDataReady() != TRUE) {
+        return FALSE;
+    }
+
+    beaconReading = AD_ReadADPin(BEACON_1_DETECTOR_AD_PIN);
+    if (beaconReading == (uint16_t) ERROR) {
+        return FALSE;
+    }
+
+    thisEvent.EventType = BEACON_SAMPLE_READY;
+    thisEvent.EventParam = beaconReading;
+
+#if !defined(EVENTCHECKER_TEST) && !defined(MOVEMENT_TEST)
+    PostTemplateHSM(thisEvent);
+#else
+    SaveEvent(thisEvent);
+#endif
+
+    return TRUE;
+}
+
 uint8_t TemplateCheckPing(void) {
     static uint8_t ping_close = FALSE;
     static uint8_t ping_far = FALSE;
@@ -348,6 +382,13 @@ uint8_t TemplateCheckPing(void) {
     return returnVal;
 }
 
+void TemplateResetPingReference(void) {
+    ReferenceValid = FALSE;
+    LastReadingValid = FALSE;
+    DistanceFilter_Reset(&DistanceAverage);
+    TryZeroReference();
+}
+
 
 
 
@@ -405,7 +446,7 @@ void PrintEvent(void) {
 #ifdef MOVING_TEST
 
 #include <stdio.h>
-#define MOVING_TEST_ONE_SECOND 1000000
+#define MOVING_TEST_ONE_SECOND 1000000u
 
 void main(void) {
     unsigned int delay;
@@ -415,9 +456,10 @@ void main(void) {
     PS_Init();
 
     printf("Testing Moving Functions\n");
-
+    int power = 900;
     while (1) {
-        PS_AngledLeft(700);
+
+        PS_Forward(power);
     }
 }
 

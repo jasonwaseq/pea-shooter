@@ -117,102 +117,102 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/_ext/1360937237/BOARD.o: ../src/BOARD.c  .generated_files/flags/default/fbed955767ed434bd3f358b2aa88e10987173bf1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/BOARD.o: ../src/BOARD.c  .generated_files/flags/default/79d46c12f7efbdaaa665dbf6a8d5644814b69d47 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/BOARD.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/BOARD.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/BOARD.o.d" -o ${OBJECTDIR}/_ext/1360937237/BOARD.o ../src/BOARD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/BOARD.o.d" -o ${OBJECTDIR}/_ext/1360937237/BOARD.o ../src/BOARD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/roach.o: ../src/roach.c  .generated_files/flags/default/f09a313d1632183311b82fb86c243220f966a9ca .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/roach.o: ../src/roach.c  .generated_files/flags/default/229b505dc79571ab2e5884b637d2b8d7dfd2bb0f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/roach.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/roach.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/roach.o.d" -o ${OBJECTDIR}/_ext/1360937237/roach.o ../src/roach.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/roach.o.d" -o ${OBJECTDIR}/_ext/1360937237/roach.o ../src/roach.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/serial.o: ../src/serial.c  .generated_files/flags/default/e130714eb74a3f12f7e970b7337d34de41e13eb2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/serial.o: ../src/serial.c  .generated_files/flags/default/e24dd91bf07501030ab36931ff4882f828a40ed5 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/serial.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/serial.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/serial.o.d" -o ${OBJECTDIR}/_ext/1360937237/serial.o ../src/serial.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/serial.o.d" -o ${OBJECTDIR}/_ext/1360937237/serial.o ../src/serial.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/88fae4610cf4ec1fb0a8898d548dafcb99c5fe8a .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/7c8cb7b7774216a2dfc2f4f29562755fb1cb7633 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/AD.o: ../src/AD.c  .generated_files/flags/default/dafcc1c137371594457dde8a08d07504333131ef .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/AD.o: ../src/AD.c  .generated_files/flags/default/591a9767fb66c0e2cf8d4ff603128f59ad5b6cca .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/AD.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/AD.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/AD.o.d" -o ${OBJECTDIR}/_ext/1360937237/AD.o ../src/AD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/AD.o.d" -o ${OBJECTDIR}/_ext/1360937237/AD.o ../src/AD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/pwm.o: ../src/pwm.c  .generated_files/flags/default/d36ca10d635f428e8c8df23b6eba32101bea33fe .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/pwm.o: ../src/pwm.c  .generated_files/flags/default/31531410b659cf8588ba1e2188915121914950d2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/pwm.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/pwm.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/pwm.o.d" -o ${OBJECTDIR}/_ext/1360937237/pwm.o ../src/pwm.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/pwm.o.d" -o ${OBJECTDIR}/_ext/1360937237/pwm.o ../src/pwm.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/peashooter.o: peashooter.c  .generated_files/flags/default/aa70ab23da4438a335de8abdc57dda3b23b8520 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/peashooter.o: peashooter.c  .generated_files/flags/default/a7d55a45737399b2fd008cbd83f296215eecdd6e .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/peashooter.o.d 
 	@${RM} ${OBJECTDIR}/peashooter.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/peashooter.o.d" -o ${OBJECTDIR}/peashooter.o peashooter.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/peashooter.o.d" -o ${OBJECTDIR}/peashooter.o peashooter.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/SensorsEventChecker.o: SensorsEventChecker.c  .generated_files/flags/default/6355e7c5368f4e6ff42d5ff27bcc06657a194821 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/SensorsEventChecker.o: SensorsEventChecker.c  .generated_files/flags/default/be9c836c50191f8731e55c337bd58ba7aac3572f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/SensorsEventChecker.o.d 
 	@${RM} ${OBJECTDIR}/SensorsEventChecker.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/SensorsEventChecker.o.d" -o ${OBJECTDIR}/SensorsEventChecker.o SensorsEventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/SensorsEventChecker.o.d" -o ${OBJECTDIR}/SensorsEventChecker.o SensorsEventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 else
-${OBJECTDIR}/_ext/1360937237/BOARD.o: ../src/BOARD.c  .generated_files/flags/default/bb36a1be11759b2166c3d64a9a8b7eb9062511ca .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/BOARD.o: ../src/BOARD.c  .generated_files/flags/default/71da440c60a78422629d82c17247a60c41a9353d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/BOARD.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/BOARD.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/BOARD.o.d" -o ${OBJECTDIR}/_ext/1360937237/BOARD.o ../src/BOARD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/BOARD.o.d" -o ${OBJECTDIR}/_ext/1360937237/BOARD.o ../src/BOARD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/roach.o: ../src/roach.c  .generated_files/flags/default/972b95a5002299908ab368f69bc431d9d144e8de .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/roach.o: ../src/roach.c  .generated_files/flags/default/ccde168908a84af32ae27329f9976ff0e49a70b1 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/roach.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/roach.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/roach.o.d" -o ${OBJECTDIR}/_ext/1360937237/roach.o ../src/roach.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/roach.o.d" -o ${OBJECTDIR}/_ext/1360937237/roach.o ../src/roach.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/serial.o: ../src/serial.c  .generated_files/flags/default/6c549a80f837b143ca6d0138af8cc6d142f587b9 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/serial.o: ../src/serial.c  .generated_files/flags/default/3f80390b2da39b0cefe294a5cd4e80dced73c102 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/serial.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/serial.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/serial.o.d" -o ${OBJECTDIR}/_ext/1360937237/serial.o ../src/serial.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/serial.o.d" -o ${OBJECTDIR}/_ext/1360937237/serial.o ../src/serial.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/d07bd509f3de30c059d6fbed18de06776cca8f2d .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/main.o: main.c  .generated_files/flags/default/c7c412cf9c8586f7b6a4d9bad997bcf4a5fdb1c2 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/AD.o: ../src/AD.c  .generated_files/flags/default/c2552e642f9f9101600f9ac902b2086ae9d05507 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/AD.o: ../src/AD.c  .generated_files/flags/default/3da2c6ca4028e15246b38ffa5adc59028b0cfddb .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/AD.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/AD.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/AD.o.d" -o ${OBJECTDIR}/_ext/1360937237/AD.o ../src/AD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/AD.o.d" -o ${OBJECTDIR}/_ext/1360937237/AD.o ../src/AD.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1360937237/pwm.o: ../src/pwm.c  .generated_files/flags/default/91e55415938c64848a3efcf57035b1705f1b2285 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/_ext/1360937237/pwm.o: ../src/pwm.c  .generated_files/flags/default/6adc76aafe48a7225e426df70dd53482ce6c9774 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/pwm.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/pwm.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/pwm.o.d" -o ${OBJECTDIR}/_ext/1360937237/pwm.o ../src/pwm.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1360937237/pwm.o.d" -o ${OBJECTDIR}/_ext/1360937237/pwm.o ../src/pwm.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/peashooter.o: peashooter.c  .generated_files/flags/default/fcf3fd36d33ffbf8f7ec36ff399e742e5b9d6544 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/peashooter.o: peashooter.c  .generated_files/flags/default/2b1a7e13113931ec1147ac3894b8601d89419818 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/peashooter.o.d 
 	@${RM} ${OBJECTDIR}/peashooter.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/peashooter.o.d" -o ${OBJECTDIR}/peashooter.o peashooter.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/peashooter.o.d" -o ${OBJECTDIR}/peashooter.o peashooter.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/SensorsEventChecker.o: SensorsEventChecker.c  .generated_files/flags/default/b91c3a9a01d3603eeefad44586d2461fc48c8ebd .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+${OBJECTDIR}/SensorsEventChecker.o: SensorsEventChecker.c  .generated_files/flags/default/129063c653e0db7852222d280794e275ea044e7f .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/SensorsEventChecker.o.d 
 	@${RM} ${OBJECTDIR}/SensorsEventChecker.o 
-	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DRUN_HSM -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/SensorsEventChecker.o.d" -o ${OBJECTDIR}/SensorsEventChecker.o SensorsEventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -DMOVING_TEST -I"../include" -I"../src" -I"C:/Users/asus/Documents/ece118/pea-shooter/Movement.X" -I"../HSM.X" -I"../BeaconDetector.X" -I"../HSM.X" -MP -MMD -MF "${OBJECTDIR}/SensorsEventChecker.o.d" -o ${OBJECTDIR}/SensorsEventChecker.o SensorsEventChecker.c    -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 endif
 

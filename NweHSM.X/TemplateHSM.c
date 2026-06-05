@@ -16,6 +16,7 @@ typedef enum {
     LocateCorner,
     FollowEdge,
     Launcher,
+    STOP,
 } TemplateHSMState_t;
 
 static TemplateHSMState_t CurrentState = Init;
@@ -47,7 +48,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_INIT) {
                 printf("RunTemplateHSM: Init: ES_INIT\r\n");
 
-                nextState = LocateCorner;
+                nextState = FollowEdge;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -115,7 +116,7 @@ ES_Event RunTemplateHSM(ES_Event ThisEvent) {
 
                         case TAPE_ARRAY_CHANGED:
                             if (ThisEvent.EventParam == ALL_TAPES) {
-                                nextState = Launcher;
+                               nextState = STOP;
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                             }
