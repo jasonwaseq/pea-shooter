@@ -16,6 +16,22 @@ foreach(source_file ${MinSpecHSM_default_default_XC32_FILE_TYPE_assembleWithPrep
 endforeach()
 
 set(MinSpecHSM_default_default_XC32_FILE_TYPE_compile
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/AD.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/BOARD.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_CheckEvents.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_Framework.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_KeyboardInput.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_PostList.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_Queue.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_TattleTale.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/ES_Timers.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/IO_Ports.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/LED.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/RC_Servo.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/pwm.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/roach.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/serial.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../src/timers.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../HSMFiles/AlignSubHSM.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../HSMFiles/AvoidSubHSM.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../HSMFiles/ES_Main.c"

@@ -44,6 +44,182 @@ cmake_ninja_workdir = /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/MinS
 
 build cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile: phony || .
 
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/AD.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/AD.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/AD.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/BOARD.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/BOARD.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/BOARD.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_CheckEvents.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_CheckEvents.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_CheckEvents.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Framework.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_Framework.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Framework.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_KeyboardInput.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_KeyboardInput.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_KeyboardInput.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_PostList.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_PostList.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_PostList.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Queue.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_Queue.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Queue.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_TattleTale.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_TattleTale.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_TattleTale.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Timers.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/ES_Timers.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Timers.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/IO_Ports.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/IO_Ports.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/IO_Ports.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/LED.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/LED.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/LED.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/RC_Servo.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/RC_Servo.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/RC_Servo.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/pwm.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/pwm.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/pwm.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/roach.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/roach.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/roach.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/serial.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/serial.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/serial.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
+build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/timers.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/src/timers.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
+  DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
+  DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/timers.c.o.d
+  FLAGS = -x c -fdiagnostics-color=always -g -x c -c -mprocessor=32MX320F128H -ffunction-sections -fdata-sections -O1 -fno-common -Werror -Wall -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
+  INCLUDES = -I"/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../.."
+  OBJECT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src
+  TARGET_COMPILE_PDB = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir
+
 build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o: C_COMPILER__MinSpecHSM_default_default_XC32_compile_unscanned_ /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c || cmake_object_order_depends_target_MinSpecHSM_default_default_XC32_compile
   DEFINES = -DXPRJ_default=default -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1
   DEP_FILE = CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o.d
@@ -137,7 +313,7 @@ build CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/
 #############################################
 # Object library MinSpecHSM_default_default_XC32_compile
 
-build MinSpecHSM_default_default_XC32_compile: phony CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o
+build MinSpecHSM_default_default_XC32_compile: phony CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/AD.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/BOARD.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_CheckEvents.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Framework.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_KeyboardInput.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_PostList.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Queue.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_TattleTale.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Timers.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/IO_Ports.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/LED.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/RC_Servo.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/pwm.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/roach.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/serial.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/timers.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o
 
 # =============================================================================
 # Object build statements for EXECUTABLE target MinSpecHSM_default_image_mUN63ejm
@@ -156,7 +332,7 @@ build cmake_object_order_depends_target_MinSpecHSM_default_image_mUN63ejm: phony
 #############################################
 # Link the executable /Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/out/MinSpecHSM/default.elf
 
-build /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/MinSpecHSM.X/out/MinSpecHSM/default.elf: C_EXECUTABLE_LINKER__MinSpecHSM_default_image_mUN63ejm_ CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o || MinSpecHSM_default_default_XC32_compile
+build /Users/feet/Desktop/ECE118/Final$ Project/pea-shooter/MinSpecHSM.X/out/MinSpecHSM/default.elf: C_EXECUTABLE_LINKER__MinSpecHSM_default_image_mUN63ejm_ CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/AD.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/BOARD.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_CheckEvents.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Framework.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_KeyboardInput.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_PostList.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Queue.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_TattleTale.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/ES_Timers.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/IO_Ports.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/LED.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/RC_Servo.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/pwm.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/roach.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/serial.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/src/timers.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AlignSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/AvoidSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ES_Main.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/FollowTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/ISZFinderSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LaunchSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/LocateTapeSubHSM.c.o CMakeFiles/MinSpecHSM_default_default_XC32_compile.dir/Users/feet/Desktop/ECE118/Final_Project/pea-shooter/MinSpecHSM.X/HSMFiles/MainHSM.c.o || MinSpecHSM_default_default_XC32_compile
   LINK_FLAGS = -g -mdebugger -mprocessor=32MX320F128H "-Wl,--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=_min_heap_size=0,--gc-sections,--no-code-in-dinit,--no-dinit-in-serial-mem,-L/Users/feet/Desktop/ECE118/Final Project/pea-shooter/MinSpecHSM.X/cmake/MinSpecHSM/default/../../..,-Map=mem.map,--memorysummary,memoryfile.xml" -mdfp=/Users/feet/.mchp_packs/Microchip/PIC32MX_DFP/1.5.259
   OBJECT_DIR = CMakeFiles/MinSpecHSM_default_image_mUN63ejm.dir
   POST_BUILD = :
