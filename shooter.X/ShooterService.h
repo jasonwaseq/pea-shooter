@@ -78,11 +78,11 @@
 #endif
 
 #ifndef UPPER_SHOOTER_DUTY
-#define UPPER_SHOOTER_DUTY 700
+#define UPPER_SHOOTER_DUTY 850
 #endif
 
 #ifndef LOWER_SHOOTER_DUTY_CYCLE
-#define LOWER_SHOOTER_DUTY_CYCLE 700
+#define LOWER_SHOOTER_DUTY_CYCLE 350
 #endif
 
 #ifndef INDEXER_PWM_PIN
@@ -102,11 +102,11 @@
 #endif
 
 #ifndef INDEXER_RUN_DUTY
-#define INDEXER_RUN_DUTY 500
+#define INDEXER_RUN_DUTY 450
 #endif
 
 #ifndef INDEXER_STARTUP_TIME_MS
-#define INDEXER_STARTUP_TIME_MS 500
+#define INDEXER_STARTUP_TIME_MS 1000
 #endif
 
 uint8_t InitShooterService(uint8_t priority);

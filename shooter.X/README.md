@@ -7,12 +7,12 @@ Default firmware behavior:
 
 - Upper shooter motor auto-start: enabled
 - Upper shooter output: drives `RPWM`/`PortY-04` with `R_EN`/`PortX-03`
-- Upper shooter duty cycle: `700 / 1000`, or 70.0%
+- Upper shooter duty cycle: `850 / 1000`, or 85.0%
 - Lower shooter output: drives `LPWM`/`PortX-11` with `L_EN`/`PortX-04`
-- Lower shooter duty cycle: `700 / 1000`, or 70.0%
+- Lower shooter duty cycle: `350 / 1000`, or 35.0%
 - Indexer output: drives `PWM`/`PortZ-06`
-- Indexer startup duty cycle: `1000 / 1000`, or 100.0%, for `500 ms`
-- Indexer running duty cycle: `500 / 1000`, or 50.0%
+- Indexer startup duty cycle: `1000 / 1000`, or 100.0%, for `1 second`
+- Indexer running duty cycle: `450 / 1000`, or 45.0%
 - Hardware PWM frequency: `PWM_1KHZ`
 
 ## Wiring
@@ -48,13 +48,16 @@ Important notes:
   `PWM_PORTX11`.
 
 With the default code, the upper and lower shooter outputs start at the fixed
-duty cycle after initialization. The indexer starts at full PWM duty for 500 ms,
-then drops to 50% duty and stays there.
+duty cycle after initialization. The indexer starts at full PWM duty for 1 second,
+then drops to 45% duty and stays there.
 
 When the upper shooter is started, the service drives `RPWM` and enables
 `R_EN`. The lower shooter uses only `LPWM` and `L_EN`. `PortZ-06` drives the
 indexer.
 
 Beacon detector ADC logic is intentionally kept in `BeaconDetector.X`.
+
+The indexer behavior above is part of this `shooter.X` firmware; no separate
+`Indexer.X` firmware is needed for the shooter/indexer startup sequence.
 
 To change the shooter PWM pins or duty cycles, edit `ShooterService.h`.

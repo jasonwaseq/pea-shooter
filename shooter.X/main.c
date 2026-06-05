@@ -10,7 +10,7 @@
 #include "pwm.h"
 #include "ShooterService.h"
 
-#define CORE_TIMER_500MS_TICKS 20000000UL
+#define CORE_TIMER_1S_TICKS 40000000UL
 
 static unsigned int ReadCoreTimer(void)
 {
@@ -78,7 +78,7 @@ int main(void)
     PWM_SetDutyCycle(INDEXER_PWM_PIN,
             INDEXER_STARTUP_DUTY);
 
-    WaitCoreTimerTicks(CORE_TIMER_500MS_TICKS);
+    WaitCoreTimerTicks(CORE_TIMER_1S_TICKS);
 
     PWM_SetDutyCycle(INDEXER_PWM_PIN,
             INDEXER_RUN_DUTY);
